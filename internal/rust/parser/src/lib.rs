@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+use std::ffi::CStr;
 use std::ffi::CString;
+use std::os::raw::c_char;
 use std::str;
 
 use ast::*;
@@ -18,15 +20,29 @@ pub fn parse(s: &str) -> JsValue {
     return JsValue::from_serde(&file).unwrap();
 }
 
-// TODO uncomment when we get back to the Go build side.
-//#[no_mangle]
-//pub fn go_parse(s: *const c_char) {
-//    let buf = unsafe {
-//        CStr::from_ptr(s).to_bytes()
-//    };
-//    let str = String::from_utf8(buf.to_vec()).unwrap();
-//    println!("Parse in Rust {}", str);
-//}
+#[no_mangle]
+pub fn go_parse(s: *const c_char) -> *const c_char {
+    let input = unsafe { CStr::from_ptr(s).to_str().unwrap() };
+    let mut parser = Parser::new(input);
+    let file = parser.parse_file(String::from("go"));
+
+    let json_str = match serde_json::to_string(&file) {
+        Ok(json) => json,
+        Err(e) => format!("{}", e),
+    };
+    CString::new(json_str).unwrap().into_raw()
+}
+
+#[no_mangle]
+pub fn go_drop_string(s: *mut c_char) {
+    unsafe {
+        // Transfer to an owned string that will be dropped
+        CString::from_raw(s);
+    };
+}
+
+#[no_mangle]
+pub fn go_do_nothing(_s: *mut char) {}
 
 fn format_token(t: T) -> &'static str {
     match t {

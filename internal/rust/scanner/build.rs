@@ -33,6 +33,7 @@ fn main() {
         .args(&[
             "-C",
             "-o",
+            "-G2",
             out_path.join("scanner.c").to_str().unwrap(),
             "src/scanner.rl",
         ])
