@@ -42,6 +42,25 @@ pub fn go_drop_string(s: *mut c_char) {
 }
 
 #[no_mangle]
+pub fn go_parse_no_serialize(s: *const c_char) -> *mut File {
+    let input = unsafe { CStr::from_ptr(s).to_str().unwrap() };
+    let mut parser = Parser::new(input);
+    let file = parser.parse_file(String::from("go"));
+
+    Box::into_raw(Box::new(file))
+}
+
+#[no_mangle]
+pub fn go_drop_file(f: *mut File) {
+    if f.is_null() {
+        return;
+    }
+    unsafe{
+        Box::from_raw(f);
+    }
+}
+
+#[no_mangle]
 pub fn go_do_nothing(_s: *mut char) {}
 
 fn format_token(t: T) -> &'static str {
