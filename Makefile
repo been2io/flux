@@ -34,6 +34,9 @@ rust: build
 
 build: internal/rust
 
+rust-bench:
+	$(MAKE) -C internal/rust rust-bench
+
 $(SUBDIRS): $(UTILS)
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
@@ -71,7 +74,7 @@ test: internal/rust
 test-race:
 	$(GO_TEST) -race -count=1 ./...
 
-test-bench:
+test-bench: rust-bench
 	$(GO_TEST) -run=NONE -bench=. -benchtime=1x ./...
 
 vet:
