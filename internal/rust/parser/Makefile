@@ -3,8 +3,6 @@ export CC=clang
 # Default target, build
 build:
 	wasm-pack build --dev --scope influxdata
-
-rust-bench:
 	$(CARGO) build --release
 
 clean:

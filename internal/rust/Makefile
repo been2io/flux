@@ -10,9 +10,6 @@ generate:
 
 build: parser
 
-rust-bench:
-	$(MAKE) -C parser rust-bench
-
 clean: $(SUBDIRS)
 
 test: $(SUBDIRS)
