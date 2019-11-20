@@ -8,6 +8,7 @@ import (
 
 	flatbuffers "github.com/google/flatbuffers/go"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/influxdata/flux/ast"
 	"github.com/influxdata/flux/ast/internal/fbast"
 	gparser "github.com/influxdata/flux/internal/parser"
@@ -23,9 +24,10 @@ var CompareOptions = []cmp.Option{
 		}
 		return re.String()
 	}),
-	cmp.Transformer("", func(pos ast.Position) string {
-		return pos.String()
-	}),
+	cmpopts.IgnoreFields(ast.BaseNode{}, "Loc"),
+	// cmp.Transformer("", func(pos ast.Position) string {
+	// 	return pos.String()
+	// }),
 }
 
 func TestRoundTrip(t *testing.T) {
@@ -111,8 +113,8 @@ bad_expr = 3 * / 1
 				cmp.Diff(astFbs, astGo, CompareOptions..., ))
 		}
 		if !cmp.Equal(astFbs, astRust, CompareOptions...) {
-			t.Errorf("AST roundtrip vs. Rust unexpected packages -fbs/+go:\n%s",
-				cmp.Diff(astFbs, astGo, CompareOptions...))
+			t.Errorf("AST roundtrip vs. Rust unexpected packages -fbs/+rust:\n%s",
+				cmp.Diff(astFbs, astRust, CompareOptions...))
 		}
 	}
 }
