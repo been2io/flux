@@ -4,6 +4,7 @@ pub use analyze::analyze;
 mod env;
 mod fresh;
 mod infer;
+mod inject;
 
 // TODO(jsternberg): Once more work is done on the infer methods,
 // this should be removed and the warnings fixed.
@@ -37,4 +38,5 @@ pub fn analyze_source(source: &str) -> Result<nodes::Package> {
         files: vec![file],
     };
     analyze(ast_pkg)
+    // TODO infer
 }

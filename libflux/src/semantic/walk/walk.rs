@@ -1,5 +1,6 @@
 use crate::ast::SourceLocation;
 use crate::semantic::nodes::*;
+use crate::semantic::types::MonoType;
 use std::fmt;
 use std::rc::Rc;
 
@@ -141,6 +142,31 @@ impl<'a> Node<'a> {
             Node::InterpolatedPart(n) => &n.loc,
             Node::VariableAssgn(n) => &n.loc,
             Node::MemberAssgn(n) => &n.loc,
+        }
+    }
+    pub fn type_of(&self) -> Option<&MonoType> {
+        match self {
+            Node::IdentifierExpr(n) => Some(&n.typ),
+            Node::ArrayExpr(n) => Some(&n.typ),
+            Node::FunctionExpr(n) => Some(&n.typ),
+            Node::LogicalExpr(n) => Some(&n.typ),
+            Node::ObjectExpr(n) => Some(&n.typ),
+            Node::MemberExpr(n) => Some(&n.typ),
+            Node::IndexExpr(n) => Some(&n.typ),
+            Node::BinaryExpr(n) => Some(&n.typ),
+            Node::UnaryExpr(n) => Some(&n.typ),
+            Node::CallExpr(n) => Some(&n.typ),
+            Node::ConditionalExpr(n) => Some(&n.typ),
+            Node::StringExpr(n) => Some(&n.typ),
+            Node::IntegerLit(n) => Some(&n.typ),
+            Node::FloatLit(n) => Some(&n.typ),
+            Node::StringLit(n) => Some(&n.typ),
+            Node::DurationLit(n) => Some(&n.typ),
+            Node::UintLit(n) => Some(&n.typ),
+            Node::BooleanLit(n) => Some(&n.typ),
+            Node::DateTimeLit(n) => Some(&n.typ),
+            Node::RegexpLit(n) => Some(&n.typ),
+            _ => None,
         }
     }
 }
@@ -834,7 +860,7 @@ mod tests {
 
         #[test]
         fn test_nesting_count() {
-            let mut pkg = compile(
+            let pkg = compile(
                 r#"
 f = () => {
     // 1
@@ -859,7 +885,7 @@ g()
 "#,
             );
             let mut v = NestingCounter { count: 0 };
-            walk(&mut v, Rc::new(Node::Package(&mut pkg)));
+            walk(&mut v, Rc::new(Node::Package(&pkg)));
             assert_eq!(v.count, 5);
         }
 

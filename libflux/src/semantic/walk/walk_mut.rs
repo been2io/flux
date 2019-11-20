@@ -1,5 +1,7 @@
 use crate::ast::SourceLocation;
 use crate::semantic::nodes::*;
+use crate::semantic::sub::{Substitutable, Substitution};
+use crate::semantic::types::MonoType;
 use std::fmt;
 
 /// NodeMut represents any structure that can appear in the semantic graph.
@@ -140,6 +142,56 @@ impl<'a> NodeMut<'a> {
             NodeMut::InterpolatedPart(n) => &n.loc,
             NodeMut::VariableAssgn(n) => &n.loc,
             NodeMut::MemberAssgn(n) => &n.loc,
+        }
+    }
+    pub fn type_of(&self) -> Option<&MonoType> {
+        match self {
+            NodeMut::IdentifierExpr(n) => Some(&n.typ),
+            NodeMut::ArrayExpr(n) => Some(&n.typ),
+            NodeMut::FunctionExpr(n) => Some(&n.typ),
+            NodeMut::LogicalExpr(n) => Some(&n.typ),
+            NodeMut::ObjectExpr(n) => Some(&n.typ),
+            NodeMut::MemberExpr(n) => Some(&n.typ),
+            NodeMut::IndexExpr(n) => Some(&n.typ),
+            NodeMut::BinaryExpr(n) => Some(&n.typ),
+            NodeMut::UnaryExpr(n) => Some(&n.typ),
+            NodeMut::CallExpr(n) => Some(&n.typ),
+            NodeMut::ConditionalExpr(n) => Some(&n.typ),
+            NodeMut::StringExpr(n) => Some(&n.typ),
+            NodeMut::IntegerLit(n) => Some(&n.typ),
+            NodeMut::FloatLit(n) => Some(&n.typ),
+            NodeMut::StringLit(n) => Some(&n.typ),
+            NodeMut::DurationLit(n) => Some(&n.typ),
+            NodeMut::UintLit(n) => Some(&n.typ),
+            NodeMut::BooleanLit(n) => Some(&n.typ),
+            NodeMut::DateTimeLit(n) => Some(&n.typ),
+            NodeMut::RegexpLit(n) => Some(&n.typ),
+            _ => None,
+        }
+    }
+    pub fn replace_type(&mut self, sub: &Substitution) {
+        match self {
+            NodeMut::IdentifierExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::ArrayExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::FunctionExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::LogicalExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::ObjectExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::MemberExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::IndexExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::BinaryExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::UnaryExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::CallExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::ConditionalExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::StringExpr(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::IntegerLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::FloatLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::StringLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::DurationLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::UintLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::BooleanLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::DateTimeLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            NodeMut::RegexpLit(ref mut n) => n.typ = n.typ.clone().apply(sub),
+            _ => (),
         }
     }
 }
