@@ -73,8 +73,21 @@ func (rcv *NativeVariableAssignment) Init_(obj *flatbuffers.Table) bool {
 	return false
 }
 
+func (rcv *NativeVariableAssignment) Typ(obj *PolyType) *PolyType {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	if o != 0 {
+		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		if obj == nil {
+			obj = new(PolyType)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
+	}
+	return nil
+}
+
 func NativeVariableAssignmentStart(builder *flatbuffers.Builder) {
-	builder.StartObject(4)
+	builder.StartObject(5)
 }
 func NativeVariableAssignmentAddLoc(builder *flatbuffers.Builder, loc flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(loc), 0)
@@ -87,6 +100,9 @@ func NativeVariableAssignmentAddInit_type(builder *flatbuffers.Builder, init_typ
 }
 func NativeVariableAssignmentAddInit_(builder *flatbuffers.Builder, init_ flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(init_), 0)
+}
+func NativeVariableAssignmentAddTyp(builder *flatbuffers.Builder, typ flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(typ), 0)
 }
 func NativeVariableAssignmentEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
