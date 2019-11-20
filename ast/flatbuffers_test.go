@@ -14,7 +14,7 @@ import (
 	gparser "github.com/influxdata/flux/internal/parser"
 	"github.com/influxdata/flux/internal/token"
 	"github.com/influxdata/flux/libflux/go/libflux"
-	rparser "github.com/influxdata/flux/parser"
+	//rparser "github.com/influxdata/flux/parser"
 )
 
 var CompareOptions = []cmp.Option{
@@ -25,9 +25,9 @@ var CompareOptions = []cmp.Option{
 		return re.String()
 	}),
 	cmpopts.IgnoreFields(ast.BaseNode{}, "Loc"),
-	// cmp.Transformer("", func(pos ast.Position) string {
-	// 	return pos.String()
-	// }),
+	//cmp.Transformer("", func(pos ast.Position) string {
+	//	return pos.String()
+	//}),
 }
 
 func TestRoundTrip(t *testing.T) {
@@ -106,16 +106,16 @@ bad_expr = 3 * / 1
 			Package: packageName,
 			Files:   []*ast.File{file},
 		}
-		astRust := rparser.ParseSource(src)
+		//astRust := rparser.ParseSource(src)
 
 		if !cmp.Equal(astFbs, astGo, CompareOptions...) {
 			t.Errorf("AST roundtrip vs. Go unexpected packages -fbs/+go:\n%s",
 				cmp.Diff(astFbs, astGo, CompareOptions..., ))
 		}
-		if !cmp.Equal(astFbs, astRust, CompareOptions...) {
-			t.Errorf("AST roundtrip vs. Rust unexpected packages -fbs/+rust:\n%s",
-				cmp.Diff(astFbs, astRust, CompareOptions...))
-		}
+		//if !cmp.Equal(astFbs, astRust, CompareOptions...) {
+		//	t.Errorf("AST roundtrip vs. Rust unexpected packages -fbs/+rust:\n%s",
+		//		cmp.Diff(astFbs, astRust, CompareOptions...))
+		//}
 	}
 }
 
