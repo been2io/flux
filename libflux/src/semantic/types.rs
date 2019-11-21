@@ -54,12 +54,10 @@ impl PartialEq for PolyType {
 }
 
 impl Substitutable for PolyType {
-    fn apply(self, sub: &Substitution) -> Self {
-        PolyType {
-            vars: self.vars,
-            cons: self.cons,
-            expr: self.expr.apply(sub),
-        }
+    fn apply(&self, sub: &Substitution) -> Self {
+        let mut applied = self.clone();
+        applied.expr = self.expr.apply(sub);
+        applied
     }
     fn free_vars(&self) -> Vec<Tvar> {
         minus(&self.vars, self.expr.free_vars())
@@ -287,7 +285,7 @@ impl fmt::Display for MonoType {
 }
 
 impl Substitutable for MonoType {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         match self {
             MonoType::Bool
             | MonoType::Int
@@ -296,8 +294,8 @@ impl Substitutable for MonoType {
             | MonoType::String
             | MonoType::Duration
             | MonoType::Time
-            | MonoType::Regexp => self,
-            MonoType::Var(tvr) => sub.apply(tvr),
+            | MonoType::Regexp => self.clone(),
+            MonoType::Var(tvr) => sub.apply(*tvr),
             MonoType::Arr(arr) => MonoType::Arr(Box::new(arr.apply(sub))),
             MonoType::Row(obj) => MonoType::Row(Box::new(obj.apply(sub))),
             MonoType::Fun(fun) => MonoType::Fun(Box::new(fun.apply(sub))),
@@ -545,7 +543,7 @@ impl fmt::Display for Array {
 }
 
 impl Substitutable for Array {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         Array(self.0.apply(sub))
     }
     fn free_vars(&self) -> Vec<Tvar> {
@@ -650,7 +648,7 @@ impl cmp::PartialEq for Row {
 }
 
 impl Substitutable for Row {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         match self {
             Row::Empty => Row::Empty,
             Row::Extension { head, tail } => Row::Extension {
@@ -863,9 +861,9 @@ impl fmt::Display for Property {
 }
 
 impl Substitutable for Property {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         Property {
-            k: self.k,
+            k: self.k.clone(),
             v: self.v.apply(sub),
         }
     }
@@ -948,8 +946,10 @@ impl fmt::Display for Function {
 }
 
 impl<T: Substitutable> Substitutable for HashMap<String, T> {
-    fn apply(self, sub: &Substitution) -> Self {
-        self.into_iter().map(|(k, v)| (k, v.apply(sub))).collect()
+    fn apply(&self, sub: &Substitution) -> Self {
+        self.iter()
+            .map(|(k, v)| (k.clone(), v.apply(sub)))
+            .collect()
     }
     fn free_vars(&self) -> Vec<Tvar> {
         self.values()
@@ -958,7 +958,7 @@ impl<T: Substitutable> Substitutable for HashMap<String, T> {
 }
 
 impl<T: Substitutable> Substitutable for Option<T> {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         match self {
             Some(t) => Some(t.apply(sub)),
             None => None,
@@ -973,7 +973,7 @@ impl<T: Substitutable> Substitutable for Option<T> {
 }
 
 impl Substitutable for Function {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         Function {
             req: self.req.apply(sub),
             opt: self.opt.apply(sub),

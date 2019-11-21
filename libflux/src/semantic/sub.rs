@@ -49,6 +49,6 @@ impl Substitution {
 
 // A type is substitutable if a substitution can be applied to it.
 pub trait Substitutable {
-    fn apply(self, sub: &Substitution) -> Self;
+    fn apply(&self, sub: &Substitution) -> Self;
     fn free_vars(&self) -> Vec<Tvar>;
 }

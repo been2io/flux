@@ -15,9 +15,9 @@ pub struct Environment {
 }
 
 impl Substitutable for Environment {
-    fn apply(self, sub: &Substitution) -> Self {
+    fn apply(&self, sub: &Substitution) -> Self {
         Environment {
-            parent: match self.parent {
+            parent: match &self.parent {
                 Some(env) => Some(Box::new(env.apply(sub))),
                 None => None,
             },
