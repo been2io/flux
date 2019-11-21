@@ -1,0 +1,58 @@
+package arrowutil
+
+import "github.com/apache/arrow/go/arrow/array"
+
+{{range .}}
+type {{.Name}}Iterator struct {
+	Values []*{{.Type}}
+	i      int
+}
+
+func Iterate{{.Name}}s(arrs []array.Interface) {{.Name}}Iterator {
+	values := make([]*{{.Type}}, 0, len(arrs))
+	for _, arr := range arrs {
+		if arr.Len() == 0 || arr.Len() == arr.NullN() {
+			continue
+		}
+		values = append(values, arr.(*{{.Type}}))
+	}
+	if len(values) == 0 {
+		return {{.Name}}Iterator{}
+	}
+	return {{.Name}}Iterator{Values: values}
+}
+
+// Value returns the current value in the iterator.
+func (i *{{.Name}}Iterator) {{.Value}}() {{.PrimitiveType}} {
+	vs := i.Values[0]
+	return vs.{{.Value}}(i.i)
+}
+
+// IsValid returns if the current value is valid.
+func (i *{{.Name}}Iterator) IsValid() bool {
+	vs := i.Values[0]
+	return vs.IsValid(i.i)
+}
+
+// IsNull returns if the current value is null.
+func (i *{{.Name}}Iterator) IsNull() bool {
+	vs := i.Values[0]
+	return vs.IsNull(i.i)
+}
+
+// Next will discard the current value and move to the
+// next one. It will return whether another value
+func (i *{{.Name}}Iterator) Next() bool {
+	i.i++
+	if i.i >= i.Values[0].Len() {
+		i.i = 0
+		i.Values = i.Values[1:]
+	}
+	return len(i.Values) > 0
+}
+
+// IsEmpty returns true if the iterator has no values to read.
+func (i *{{.Name}}Iterator) IsEmpty() bool {
+	return len(i.Values) == 0
+}
+{{end}}

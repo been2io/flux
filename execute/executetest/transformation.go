@@ -252,6 +252,59 @@ func (d *dataStore) ExpireTable(key flux.GroupKey) {
 func (d *dataStore) SetTriggerSpec(t plan.TriggerSpec) {
 }
 
+func ProcessBenchmarkHelper(
+	b *testing.B,
+	genInput func(alloc *memory.Allocator) (flux.TableIterator, error),
+	create func(id execute.DatasetID, alloc *memory.Allocator) (execute.Transformation, execute.Dataset),
+) {
+	b.Helper()
+
+	defer func() {
+		if err := recover(); err != nil {
+			debug.PrintStack()
+			b.Fatalf("caught panic: %v", err)
+		}
+	}()
+
+	alloc := &memory.Allocator{}
+	parentID := RandomDatasetID()
+	tables, err := genInput(alloc)
+	if err != nil {
+		b.Fatalf("unexpected error: %s", err)
+	}
+
+	store := newDevNullStore()
+	tx, d := create(RandomDatasetID(), alloc)
+	d.SetTriggerSpec(plan.DefaultTriggerSpec)
+	d.AddTransformation(store)
+
+	if err := tables.Do(func(table flux.Table) error {
+		return tx.Process(parentID, table)
+	}); err != nil {
+		b.Fatalf("unexpected error: %s", err)
+	}
+
+	// We always return a fatal error on failure so
+	// we only get here when the error is nil.
+	tx.Finish(parentID, nil)
+}
+
+type devNullStore struct{}
+
+func newDevNullStore() devNullStore {
+	return devNullStore{}
+}
+
+func (d devNullStore) RetractTable(id execute.DatasetID, key flux.GroupKey) error { return nil }
+func (d devNullStore) Process(id execute.DatasetID, tbl flux.Table) error {
+	return tbl.Do(func(flux.ColReader) error {
+		return nil
+	})
+}
+func (d devNullStore) UpdateWatermark(id execute.DatasetID, t execute.Time) error      { return nil }
+func (d devNullStore) UpdateProcessingTime(id execute.DatasetID, t execute.Time) error { return nil }
+func (d devNullStore) Finish(id execute.DatasetID, err error)                          {}
+
 // Some transformations need to take a URL e.g. sql.to, kafka.to
 // the URL/DSN supplied by the user need to be validated by a URLValidator{}
 // before we can establish the connection.
