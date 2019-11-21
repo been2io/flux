@@ -32,11 +32,11 @@ use std::vec::Vec;
 // Result returned from the various 'infer' methods defined in this
 // module. The result of inferring an expression or statment is an
 // updated type environment and a set of type constraints to be solved.
-type Result = std::result::Result<(Environment, Constraints), Error>;
+pub type Result = std::result::Result<(Environment, Constraints), Error>;
 
 #[derive(Debug)]
 pub struct Error {
-    msg: String,
+    pub msg: String,
 }
 
 impl fmt::Display for Error {
@@ -197,6 +197,14 @@ impl Expression {
 
 pub struct Importer<'a> {
     values: HashMap<&'a str, PolyType>,
+}
+
+impl<'a> Importer<'a> {
+    pub fn new() -> Importer<'a> {
+        Importer {
+            values: HashMap::new(),
+        }
+    }
 }
 
 impl<'a> From<HashMap<&'a str, PolyType>> for Importer<'a> {
