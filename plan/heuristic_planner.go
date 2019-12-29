@@ -1,6 +1,8 @@
 package plan
 
-import "sort"
+import (
+	"sort"
+)
 
 // heuristicPlanner applies a set of rules to the nodes in a Spec
 // until a fixed point is reached and no more rules can be applied.

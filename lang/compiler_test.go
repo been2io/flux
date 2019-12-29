@@ -48,63 +48,6 @@ func TestFluxCompiler(t *testing.T) {
 			name: "simple",
 			q:    `from(bucket: "foo")`,
 		},
-		{
-			name: "syntax error",
-			q:    `t={]`,
-			err:  "expected RBRACE",
-		},
-		{
-			name: "type error",
-			q:    `t=0 t.s`,
-			err:  "type error",
-		},
-		{
-			name: "from with no streaming data",
-			q:    `x = from(bucket: "foo")`,
-			err:  "no streaming data",
-		},
-		{
-			name: "from with yield",
-			q:    `x = from(bucket: "foo") |> yield()`,
-		},
-		{
-			name: "extern",
-			extern: &ast.File{
-				Body: []ast.Statement{
-					&ast.OptionStatement{
-						Assignment: &ast.VariableAssignment{
-							ID:   &ast.Identifier{Name: "twentySix"},
-							Init: &ast.IntegerLiteral{Value: 26},
-						},
-					},
-				},
-			},
-			q: `twentySeven = twentySix + 1
-				twentySeven
-				from(bucket: "foo")`,
-		},
-		{
-			name: "extern with error",
-			extern: &ast.File{
-				Body: []ast.Statement{
-					&ast.OptionStatement{
-						Assignment: &ast.VariableAssignment{
-							ID:   &ast.Identifier{Name: "twentySix"},
-							Init: &ast.IntegerLiteral{Value: 26},
-						},
-					},
-				},
-			},
-			q: `twentySeven = twentyFive + 2
-				twentySeven
-				from(bucket: "foo")`,
-			err: "undefined identifier",
-		},
-		{
-			name: "with now",
-			now:  time.Unix(1000, 0),
-			q:    `from(bucket: "foo")`,
-		},
 	} {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
