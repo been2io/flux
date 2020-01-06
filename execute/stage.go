@@ -9,7 +9,7 @@ func init() {
 	RegisterSource("stage", createStageSource)
 
 }
-var CreateReader func() (flux.TableIterator, error)
+var CreateReader func(spec flux.Spec) (flux.TableIterator, error)
 
 func createStageSource(s plan.ProcedureSpec, id DatasetID, a Administration) (Source, error) {
 	t := &StageSource{
