@@ -2,12 +2,12 @@ package universe
 
 import (
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/stage"
+	"github.com/influxdata/flux/plan"
 	"github.com/influxdata/flux/stdlib/influxdata/influxdb"
 )
 
 func init() {
-	stage.IsPushDownOp = isPushDownOp
+	plan.IsPushDownOp = isPushDownOp
 }
 func isPushDownOp(o *flux.Operation) bool {
 

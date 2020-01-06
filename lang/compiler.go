@@ -3,7 +3,6 @@ package lang
 import (
 	"context"
 	"fmt"
-	"github.com/influxdata/flux/stage"
 	"log"
 	"time"
 
@@ -150,10 +149,6 @@ func buildPlan(ctx context.Context, spec *flux.Spec, opts *compileOptions) (*pla
 
 	pb.AddLogicalOptions(lopts...)
 	pb.AddPhysicalOptions(popts...)
-	spec, err := stage.StagePlanner{}.Plan(spec)
-	if err != nil {
-		return nil, err
-	}
 	ps, err := pb.Build().Plan(spec)
 	if err != nil {
 		return nil, err
