@@ -2,29 +2,38 @@ package execute
 
 import (
 	"context"
+	"errors"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/plan"
 )
+
 func init() {
 	RegisterSource("stage", createStageSource)
 
 }
+
 var CreateReader func(spec flux.Spec) (flux.TableIterator, error)
 
 func createStageSource(s plan.ProcedureSpec, id DatasetID, a Administration) (Source, error) {
+	spec := s.(*plan.StageProcedureSpec)
+	if spec == nil {
+		return nil, errors.New("no spec with stage")
+	}
 	t := &StageSource{
-		id: id,
+		id:   id,
+		spec: spec.Spec,
 	}
 	return t, nil
 }
 
 type StageSource struct {
-	id DatasetID
-	ts []Transformation
+	id   DatasetID
+	ts   []Transformation
+	spec flux.Spec
 }
 
 func (rs *StageSource) Run(ctx context.Context) {
-	tables, err := CreateReader()
+	tables, err := CreateReader(rs.spec)
 	if err != nil {
 		panic(err)
 	}

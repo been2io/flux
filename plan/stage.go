@@ -5,8 +5,6 @@ import (
 	"github.com/influxdata/flux"
 )
 
-
-
 const StageKind = "stage"
 
 var CreateReader func(spec flux.Spec) (flux.TableIterator, error)
@@ -21,45 +19,44 @@ func newStageOp() flux.OperationSpec {
 }
 
 type StageOperationSpec struct {
-	Spec *flux.Spec
+	Spec flux.Spec
 }
 
-func (s StageOperationSpec) AddOperation(operation *flux.Operation) {
-	s.Spec.Operations = append(s.Spec.Operations, operation)
+func (s *StageOperationSpec) AddOperation(operation *flux.Operation) {
+	o := *operation
+	s.Spec.Operations = append(s.Spec.Operations, &o)
 }
-func (s StageOperationSpec) AddEdge(e flux.Edge) {
+func (s *StageOperationSpec) AddEdge(e flux.Edge) {
 	s.Spec.Edges = append(s.Spec.Edges, e)
 }
 func (StageOperationSpec) Kind() flux.OperationKind {
 	return StageKind
 }
 
-type stageProcedureSpec struct {
-	Spec *flux.Spec
+type StageProcedureSpec struct {
+	Spec flux.Spec
 }
 
-func (spec stageProcedureSpec) Cost(inStats []Statistics) (cost Cost, outStats Statistics) {
+func (spec StageProcedureSpec) Cost(inStats []Statistics) (cost Cost, outStats Statistics) {
 	return Cost{}, Statistics{}
 }
 
 func createStageProcedureSpec(qs flux.OperationSpec, pa Administration) (ProcedureSpec, error) {
 	o := qs.(*StageOperationSpec)
 
-	return &stageProcedureSpec{
+	return &StageProcedureSpec{
 		Spec: o.Spec,
 	}, nil
 }
-func (spec stageProcedureSpec) Kind() ProcedureKind {
+func (spec StageProcedureSpec) Kind() ProcedureKind {
 	return StageKind
 }
 
-func (spec stageProcedureSpec) Copy() ProcedureSpec {
-	return &stageProcedureSpec{
+func (spec StageProcedureSpec) Copy() ProcedureSpec {
+	return &StageProcedureSpec{
 		Spec: spec.Spec,
 	}
 }
-
-
 
 type StagePlanner struct {
 }
@@ -106,7 +103,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 	}
 	for _, root := range roots {
 		stageSpec := &StageOperationSpec{
-			Spec: &flux.Spec{
+			Spec: flux.Spec{
 				Resources: spec.Resources,
 			},
 		}
@@ -117,7 +114,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		})
 		root.Spec = stageSpec
 	}
-	return spec,nil
+	return spec, nil
 	//build new spec
 
 	new := &flux.Spec{
@@ -131,7 +128,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 
 		stageOpSpec := &StageOperationSpec{
 
-			Spec: &flux.Spec{
+			Spec: flux.Spec{
 				Resources: spec.Resources,
 			},
 		}
