@@ -9,7 +9,7 @@ import (
 
 const StageKind = "stage"
 
-var CreateReader func() (flux.TableIterator, error)
+var CreateReader func(spec flux.Spec) (flux.TableIterator, error)
 
 func init() {
 	flux.RegisterOpSpec(StageKind, newStageOp)
