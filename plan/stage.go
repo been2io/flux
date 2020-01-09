@@ -109,7 +109,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		}
 		stageSpec.AddOperation(root)
 		v.walk(root, func(p, n *flux.Operation) {
-			stageSpec.AddOperation(p)
+			stageSpec.AddOperation(n)
 			stageSpec.AddEdge(edge(p, n))
 		})
 		root.Spec = stageSpec
