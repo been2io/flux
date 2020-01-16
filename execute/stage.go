@@ -27,21 +27,35 @@ func createStageSource(s plan.ProcedureSpec, id DatasetID, a Administration) (So
 }
 
 type StageSource struct {
-	id   DatasetID
-	ts   []Transformation
-	spec flux.Spec
+	id     DatasetID
+	ts     []Transformation
+	spec   flux.Spec
+	bounds Bounds
 }
 
-func (rs *StageSource) Run(ctx context.Context) {
+func (rs *StageSource) RunTables(ctx context.Context) error {
 	tables, err := CreateReader(rs.spec)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	err = tables.Do(func(table flux.Table) error {
 		return rs.processTable(ctx, table)
 	})
 	if err != nil {
-		panic(err)
+		return err
+	}
+	watermark := rs.bounds.Stop
+	for _, t := range rs.ts {
+		if err := t.UpdateWatermark(rs.id, watermark); err != nil {
+			return err
+		}
+	}
+	return err
+}
+func (rs *StageSource) Run(ctx context.Context) {
+	err := rs.RunTables(ctx)
+	for _, t := range rs.ts {
+		t.Finish(rs.id, err)
 	}
 }
 
