@@ -36,10 +36,10 @@ type planner struct {
 }
 
 func (p *planner) Plan(fspec *flux.Spec) (*Spec, error) {
-	/*fspec, err := StagePlanner{}.Plan(fspec)
+	fspec, err := StagePlanner{}.Plan(fspec)
 	if err != nil {
 		return nil, err
-	}*/
+	}
 	ip, err := p.lp.CreateInitialPlan(fspec)
 	if err != nil {
 		return nil, err
