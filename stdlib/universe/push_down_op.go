@@ -21,6 +21,8 @@ func isPushDownOp(o *flux.Operation) bool {
 	case SampleKind:
 	case GroupKind:
 	case influxdb.FromKind:
+	case "influxDBFrom":
+
 
 	default:
 		return false
