@@ -104,6 +104,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 	for _, root := range roots {
 		stageSpec := &StageOperationSpec{
 			Spec: flux.Spec{
+				Now:       spec.Now,
 				Resources: spec.Resources,
 			},
 		}

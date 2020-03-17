@@ -3,7 +3,6 @@ module github.com/influxdata/flux
 go 1.12
 
 require (
-	cloud.google.com/go v0.43.0
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/apache/arrow/go/arrow v0.0.0-20191024131854-af6fa24be0db
@@ -45,6 +44,5 @@ require (
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/tools v0.0.0-20190628153133-6cdbf07be9d0
 	gonum.org/v1/gonum v0.0.0-20181121035319-3f7ecaa7e8ca
-	google.golang.org/api v0.7.0
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
