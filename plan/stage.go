@@ -68,7 +68,7 @@ type stageMarkVisitor struct {
 func (v *stageMarkVisitor) walk(op *flux.Operation, f func(p, n *flux.Operation)) {
 	ops := v.children[op.ID]
 	for _, ch := range ops {
-		if IsPushDownOp(op) {
+		if IsPushDownOp(ch) {
 			f(op, ch)
 			v.walk(ch, f)
 		}
