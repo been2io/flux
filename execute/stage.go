@@ -32,9 +32,18 @@ type StageSource struct {
 	spec   flux.Spec
 	bounds Bounds
 }
+type StageReader interface {
+	Read(spec flux.Spec, ctx context.Context) (flux.TableIterator, error)
+}
+
+const STAGEREADER = "stageReader"
 
 func (rs *StageSource) RunTables(ctx context.Context) error {
-	tables, err := CreateReader(rs.spec)
+	reader, ok := ctx.Value(STAGEREADER).(StageReader)
+	if !ok {
+		return errors.New("no stage reader found")
+	}
+	tables, err := reader.Read(rs.spec, ctx)
 	if err != nil {
 		return err
 	}
