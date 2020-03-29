@@ -38,11 +38,30 @@ type StageReader interface {
 
 const STAGEREADER = "stageReader"
 
+type StageSourceHandler interface {
+	UpdateWatermark(time int64) error
+	Finish(err error)
+}
+
+func (rs *StageSource) UpdateWatermark(ts int64) error {
+	for _, t := range rs.ts {
+		if err := t.UpdateWatermark(rs.id, Time(ts)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func (rs *StageSource) Finish(err error) {
+	for _, t := range rs.ts {
+		t.Finish(rs.id, err)
+	}
+}
 func (rs *StageSource) RunTables(ctx context.Context) error {
 	reader, ok := ctx.Value(STAGEREADER).(StageReader)
 	if !ok {
 		return errors.New("no stage reader found")
 	}
+	ctx = context.WithValue(ctx, "source", rs)
 	tables, err := reader.Read(rs.spec, ctx)
 	if err != nil {
 		return err
