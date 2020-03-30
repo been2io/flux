@@ -23,7 +23,6 @@ func isPushDownOp(o *flux.Operation) bool {
 	case influxdb.FromKind:
 	case "influxDBFrom":
 
-
 	default:
 		return false
 	}
