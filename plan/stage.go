@@ -1,13 +1,10 @@
 package plan
 
 import (
-	"fmt"
 	"github.com/influxdata/flux"
 )
 
 const StageKind = "stage"
-
-var CreateReader func(spec flux.Spec) (flux.TableIterator, error)
 
 func init() {
 	flux.RegisterOpSpec(StageKind, newStageOp)
@@ -77,27 +74,41 @@ func (v *stageMarkVisitor) walk(op *flux.Operation, f func(p, n *flux.Operation)
 
 }
 
-var IsPushDownOp func(op *flux.Operation) bool
-
 type visitor struct {
 	relations map[flux.OperationID][]*flux.Operation
+	skipKinds []flux.OperationKind
+	last      *flux.Operation
 }
 
 func (v *visitor) walk(operation *flux.Operation, f func(first, second *flux.Operation)) {
+	if v.last == nil {
+		v.last = operation
+	}
+	parent := operation
+	skipped := false
+	for _, skip := range v.skipKinds {
+		if skip == v.last.Spec.Kind() {
+			skipped = true
+			break
+		}
+	}
+	if skipped {
+		parent = v.last
+	}
 	for _, op := range v.relations[operation.ID] {
-		f(operation, op)
+		f(parent, op)
+		v.walk(op, f)
 	}
 }
-
 func edge(parent *flux.Operation, child *flux.Operation) flux.Edge {
 	return flux.Edge{Parent: parent.ID, Child: child.ID}
 }
 func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
-	parents, children, roots, err := spec.DetermineParentsChildrenAndRoots()
+	_, children, roots, err := spec.DetermineParentsChildrenAndRoots()
 	if err != nil {
 		return nil, err
 	}
-	var stageMarks = make(map[*flux.Operation]struct{})
+	var markedOp []*flux.Operation
 	v := stageMarkVisitor{
 		children: children,
 	}
@@ -110,55 +121,48 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		}
 		stageSpec.AddOperation(root)
 		v.walk(root, func(p, n *flux.Operation) {
+			markedOp = append(markedOp, n)
 			stageSpec.AddOperation(n)
 			stageSpec.AddEdge(edge(p, n))
 		})
 		root.Spec = stageSpec
 	}
+	skipped := []flux.OperationKind{flux.OperationKind("group"), flux.OperationKind("filter")}
+
+	for _, op := range markedOp {
+		for _, skip := range skipped {
+			if skip == op.Spec.Kind() {
+				var ops []*flux.Operation
+				var edges []flux.Edge
+				//rm operations
+				for _, o := range spec.Operations {
+					if o.ID != op.ID {
+						ops = append(ops, o)
+					}
+				}
+				// rm edge
+				c := spec.Children(op.ID)
+				ps := spec.Parents(op.ID)
+
+				for _, edge := range spec.Edges {
+					if edge.Child != op.ID && edge.Parent != op.ID {
+						edges = append(edges, edge)
+					}
+				}
+				for _, p := range ps {
+					for _, child := range c {
+						edges = append(edges, edge(p, child))
+					}
+				}
+				spec.Operations = ops
+				spec.Edges = edges
+				if err := spec.Validate(); err != nil {
+					return nil,err
+				}
+			}
+		}
+	}
+
 	return spec, nil
-	//build new spec
-
-	new := &flux.Spec{
-		Resources: spec.Resources,
-	}
-	i := 0
-
-	for markedOp, _ := range stageMarks {
-		//build stage spec
-		i++
-
-		stageOpSpec := &StageOperationSpec{
-
-			Spec: flux.Spec{
-				Resources: spec.Resources,
-			},
-		}
-
-		stageOp := &flux.Operation{
-			ID:   flux.OperationID(fmt.Sprintf("stage%v", i)),
-			Spec: stageOpSpec,
-		}
-		v := visitor{relations: parents}
-		stageOpSpec.AddOperation(markedOp)
-		stageOpSpec.AddEdge(edge(markedOp, stageOp))
-
-		v.walk(markedOp, func(first, second *flux.Operation) {
-			stageOpSpec.AddOperation(second)
-			stageOpSpec.AddEdge(flux.Edge{Parent: second.ID, Child: first.ID})
-		})
-
-		//build new spec
-		new.Operations = append(new.Operations, stageOp)
-		new.Operations = append(new.Operations, markedOp)
-		v = visitor{
-			relations: children,
-		}
-		v.walk(markedOp, func(first, second *flux.Operation) {
-			new.Operations = append(new.Operations, second)
-			new.Edges = append(new.Edges, edge(first, second))
-		})
-
-	}
-	return new, nil
 
 }
