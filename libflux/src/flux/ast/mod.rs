@@ -1,3 +1,4 @@
+#![allow(missing_docs)]
 pub mod check;
 
 pub mod flatbuffers;
@@ -15,6 +16,8 @@ use chrono::FixedOffset;
 use serde::de::{Deserialize, Deserializer, Error, Visitor};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use serde_aux::prelude::*;
+
+pub const DEFAULT_PACKAGE_NAME: &str = "main";
 
 // Position is the AST counterpart of Scanner's Position.
 // It adds serde capabilities.
@@ -98,34 +101,56 @@ where
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum Expression {
     Identifier(Identifier),
-
+    #[serde(rename = "ArrayExpression")]
     Array(Box<ArrayExpr>),
+    #[serde(rename = "FunctionExpression")]
     Function(Box<FunctionExpr>),
+    #[serde(rename = "LogicalExpression")]
     Logical(Box<LogicalExpr>),
+    #[serde(rename = "ObjectExpression")]
     Object(Box<ObjectExpr>),
+    #[serde(rename = "MemberExpression")]
     Member(Box<MemberExpr>),
+    #[serde(rename = "IndexExpression")]
     Index(Box<IndexExpr>),
+    #[serde(rename = "BinaryExpression")]
     Binary(Box<BinaryExpr>),
+    #[serde(rename = "UnaryExpression")]
     Unary(Box<UnaryExpr>),
+    #[serde(rename = "PipeExpression")]
     PipeExpr(Box<PipeExpr>),
+    #[serde(rename = "CallExpression")]
     Call(Box<CallExpr>),
+    #[serde(rename = "ConditionalExpression")]
     Conditional(Box<ConditionalExpr>),
+    #[serde(rename = "StringExpression")]
     StringExpr(Box<StringExpr>),
+    #[serde(rename = "ParenExpression")]
     Paren(Box<ParenExpr>),
 
+    #[serde(rename = "IntegerLiteral")]
     Integer(IntegerLit),
+    #[serde(rename = "FloatLiteral")]
     Float(FloatLit),
+    #[serde(rename = "StringLiteral")]
     StringLit(StringLit),
+    #[serde(rename = "DurationLiteral")]
     Duration(DurationLit),
+    #[serde(rename = "UnsignedIntegerLiteral")]
     Uint(UintLit),
+    #[serde(rename = "BooleanLiteral")]
     Boolean(BooleanLit),
+    #[serde(rename = "DateTimeLiteral")]
     DateTime(DateTimeLit),
+    #[serde(rename = "RegexpLiteral")]
     Regexp(RegexpLit),
+    #[serde(rename = "PipeLiteral")]
     PipeLit(PipeLit),
 
+    #[serde(rename = "BadExpression")]
     Bad(Box<BadExpr>),
 }
 
@@ -162,15 +187,22 @@ impl Expression {
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum Statement {
-    Expr(ExprStmt),
+    #[serde(rename = "ExpressionStatement")]
+    Expr(Box<ExprStmt>),
+    #[serde(rename = "VariableAssignment")]
     Variable(Box<VariableAssgn>),
+    #[serde(rename = "OptionStatement")]
     Option(Box<OptionStmt>),
-    Return(ReturnStmt),
-    Bad(BadStmt),
+    #[serde(rename = "ReturnStatement")]
+    Return(Box<ReturnStmt>),
+    #[serde(rename = "BadStatement")]
+    Bad(Box<BadStmt>),
+    #[serde(rename = "TestStatement")]
     Test(Box<TestStmt>),
-    Builtin(BuiltinStmt),
+    #[serde(rename = "BuiltinStatement")]
+    Builtin(Box<BuiltinStmt>),
 }
 
 impl Statement {
@@ -186,12 +218,27 @@ impl Statement {
             Statement::Builtin(wrapped) => &wrapped.base,
         }
     }
+
+    // returns a integer based type value.
+    pub fn typ(&self) -> i8 {
+        match self {
+            Statement::Expr(_) => 0,
+            Statement::Variable(_) => 1,
+            Statement::Option(_) => 2,
+            Statement::Return(_) => 3,
+            Statement::Bad(_) => 4,
+            Statement::Test(_) => 5,
+            Statement::Builtin(_) => 6,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum Assignment {
+    #[serde(rename = "VariableAssignment")]
     Variable(Box<VariableAssgn>),
+    #[serde(rename = "MemberAssignment")]
     Member(Box<MemberAssgn>),
 }
 
@@ -206,9 +253,10 @@ impl Assignment {
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum PropertyKey {
     Identifier(Identifier),
+    #[serde(rename = "StringLiteral")]
     StringLit(StringLit),
 }
 
@@ -256,11 +304,25 @@ where
     seq.end()
 }
 
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+pub struct Comment {
+    pub lit: String,
+    pub next: Option<Box<Comment>>,
+}
+
+pub type CommentList = Option<Box<Comment>>;
+
 // BaseNode holds the attributes every expression or statement must have
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct BaseNode {
     #[serde(default)]
     pub location: SourceLocation,
+    // If the base node is for a terminal the comments will be here. We also
+    // use the base node comments when a non-terminal contains just one
+    // terminal on the right hand side. This saves us populating the
+    // type-specific AST nodes with comment lists when we can avoid it..
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comments: CommentList,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(serialize_with = "serialize_errors")]
     #[serde(default)]
@@ -270,6 +332,10 @@ pub struct BaseNode {
 impl BaseNode {
     pub fn is_empty(&self) -> bool {
         self.errors.is_empty() && !self.location.is_valid()
+    }
+
+    pub fn set_comments(&mut self, comments: CommentList) {
+        self.comments = comments;
     }
 }
 
@@ -286,6 +352,19 @@ pub struct Package {
     pub path: String,
     pub package: String,
     pub files: Vec<File>,
+}
+
+impl From<File> for Package {
+    fn from(file: File) -> Self {
+        Package {
+            base: BaseNode {
+                ..BaseNode::default()
+            },
+            path: String::from(""),
+            package: String::from(file.get_package()),
+            files: vec![file],
+        }
+    }
 }
 
 // File represents a source from a single file
@@ -306,6 +385,17 @@ pub struct File {
     #[serde(deserialize_with = "deserialize_default_from_null")]
     pub imports: Vec<ImportDeclaration>,
     pub body: Vec<Statement>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub eof: CommentList,
+}
+
+impl File {
+    fn get_package(self: &File) -> &str {
+        match &self.package {
+            Some(pkg_clause) => pkg_clause.name.name.as_str(),
+            None => DEFAULT_PACKAGE_NAME,
+        }
+    }
 }
 
 // PackageClause defines the current package identifier.
@@ -340,7 +430,11 @@ pub struct Block {
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lbrace: CommentList,
     pub body: Vec<Statement>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rbrace: CommentList,
 }
 
 // BadStmt is a placeholder for statements for which no correct statement nodes
@@ -357,7 +451,6 @@ pub struct BadStmt {
 
 // ExprStmt may consist of an expression that does not return a value and is executed solely for its side-effects.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ExpressionStatement", tag = "type")]
 pub struct ExprStmt {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -368,7 +461,6 @@ pub struct ExprStmt {
 
 // ReturnStmt defines an Expression to return
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ReturnStatement", tag = "type")]
 pub struct ReturnStmt {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -379,7 +471,6 @@ pub struct ReturnStmt {
 
 // OptionStmt syntactically is a single variable declaration
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "OptionStatement", tag = "type")]
 pub struct OptionStmt {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -390,7 +481,6 @@ pub struct OptionStmt {
 
 // BuiltinStmt declares a builtin identifier and its struct
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "BuiltinStatement", tag = "type")]
 pub struct BuiltinStmt {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -401,7 +491,6 @@ pub struct BuiltinStmt {
 
 // TestStmt declares a Flux test case
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "TestStatement", tag = "type")]
 pub struct TestStmt {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -412,7 +501,6 @@ pub struct TestStmt {
 
 // VariableAssgn represents the declaration of a variable
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "VariableAssignment", tag = "type")]
 pub struct VariableAssgn {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -424,7 +512,6 @@ pub struct VariableAssgn {
 
 // MemberAssgn represents an assignement into a member of an object.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "MemberAssignment", tag = "type")]
 pub struct MemberAssgn {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -436,67 +523,77 @@ pub struct MemberAssgn {
 
 // StringExpr represents an interpolated string
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "StringExpression", tag = "type")]
 pub struct StringExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
+    #[serde(flatten)]
     pub base: BaseNode,
     pub parts: Vec<StringExprPart>,
 }
 
 // StringExprPart represents part of an interpolated string
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum StringExprPart {
+    #[serde(rename = "TextPart")]
     Text(TextPart),
+    #[serde(rename = "InterpolatedPart")]
     Interpolated(InterpolatedPart),
 }
 
 // TextPart represents the text part of an interpolated string
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
 pub struct TextPart {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
+    #[serde(flatten)]
     pub base: BaseNode,
     pub value: String,
 }
 
 // InterpolatedPart represents the expression part of an interpolated string
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
 pub struct InterpolatedPart {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
+    #[serde(flatten)]
     pub base: BaseNode,
     pub expression: Expression,
 }
 
 // ParenExpr represents an expression wrapped in parenthesis
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ParenExpression", tag = "type")]
 pub struct ParenExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
+    #[serde(flatten)]
     pub base: BaseNode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lparen: CommentList,
     pub expression: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rparen: CommentList,
 }
 
 // CallExpr represents a function call
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "CallExpression", tag = "type")]
 pub struct CallExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
     pub callee: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lparen: CommentList,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub arguments: Vec<Expression>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rparen: CommentList,
 }
 
 // PipeExpr represents a call expression using the pipe forward syntax.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "PipeExpression", tag = "type")]
 pub struct PipeExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -508,36 +605,48 @@ pub struct PipeExpr {
 
 // MemberExpr represents calling a property of a Call
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "MemberExpression", tag = "type")]
 pub struct MemberExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
     pub object: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lbrack: CommentList,
     pub property: PropertyKey,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rbrack: CommentList,
 }
 
 // IndexExpr represents indexing into an array
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "IndexExpression", tag = "type")]
 pub struct IndexExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
     pub array: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lbrack: CommentList,
     pub index: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rbrack: CommentList,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "FunctionExpression", tag = "type")]
 pub struct FunctionExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lparen: CommentList,
+    #[serde(deserialize_with = "deserialize_default_from_null")]
     pub params: Vec<Property>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rparen: CommentList,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arrow: CommentList,
     pub body: FunctionBody,
 }
 
@@ -768,7 +877,6 @@ impl<'de> Deserialize<'de> for LogicalOperator {
 // `or` expressions compute the disjunction of two boolean expressions and return boolean values.
 // `and`` expressions compute the conjunction of two boolean expressions and return boolean values.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "LogicalExpression", tag = "type")]
 pub struct LogicalExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -781,46 +889,77 @@ pub struct LogicalExpr {
 
 // ArrayExpr is used to create and directly specify the elements of an array object
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ArrayExpression", tag = "type")]
+pub struct ArrayItem {
+    #[serde(default)]
+    #[serde(flatten)]
+    pub expression: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comma: CommentList,
+}
+
+// ArrayExpr is used to create and directly specify the elements of an array object
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct ArrayExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
-    pub elements: Vec<Expression>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lbrack: CommentList,
+    #[serde(deserialize_with = "deserialize_default_from_null")]
+    pub elements: Vec<ArrayItem>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rbrack: CommentList,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+pub struct WithSource {
+    #[serde(default)]
+    #[serde(flatten)]
+    pub source: Identifier,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub with: CommentList,
 }
 
 // ObjectExpr allows the declaration of an anonymous object within a declaration.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ObjectExpression", tag = "type")]
 pub struct ObjectExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub with: Option<Identifier>,
+    pub lbrace: CommentList,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub with: Option<WithSource>,
     pub properties: Vec<Property>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rbrace: CommentList,
 }
 
 // ConditionalExpr selects one of two expressions, `Alternate` or `Consequent`
 // depending on a third, boolean, expression, `Test`.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "ConditionalExpression", tag = "type")]
 pub struct ConditionalExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
     #[serde(flatten)]
     pub base: BaseNode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tk_if: CommentList,
     pub test: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tk_then: CommentList,
     pub consequent: Expression,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tk_else: CommentList,
     pub alternate: Expression,
 }
 
 // BadExpr is a malformed expression that contains the reason why in `text`.
 // It can contain another expression, so that the parser can make a chained list of bad expressions.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "BadExpression", tag = "type")]
 pub struct BadExpr {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -840,13 +979,16 @@ pub struct Property {
     #[serde(flatten)]
     pub base: BaseNode,
     pub key: PropertyKey,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub separator: CommentList,
     // `value` is optional, because of the shortcut: {a} <--> {a: a}
     pub value: Option<Expression>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comma: CommentList,
 }
 
 // Identifier represents a name that identifies a unique Node
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
 pub struct Identifier {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -857,7 +999,6 @@ pub struct Identifier {
 
 // PipeLit represents an specialized literal value, indicating the left hand value of a pipe expression.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "PipeLiteral", tag = "type")]
 pub struct PipeLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -867,7 +1008,6 @@ pub struct PipeLit {
 
 // StringLit expressions begin and end with double quote marks.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "StringLiteral", tag = "type")]
 pub struct StringLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -878,7 +1018,6 @@ pub struct StringLit {
 
 // Boolean represent boolean values
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "BooleanLiteral", tag = "type")]
 pub struct BooleanLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -889,7 +1028,6 @@ pub struct BooleanLit {
 
 // FloatLit represent floating point numbers according to the double representations defined by the IEEE-754-1985
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "FloatLiteral", tag = "type")]
 pub struct FloatLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -900,7 +1038,6 @@ pub struct FloatLit {
 
 // IntegerLit represent integer numbers.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "IntegerLiteral", tag = "type")]
 pub struct IntegerLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -913,7 +1050,6 @@ pub struct IntegerLit {
 
 // UintLit represent integer numbers.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "UnsignedIntegerLiteral", tag = "type")]
 pub struct UintLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -992,7 +1128,6 @@ where
 
 // RegexpLit expressions begin and end with `/` and are regular expressions with syntax accepted by RE2
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "RegexpLiteral", tag = "type")]
 pub struct RegexpLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -1015,7 +1150,6 @@ pub struct Duration {
 // TODO: this may be better as a class initialization
 // All magnitudes in Duration vector should have the same sign
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "DurationLiteral", tag = "type")]
 pub struct DurationLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]
@@ -1030,7 +1164,6 @@ pub struct DurationLit {
 // the syntax of golang's RFC3339 Nanosecond variant
 // TODO: this may be better as a class initialization
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-#[serde(rename = "DateTimeLiteral", tag = "type")]
 pub struct DateTimeLit {
     #[serde(skip_serializing_if = "BaseNode::is_empty")]
     #[serde(default)]

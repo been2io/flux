@@ -174,7 +174,7 @@ pub enum Kind {
     Equatable,
     Nullable,
     Row,
-    Signed,
+    Negatable,
 }
 
 impl fmt::Display for Kind {
@@ -188,7 +188,7 @@ impl fmt::Display for Kind {
             Kind::Equatable => f.write_str("Equatable"),
             Kind::Nullable => f.write_str("Nullable"),
             Kind::Row => f.write_str("Row"),
-            Kind::Signed => f.write_str("Signed"),
+            Kind::Negatable => f.write_str("Negatable"),
         }
     }
 }
@@ -351,16 +351,18 @@ impl MonoType {
                 | Kind::Comparable
                 | Kind::Equatable
                 | Kind::Nullable
-                | Kind::Signed => Ok(Substitution::empty()),
+                | Kind::Negatable => Ok(Substitution::empty()),
                 _ => Err(Error::cannot_constrain(&self, with)),
             },
             MonoType::Uint => match with {
                 Kind::Addable
+                | Kind::Subtractable
                 | Kind::Divisible
                 | Kind::Numeric
                 | Kind::Comparable
                 | Kind::Equatable
-                | Kind::Nullable => Ok(Substitution::empty()),
+                | Kind::Nullable
+                | Kind::Negatable => Ok(Substitution::empty()),
                 _ => Err(Error::cannot_constrain(&self, with)),
             },
             MonoType::Float => match with {
@@ -371,7 +373,7 @@ impl MonoType {
                 | Kind::Comparable
                 | Kind::Equatable
                 | Kind::Nullable
-                | Kind::Signed => Ok(Substitution::empty()),
+                | Kind::Negatable => Ok(Substitution::empty()),
                 _ => Err(Error::cannot_constrain(&self, with)),
             },
             MonoType::String => match with {
@@ -381,7 +383,7 @@ impl MonoType {
                 _ => Err(Error::cannot_constrain(&self, with)),
             },
             MonoType::Duration => match with {
-                Kind::Comparable | Kind::Equatable | Kind::Nullable | Kind::Signed => {
+                Kind::Comparable | Kind::Equatable | Kind::Nullable | Kind::Negatable => {
                     Ok(Substitution::empty())
                 }
                 _ => Err(Error::cannot_constrain(&self, with)),
@@ -549,8 +551,11 @@ impl Array {
         self.0.unify(with.0, cons, f)
     }
 
-    fn constrain(self, with: Kind, _: &mut TvarKinds) -> Result<Substitution, Error> {
-        Err(Error::cannot_constrain(&self, with))
+    fn constrain(self, with: Kind, cons: &mut TvarKinds) -> Result<Substitution, Error> {
+        match with {
+            Kind::Equatable => self.0.constrain(with, cons),
+            _ => Err(Error::cannot_constrain(&self, with)),
+        }
     }
 
     fn contains(&self, tv: Tvar) -> bool {
@@ -783,9 +788,16 @@ impl Row {
         }
     }
 
-    fn constrain(self, with: Kind, _: &mut TvarKinds) -> Result<Substitution, Error> {
+    fn constrain(self, with: Kind, cons: &mut TvarKinds) -> Result<Substitution, Error> {
         match with {
             Kind::Row => Ok(Substitution::empty()),
+            Kind::Equatable => match self {
+                Row::Empty => Ok(Substitution::empty()),
+                Row::Extension { head, tail } => {
+                    let sub = head.v.constrain(with, cons)?;
+                    Ok(sub.merge(tail.constrain(with, cons)?))
+                }
+            },
             _ => Err(Error::cannot_constrain(&self, with)),
         }
     }
@@ -929,6 +941,7 @@ impl fmt::Display for Function {
     }
 }
 
+#[allow(clippy::implicit_hasher)]
 impl<T: Substitutable> Substitutable for HashMap<String, T> {
     fn apply(self, sub: &Substitution) -> Self {
         self.into_iter().map(|(k, v)| (k, v.apply(sub))).collect()
@@ -1779,7 +1792,6 @@ mod tests {
             Kind::Divisible,
             Kind::Numeric,
             Kind::Comparable,
-            Kind::Equatable,
             Kind::Nullable,
         ];
         for c in unallowable_cons {

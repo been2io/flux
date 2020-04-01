@@ -2,9 +2,6 @@ use super::*;
 use crate::ast;
 
 use chrono;
-
-// This gives us a colorful diff.
-#[cfg(test)]
 use pretty_assertions::assert_eq;
 
 struct Locator<'a> {
@@ -58,51 +55,51 @@ fn string_interpolation_simple() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 19),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 19),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringExpr(Box::new(StringExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 19),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     parts: vec![
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a + b = ".to_string(),
                         }),
                         StringExprPart::Interpolated(InterpolatedPart {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             expression: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 17),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 left: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 12, 1, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "a".to_string(),
                                 }),
                                 right: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 16, 1, 17),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "b".to_string(),
                                 }),
@@ -111,7 +108,8 @@ fn string_interpolation_simple() {
                         }),
                     ],
                 })),
-            }),],
+            })),],
+            eof: None,
         },
     )
 }
@@ -126,39 +124,39 @@ fn string_interpolation_multiple() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 24),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 24),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringExpr(Box::new(StringExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 24),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     parts: vec![
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a = ".to_string(),
                         }),
                         StringExprPart::Interpolated(InterpolatedPart {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             expression: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 8, 1, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string(),
                             }),
@@ -166,26 +164,27 @@ fn string_interpolation_multiple() {
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 19),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: " and b = ".to_string(),
                         }),
                         StringExprPart::Interpolated(InterpolatedPart {
                             base: BaseNode {
                                 location: loc.get(1, 19, 1, 23),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             expression: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 21, 1, 22),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string(),
                             }),
                         }),
                     ],
                 })),
-            }),],
+            })),],
+            eof: None,
         },
     )
 }
@@ -200,69 +199,69 @@ fn string_interpolation_nested() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 44),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 44),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringExpr(Box::new(StringExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 44),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     parts: vec![
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "we ".to_string(),
                         }),
                         StringExprPart::Interpolated(InterpolatedPart {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 34),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             expression: Expression::StringExpr(Box::new(StringExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 7, 1, 33),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 parts: vec![
                                     StringExprPart::Text(TextPart {
                                         base: BaseNode {
                                             location: loc.get(1, 8, 1, 12),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "can ".to_string(),
                                     }),
                                     StringExprPart::Interpolated(InterpolatedPart {
                                         base: BaseNode {
                                             location: loc.get(1, 12, 1, 32),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         expression: Expression::Binary(Box::new(BinaryExpr {
                                             base: BaseNode {
                                                 location: loc.get(1, 14, 1, 31),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             left: Expression::StringLit(StringLit {
                                                 base: BaseNode {
                                                     location: loc.get(1, 14, 1, 19),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 value: "add".to_string(),
                                             }),
                                             right: Expression::StringLit(StringLit {
                                                 base: BaseNode {
                                                     location: loc.get(1, 22, 1, 31),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 value: "strings".to_string(),
                                             }),
@@ -275,13 +274,14 @@ fn string_interpolation_nested() {
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 34, 1, 43),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: " together".to_string(),
                         }),
                     ],
                 })),
-            }),],
+            })),],
+            eof: None,
         },
     )
 }
@@ -296,39 +296,39 @@ fn string_interp_with_escapes() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 45),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 45),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringExpr(Box::new(StringExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 45),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     parts: vec![
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 30),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "string \"interpolation with ".to_string(),
                         }),
                         StringExprPart::Interpolated(InterpolatedPart {
                             base: BaseNode {
                                 location: loc.get(1, 30, 1, 42),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             expression: Expression::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 32, 1, 41),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "escapes".to_string(),
                             }),
@@ -336,13 +336,14 @@ fn string_interp_with_escapes() {
                         StringExprPart::Text(TextPart {
                             base: BaseNode {
                                 location: loc.get(1, 42, 1, 44),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "\"".to_string(),
                         }),
                     ],
                 })),
-            }),],
+            })),],
+            eof: None,
         },
     )
 }
@@ -357,7 +358,7 @@ fn bad_string_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -366,46 +367,53 @@ fn bad_string_expression() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 18),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 3),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "fn".to_string(),
                 },
                 init: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
                         location: loc.get(1, 6, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 7, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 7, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
-                        value: None
+                        separator: None,
+                        value: None,
+                        comma: None,
                     }],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Expr(Expression::StringExpr(Box::new(StringExpr {
                         base: BaseNode {
                             location: loc.get(1, 13, 1, 18),
                             errors: vec![
                                 "got unexpected token in string expression @1:18-1:18: EOF"
                                     .to_string()
-                            ]
+                            ],
+                            ..BaseNode::default()
                         },
                         parts: vec![],
-                    })))
+                    }))),
                 })),
             }))],
+            eof: None,
         },
     )
 }
@@ -420,25 +428,26 @@ fn package_clause() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: Some(PackageClause {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 name: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "foo".to_string()
                 }
             }),
             imports: vec![],
-            body: vec![]
+            body: vec![],
+            eof: None,
         },
     )
 }
@@ -453,7 +462,7 @@ fn import() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -461,18 +470,19 @@ fn import() {
             imports: vec![ImportDeclaration {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 18),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 alias: None,
                 path: StringLit {
                     base: BaseNode {
                         location: loc.get(1, 8, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "path/foo".to_string()
                 }
             }],
-            body: vec![]
+            body: vec![],
+            eof: None,
         },
     )
 }
@@ -487,7 +497,7 @@ fn import_as() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 22),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -495,24 +505,25 @@ fn import_as() {
             imports: vec![ImportDeclaration {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 22),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 alias: Some(Identifier {
                     base: BaseNode {
                         location: loc.get(1, 8, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "bar".to_string()
                 }),
                 path: StringLit {
                     base: BaseNode {
                         location: loc.get(1, 12, 1, 22),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "path/foo".to_string()
                 }
             }],
-            body: vec![]
+            body: vec![],
+            eof: None,
         }
     )
 }
@@ -530,7 +541,7 @@ import "path/bar""#,
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -539,13 +550,13 @@ import "path/bar""#,
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(1, 8, 1, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/foo".to_string()
                     }
@@ -553,19 +564,20 @@ import "path/bar""#,
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(2, 1, 2, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(2, 8, 2, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/bar".to_string()
                     }
                 }
             ],
-            body: vec![]
+            body: vec![],
+            eof: None,
         }
     )
 }
@@ -586,19 +598,19 @@ import "path/bar""#,
         File {
             base: BaseNode {
                 location: loc.get(2, 1, 5, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: Some(PackageClause {
                 base: BaseNode {
                     location: loc.get(2, 1, 2, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 name: Identifier {
                     base: BaseNode {
                         location: loc.get(2, 9, 2, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "baz".to_string()
                 }
@@ -607,13 +619,13 @@ import "path/bar""#,
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(4, 1, 4, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(4, 8, 4, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/foo".to_string()
                     }
@@ -621,19 +633,20 @@ import "path/bar""#,
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(5, 1, 5, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(5, 8, 5, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/bar".to_string()
                     }
                 }
             ],
-            body: vec![]
+            body: vec![],
+            eof: None,
         },
     )
 }
@@ -656,19 +669,19 @@ import "path/bar"
         File {
             base: BaseNode {
                 location: loc.get(2, 1, 7, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: Some(PackageClause {
                 base: BaseNode {
                     location: loc.get(2, 1, 2, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 name: Identifier {
                     base: BaseNode {
                         location: loc.get(2, 9, 2, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "baz".to_string()
                 }
@@ -677,13 +690,13 @@ import "path/bar"
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(4, 1, 4, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(4, 8, 4, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/foo".to_string()
                     }
@@ -691,45 +704,46 @@ import "path/bar"
                 ImportDeclaration {
                     base: BaseNode {
                         location: loc.get(5, 1, 5, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     alias: None,
                     path: StringLit {
                         base: BaseNode {
                             location: loc.get(5, 8, 5, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "path/bar".to_string()
                     }
                 }
             ],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(7, 1, 7, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(7, 1, 7, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::AdditionOperator,
                     left: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(7, 1, 7, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     }),
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(7, 5, 7, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -752,7 +766,7 @@ fn optional_query_metadata() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 7, 7),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -761,137 +775,150 @@ fn optional_query_metadata() {
             body: vec![Statement::Option(Box::new(OptionStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 7, 7),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 assignment: Assignment::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 8, 7, 7),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 8, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "task".to_string()
                     },
                     init: Expression::Object(Box::new(ObjectExpr {
                         base: BaseNode {
                             location: loc.get(1, 15, 7, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         with: None,
                         properties: vec![
                             Property {
                                 base: BaseNode {
                                     location: loc.get(2, 5, 2, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 5, 2, 9),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "name".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(2, 11, 2, 16),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "foo".to_string()
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(3, 5, 3, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(3, 5, 3, 10),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "every".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Duration(DurationLit {
                                     base: BaseNode {
                                         location: loc.get(3, 12, 3, 14),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     values: vec![Duration {
                                         magnitude: 1,
                                         unit: "h".to_string()
                                     }]
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(4, 5, 4, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(4, 5, 4, 10),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "delay".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Duration(DurationLit {
                                     base: BaseNode {
                                         location: loc.get(4, 12, 4, 15),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     values: vec![Duration {
                                         magnitude: 10,
                                         unit: "m".to_string()
                                     }]
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(5, 5, 5, 22),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(5, 5, 5, 9),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "cron".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(5, 11, 5, 22),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "0 2 * * *".to_string()
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(6, 5, 6, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(6, 5, 6, 10),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "retry".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Integer(IntegerLit {
                                     base: BaseNode {
                                         location: loc.get(6, 12, 6, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 5
-                                }))
+                                })),
+                                comma: None,
                             }
-                        ]
+                        ],
+                        rbrace: None,
                     }))
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -914,7 +941,7 @@ fn optional_query_metadata_preceding_query_text() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 7, 22),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -924,115 +951,138 @@ fn optional_query_metadata_preceding_query_text() {
                 Statement::Option(Box::new(OptionStmt {
                     base: BaseNode {
                         location: loc.get(1, 1, 4, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     assignment: Assignment::Variable(Box::new(VariableAssgn {
                         base: BaseNode {
                             location: loc.get(1, 8, 4, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         id: Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "task".to_string()
                         },
                         init: Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 15, 4, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(2, 6, 2, 17),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 6, 2, 10),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "name".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(2, 12, 2, 17),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "foo".to_string()
-                                    }))
+                                    })),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(3, 6, 3, 15),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(3, 6, 3, 11),
-                                            errors: vec![]
+                                            comments: Some(Box::new(Comment {
+                                                lit: "// Name of task\n".to_string(),
+                                                next: None,
+                                            })),
+                                            ..BaseNode::default()
                                         },
                                         name: "every".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Duration(DurationLit {
                                         base: BaseNode {
                                             location: loc.get(3, 13, 3, 15),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         values: vec![Duration {
                                             magnitude: 1,
                                             unit: "h".to_string()
                                         }]
-                                    }))
+                                    })),
+                                    comma: None,
                                 }
-                            ]
+                            ],
+                            rbrace: Some(Box::new(Comment {
+                                lit: "// Execution frequency of task\n".to_string(),
+                                next: None,
+                            })),
                         }))
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(7, 5, 7, 22),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(7, 5, 7, 22),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(7, 5, 7, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(7, 5, 7, 9),
-                                    errors: vec![]
+                                    comments: Some(Box::new(Comment {
+                                        lit: "// Task will execute the following query\n"
+                                            .to_string(),
+                                        next: None,
+                                    })),
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(7, 15, 7, 22),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(7, 15, 7, 20),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "count".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }
                     })),
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -1047,7 +1097,7 @@ fn qualified_option() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 31),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1056,42 +1106,45 @@ fn qualified_option() {
             body: vec![Statement::Option(Box::new(OptionStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 31),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 assignment: Assignment::Member(Box::new(MemberAssgn {
                     base: BaseNode {
                         location: loc.get(1, 8, 1, 31),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     member: MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 8, 1, 19),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "alert".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 14, 1, 19),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "state".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     },
                     init: Expression::StringLit(StringLit {
                         base: BaseNode {
                             location: loc.get(1, 22, 1, 31),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "Warning".to_string()
                     })
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1106,25 +1159,26 @@ fn builtin() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Builtin(BuiltinStmt {
+            body: vec![Statement::Builtin(Box::new(BuiltinStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "from".to_string()
                 }
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1139,7 +1193,7 @@ fn test_statement() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 30),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1148,71 +1202,78 @@ fn test_statement() {
             body: vec![Statement::Test(Box::new(TestStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 30),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 assignment: VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 6, 1, 30),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "mean".to_string()
                     },
                     init: Expression::Object(Box::new(ObjectExpr {
                         base: BaseNode {
                             location: loc.get(1, 13, 1, 30),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         with: None,
                         properties: vec![
                             Property {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 21),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 14, 1, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "want".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Integer(IntegerLit {
                                     base: BaseNode {
                                         location: loc.get(1, 20, 1, 21),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 0
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(1, 23, 1, 29),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 23, 1, 26),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "got".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Integer(IntegerLit {
                                     base: BaseNode {
                                         location: loc.get(1, 28, 1, 29),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 0
-                                }))
+                                })),
+                                comma: None,
                             }
-                        ]
+                        ],
+                        rbrace: None,
                     }))
                 }
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1227,32 +1288,35 @@ fn from() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 7),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 7),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Call(Box::new(CallExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 7),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    arguments: vec![],
                     callee: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "from".to_string()
-                    })
+                    }),
+                    lparen: None,
+                    arguments: vec![],
+                    rparen: None,
                 })),
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1270,32 +1334,39 @@ fn comment() {
         File {
             base: BaseNode {
                 location: loc.get(2, 4, 2, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(2, 4, 2, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Call(Box::new(CallExpr {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    arguments: vec![],
                     callee: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 8),
-                            errors: vec![]
+                            comments: Some(Box::new(Comment {
+                                lit: "// Comment\n".to_string(),
+                                next: None,
+                            })),
+                            ..BaseNode::default()
                         },
                         name: "from".to_string()
-                    })
+                    }),
+                    lparen: None,
+                    arguments: vec![],
+                    rparen: None,
                 })),
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1310,32 +1381,35 @@ fn identifier_with_number() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 7),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 7),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Call(Box::new(CallExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 7),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    arguments: vec![],
                     callee: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "tan2".to_string()
-                    })
+                    }),
+                    lparen: None,
+                    arguments: vec![],
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1350,25 +1424,26 @@ fn regex_literal() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 5),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 5),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Regexp(RegexpLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 5),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: ".*".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1383,25 +1458,26 @@ fn regex_literal_with_escape_sequence() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Regexp(RegexpLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "a/b\\\\c\\d".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1416,16 +1492,16 @@ fn bad_regex_literal() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 4),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 4),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Regexp(RegexpLit {
                     base: BaseNode {
@@ -1433,11 +1509,13 @@ fn bad_regex_literal() {
                         errors: vec![
                             "regex parse error: * error: repetition operator missing expression"
                                 .to_string()
-                        ]
+                        ],
+                        ..BaseNode::default()
                     },
                     value: "".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1452,40 +1530,40 @@ fn regex_match_operators() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 28),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 28),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 28),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::RegexpMatchOperator,
                         left: Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a".to_string()
                         }),
                         right: Expression::Regexp(RegexpLit {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: ".*".to_string()
                         })
@@ -1493,26 +1571,27 @@ fn regex_match_operators() {
                     right: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 17, 1, 28),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotRegexpMatchOperator,
                         left: Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 17, 1, 20),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "b".to_string()
                         }),
                         right: Expression::Regexp(RegexpLit {
                             base: BaseNode {
                                 location: loc.get(1, 24, 1, 28),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "c$".to_string()
                         })
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1527,7 +1606,7 @@ fn declare_variable_as_an_int() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1536,23 +1615,24 @@ fn declare_variable_as_an_int() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "howdy".to_string()
                 },
                 init: Expression::Integer(IntegerLit {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: 1
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1567,7 +1647,7 @@ fn declare_variable_as_a_float() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1576,23 +1656,24 @@ fn declare_variable_as_a_float() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "howdy".to_string()
                 },
                 init: Expression::Float(FloatLit {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: 1.1
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1607,7 +1688,7 @@ fn declare_variable_as_an_array() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 21),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1616,52 +1697,67 @@ fn declare_variable_as_an_array() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 21),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "howdy".to_string()
                 },
                 init: Expression::Array(Box::new(ArrayExpr {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 21),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrack: None,
                     elements: vec![
-                        Expression::Integer(IntegerLit {
-                            base: BaseNode {
-                                location: loc.get(1, 10, 1, 11),
-                                errors: vec![]
-                            },
-                            value: 1
-                        }),
-                        Expression::Integer(IntegerLit {
-                            base: BaseNode {
-                                location: loc.get(1, 13, 1, 14),
-                                errors: vec![]
-                            },
-                            value: 2
-                        }),
-                        Expression::Integer(IntegerLit {
-                            base: BaseNode {
-                                location: loc.get(1, 16, 1, 17),
-                                errors: vec![]
-                            },
-                            value: 3
-                        }),
-                        Expression::Integer(IntegerLit {
-                            base: BaseNode {
-                                location: loc.get(1, 19, 1, 20),
-                                errors: vec![]
-                            },
-                            value: 4
-                        })
-                    ]
+                        ArrayItem {
+                            expression: Expression::Integer(IntegerLit {
+                                base: BaseNode {
+                                    location: loc.get(1, 10, 1, 11),
+                                    ..BaseNode::default()
+                                },
+                                value: 1
+                            }),
+                            comma: None,
+                        },
+                        ArrayItem {
+                            expression: Expression::Integer(IntegerLit {
+                                base: BaseNode {
+                                    location: loc.get(1, 13, 1, 14),
+                                    ..BaseNode::default()
+                                },
+                                value: 2
+                            }),
+                            comma: None,
+                        },
+                        ArrayItem {
+                            expression: Expression::Integer(IntegerLit {
+                                base: BaseNode {
+                                    location: loc.get(1, 16, 1, 17),
+                                    ..BaseNode::default()
+                                },
+                                value: 3
+                            }),
+                            comma: None,
+                        },
+                        ArrayItem {
+                            expression: Expression::Integer(IntegerLit {
+                                base: BaseNode {
+                                    location: loc.get(1, 19, 1, 20),
+                                    ..BaseNode::default()
+                                },
+                                value: 4
+                            }),
+                            comma: None,
+                        }
+                    ],
+                    rbrack: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1676,7 +1772,7 @@ fn declare_variable_as_an_empty_array() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 11),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1685,23 +1781,26 @@ fn declare_variable_as_an_empty_array() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 11),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "howdy".to_string()
                 },
                 init: Expression::Array(Box::new(ArrayExpr {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrack: None,
                     elements: vec![],
+                    rbrack: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1719,7 +1818,7 @@ fn use_variable_to_declare_something() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1729,44 +1828,47 @@ fn use_variable_to_declare_something() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "howdy".to_string()
                     },
                     init: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     })
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 4, 2, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -1784,7 +1886,7 @@ fn variable_is_from_statement() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 17),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -1794,64 +1896,71 @@ fn variable_is_from_statement() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 15),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "howdy".to_string()
                     },
                     init: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 15),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 17),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 17),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Member(Box::new(MemberExpr {
                             base: BaseNode {
                                 location: loc.get(2, 4, 2, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             object: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 4, 2, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "howdy".to_string()
                             }),
+                            lbrack: None,
                             property: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 10, 2, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "count".to_string()
-                            })
-                        }))
+                            }),
+                            rbrack: None,
+                        })),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -1866,52 +1975,57 @@ fn pipe_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 18),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 11, 1, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 16),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "count".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -1926,84 +2040,93 @@ fn pipe_expression_to_member_expression_function() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Member(Box::new(MemberExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             object: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            lbrack: None,
                             property: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 8, 1, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
-                            })
+                            }),
+                            rbrack: None,
                         })),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(1, 10, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 10, 1, 11),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "d".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 12, 1, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "e".to_string()
-                                }))
-                            }]
-                        }))]
+                                })),
+                                comma: None,
+                            }],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2018,45 +2141,48 @@ fn literal_pipe_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5,
                     }),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "pow2".to_string()
-                        })
-                    },
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
+                    }
                 })),
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2071,58 +2197,63 @@ fn member_expression_pipe_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 17),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 17),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 17),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "foo".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "bar".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 12, 1, 17),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "baz".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2137,92 +2268,101 @@ fn multiple_pipe_expressions() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 41),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 41),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 41),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 30),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::PipeExpr(Box::new(PipeExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             argument: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 1, 1, 5),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "from".to_string()
                                 }),
-                                arguments: vec![]
+                                lparen: None,
+                                arguments: vec![],
+                                rparen: None,
                             })),
                             call: CallExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 18),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 11, 1, 16),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "range".to_string()
                                 }),
-                                arguments: vec![]
+                                lparen: None,
+                                arguments: vec![],
+                                rparen: None,
                             }
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 22, 1, 30),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 22, 1, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "filter".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 34, 1, 41),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 34, 1, 39),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "count".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2237,52 +2377,58 @@ fn pipe_expression_into_non_call_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "foo".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 10, 1, 13),
-                            errors: vec!["pipe destination must be a function call".to_string()]
+                            errors: vec!["pipe destination must be a function call".to_string()],
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "bar".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 })),
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2302,7 +2448,7 @@ fn two_variables_for_two_froms() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 4, 16),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2312,124 +2458,133 @@ fn two_variables_for_two_froms() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 15),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "howdy".to_string()
                     },
                     init: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 15),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                 })),
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 9),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "doody".to_string()
                     },
                     init: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(2, 12, 2, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 12, 2, 16),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(3, 4, 3, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(3, 4, 3, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(3, 4, 3, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "howdy".to_string()
                         }),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(3, 11, 3, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 11, 3, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "count".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }
                     }))
-                }),
-                Statement::Expr(ExprStmt {
+                })),
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(4, 4, 4, 16),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(4, 4, 4, 16),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(4, 4, 4, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "doody".to_string()
                         }),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(4, 11, 4, 16),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(4, 11, 4, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "sum".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -2444,58 +2599,65 @@ fn from_with_database() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 32),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 32),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Call(Box::new(CallExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 32),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     callee: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "from".to_string()
                     }),
+                    lparen: None,
                     arguments: vec![Expression::Object(Box::new(ObjectExpr {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 31),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         with: None,
                         properties: vec![Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 31),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "bucket".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 13, 1, 31),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "telegraf/autogen".to_string()
-                            }))
-                        }]
-                    }))]
+                            })),
+                            comma: None,
+                        }],
+                        rbrace: None,
+                    }))],
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2515,7 +2677,7 @@ fn map_member_expressions() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 3, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2525,118 +2687,129 @@ fn map_member_expressions() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 29),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "m".to_string()
                     },
                     init: Expression::Object(Box::new(ObjectExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 29),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         with: None,
                         properties: vec![
                             Property {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 10),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "key1".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Integer(IntegerLit {
                                     base: BaseNode {
                                         location: loc.get(1, 12, 1, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 1
-                                }))
+                                })),
+                                comma: None,
                             },
                             Property {
                                 base: BaseNode {
                                     location: loc.get(1, 15, 1, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 15, 1, 19),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "key2".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(1, 20, 1, 28),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "value2".to_string()
-                                }))
+                                })),
+                                comma: None,
                             }
-                        ]
+                        ],
+                        rbrace: None,
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 4, 2, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "m".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 6, 2, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "key1".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     }))
-                }),
-                Statement::Expr(ExprStmt {
+                })),
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(3, 4, 3, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(3, 4, 3, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(3, 4, 3, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "m".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(3, 6, 3, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "key2".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -2651,7 +2824,7 @@ fn object_with_string_literal_key() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2660,43 +2833,48 @@ fn object_with_string_literal_key() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "x".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a".to_string()
                         }),
+                        separator: None,
                         value: Some(Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 10
-                        }))
-                    }]
+                        })),
+                        comma: None,
+                    }],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2711,7 +2889,7 @@ fn object_with_mixed_keys() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 21),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2720,65 +2898,72 @@ fn object_with_mixed_keys() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 21),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "x".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 21),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "a".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 10
-                            }))
+                            })),
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 15, 1, 20),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 15, 1, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 18, 1, 20),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 11
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2793,7 +2978,7 @@ fn implicit_key_object_literal() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 11),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2802,53 +2987,60 @@ fn implicit_key_object_literal() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 11),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "x".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2864,7 +3056,7 @@ fn implicit_key_object_literal_error() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2873,54 +3065,61 @@ fn implicit_key_object_literal_error() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "x".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             // TODO(affo): this should error with ast.Check: "string literal key "a" must have a value".
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "a".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -2936,7 +3135,7 @@ fn implicit_and_explicit_keys_object_literal_error() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -2945,12 +3144,12 @@ fn implicit_and_explicit_keys_object_literal_error() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "x".to_string()
                 },
@@ -2958,47 +3157,54 @@ fn implicit_and_explicit_keys_object_literal_error() {
                     // TODO(affo): this should error in ast.Check(): "cannot mix implicit and explicit properties".
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3013,73 +3219,83 @@ fn object_with() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 18),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    with: Some(Identifier {
-                        base: BaseNode {
-                            location: loc.get(1, 2, 1, 3),
-                            errors: vec![]
+                    lbrace: None,
+                    with: Some(WithSource {
+                        source: Identifier {
+                            base: BaseNode {
+                                location: loc.get(1, 2, 1, 3),
+                                ..BaseNode::default()
+                            },
+                            name: "a".to_string()
                         },
-                        name: "a".to_string()
+                        with: None
                     }),
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
-                            }))
+                            })),
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 14, 1, 17),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "d".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 16, 1, 17),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "e".to_string()
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3094,61 +3310,71 @@ fn object_with_implicit_keys() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    with: Some(Identifier {
-                        base: BaseNode {
-                            location: loc.get(1, 2, 1, 3),
-                            errors: vec![]
+                    lbrace: None,
+                    with: Some(WithSource {
+                        source: Identifier {
+                            base: BaseNode {
+                                location: loc.get(1, 2, 1, 3),
+                                ..BaseNode::default()
+                            },
+                            name: "a".to_string()
                         },
-                        name: "a".to_string()
+                        with: None,
                     }),
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3163,38 +3389,41 @@ fn index_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 5),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 5),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 5),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     array: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
+                    lbrack: None,
                     index: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 3, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3209,51 +3438,56 @@ fn nested_index_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 8),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 8),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     array: Expression::Index(Box::new(IndexExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         array: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
+                        lbrack: None,
                         index: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 3
-                        })
+                        }),
+                        rbrack: None,
                     })),
+                    lbrack: None,
                     index: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3268,45 +3502,50 @@ fn access_indexed_object_returned_from_function_call() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 7),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 7),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 7),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     array: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "f".to_string()
                         }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
+                    lbrack: None,
                     index: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3321,51 +3560,56 @@ fn index_with_member_expressions() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 9),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 9),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Member(Box::new(MemberExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 9),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     object: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     })),
+                    lbrack: None,
                     property: PropertyKey::StringLit(StringLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "c".to_string()
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3380,58 +3624,65 @@ fn index_with_member_with_call_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 11),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 11),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Member(Box::new(MemberExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     object: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Member(Box::new(MemberExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             object: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 2),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
+                            lbrack: None,
                             property: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 3, 1, 4),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
-                            })
+                            }),
+                            rbrack: None,
                         })),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
+                    lbrack: None,
                     property: PropertyKey::StringLit(StringLit {
                         base: BaseNode {
                             location: loc.get(1, 7, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: "c".to_string()
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3446,45 +3697,51 @@ fn index_with_unclosed_bracket() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec!["expected RBRACK, got EOF".to_string()]
+                        errors: vec!["expected RBRACK, got EOF".to_string()],
+                        ..BaseNode::default()
                     },
                     array: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
+                    lbrack: None,
                     index: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 3, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3499,45 +3756,51 @@ fn index_with_unbalanced_parenthesis() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     array: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
+                    lbrack: None,
                     index: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 3, 1, 6),
-                            errors: vec!["expected RPAREN, got RBRACK".to_string()]
+                            errors: vec!["expected RPAREN, got RBRACK".to_string()],
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3552,38 +3815,42 @@ fn index_with_unexpected_rparen() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Index(Box::new(IndexExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec!["invalid expression @1:4-1:5: )".to_string()]
+                        errors: vec!["invalid expression @1:4-1:5: )".to_string()],
+                        ..BaseNode::default()
                     },
                     array: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
+                    lbrack: None,
                     index: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 3, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "b".to_string()
-                    })
+                    }),
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3598,39 +3865,40 @@ fn binary_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::LessThanOperator,
                     left: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "_value".to_string()
                     }),
                     right: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 10, 1, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 10.0
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3645,52 +3913,55 @@ fn member_expression_binary_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 16),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 16),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 16),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::LessThanOperator,
                     left: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 9),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "r".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 9),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "_value".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     })),
                     right: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 12, 1, 16),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 10.0
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -3710,7 +3981,7 @@ fn var_as_binary_expression_of_other_vars() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 4, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -3720,19 +3991,19 @@ fn var_as_binary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     })
@@ -3740,19 +4011,19 @@ fn var_as_binary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "b".to_string()
                     },
                     init: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(2, 17, 2, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 2
                     })
@@ -3760,32 +4031,32 @@ fn var_as_binary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(3, 13, 3, 22),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(3, 13, 3, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     },
                     init: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(3, 17, 3, 22),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::AdditionOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(3, 17, 3, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(3, 21, 3, 22),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
@@ -3794,24 +4065,25 @@ fn var_as_binary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(4, 13, 4, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(4, 13, 4, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "d".to_string()
                     },
                     init: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(4, 17, 4, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     })
                 }))
-            ]
+            ],
+            eof: None,
         },
     )
 }
@@ -3829,7 +4101,7 @@ fn var_as_unary_expression_of_other_vars() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 19),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -3839,19 +4111,19 @@ fn var_as_unary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5
                     })
@@ -3859,31 +4131,32 @@ fn var_as_unary_expression_of_other_vars() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 19),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     },
                     init: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(2, 17, 2, 19),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::SubtractionOperator,
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 18, 2, 19),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         })
                     }))
                 }))
-            ]
+            ],
+            eof: None,
         },
     )
 }
@@ -3901,7 +4174,7 @@ fn var_as_both_binary_and_unary_expressions() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 24),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -3911,19 +4184,19 @@ fn var_as_both_binary_and_unary_expressions() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5
                     })
@@ -3931,45 +4204,46 @@ fn var_as_both_binary_and_unary_expressions() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 24),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     },
                     init: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(2, 17, 2, 24),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::MultiplicationOperator,
                         left: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(2, 17, 2, 19),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 10
                         }),
                         right: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 22, 2, 24),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::SubtractionOperator,
                             argument: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 23, 2, 24),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             })
                         }))
                     }))
                 }))
-            ]
+            ],
+            eof: None,
         },
     )
 }
@@ -3987,7 +4261,7 @@ fn unary_expressions_within_logical_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 42),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -3997,63 +4271,63 @@ fn unary_expressions_within_logical_expression() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5.0
                     })
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 42),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 42),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 13, 2, 30),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 13, 2, 22),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::MultiplicationOperator,
                                 left: Expression::Float(FloatLit {
                                     base: BaseNode {
                                         location: loc.get(2, 13, 2, 17),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 10.0
                                 }),
                                 right: Expression::Unary(Box::new(UnaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 20, 2, 22),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::SubtractionOperator,
                                     argument: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 21, 2, 22),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "a".to_string()
                                     })
@@ -4062,13 +4336,13 @@ fn unary_expressions_within_logical_expression() {
                             right: Expression::Unary(Box::new(UnaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 26, 2, 30),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::SubtractionOperator,
                                 argument: Expression::Float(FloatLit {
                                     base: BaseNode {
                                         location: loc.get(2, 27, 2, 30),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 0.5
                                 })
@@ -4077,27 +4351,28 @@ fn unary_expressions_within_logical_expression() {
                         right: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 34, 2, 42),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 34, 2, 35),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
                             right: Expression::Float(FloatLit {
                                 base: BaseNode {
                                     location: loc.get(2, 39, 2, 42),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 6.0
                             })
                         }))
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -4112,45 +4387,48 @@ fn unary_expression_with_member_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 8),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 8),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Unary(Box::new(UnaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::NotOperator,
                     argument: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         object: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "m".to_string()
                         }),
+                        lbrack: None,
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 7, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
-                        })
+                        }),
+                        rbrack: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4172,7 +4450,7 @@ a = 5.0
         File {
             base: BaseNode {
                 location: loc.get(2, 1, 6, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -4182,63 +4460,75 @@ a = 5.0
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 1, 2, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 1, 2, 2),
-                            errors: vec![]
+                            comments: Some(Box::new(Comment {
+                                lit: "// define a\n".to_string(),
+                                next: None,
+                            })),
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(2, 5, 2, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 5.0
                     })
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(4, 1, 6, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(4, 1, 6, 13),
-                            errors: vec![]
+                            comments: Some(Box::new(Comment {
+                                lit: "// or this\n".to_string(),
+                                next: None,
+                            })),
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(4, 1, 4, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(4, 1, 4, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::MultiplicationOperator,
                                 left: Expression::Float(FloatLit {
                                     base: BaseNode {
                                         location: loc.get(4, 1, 4, 5),
-                                        errors: vec![]
+                                        comments: Some(Box::new(Comment {
+                                            lit: "// eval this\n".to_string(),
+                                            next: None,
+                                        })),
+                                        ..BaseNode::default()
                                     },
                                     value: 10.0
                                 }),
                                 right: Expression::Unary(Box::new(UnaryExpr {
                                     base: BaseNode {
                                         location: loc.get(4, 8, 4, 10),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::SubtractionOperator,
                                     argument: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(4, 9, 4, 10),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "a".to_string()
                                     })
@@ -4247,13 +4537,13 @@ a = 5.0
                             right: Expression::Unary(Box::new(UnaryExpr {
                                 base: BaseNode {
                                     location: loc.get(4, 14, 4, 18),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::SubtractionOperator,
                                 argument: Expression::Float(FloatLit {
                                     base: BaseNode {
                                         location: loc.get(4, 15, 4, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 0.5
                                 })
@@ -4262,27 +4552,28 @@ a = 5.0
                         right: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(6, 5, 6, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(6, 5, 6, 6),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
                             right: Expression::Float(FloatLit {
                                 base: BaseNode {
                                     location: loc.get(6, 10, 6, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 6.0
                             })
                         }))
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -4297,7 +4588,7 @@ fn expressions_with_function_calls() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 16),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -4306,44 +4597,47 @@ fn expressions_with_function_calls() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 16),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "a".to_string()
                 },
                 init: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 16),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::EqualOperator,
                     left: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "foo".to_string()
-                        })
+                        }),
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     })),
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 14, 1, 16),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 10
                     })
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4361,94 +4655,101 @@ fn mix_unary_logical_and_binary_expressions() {
         File {
             base: BaseNode {
                 location: loc.get(2, 13, 2, 43),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(2, 13, 2, 43),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 43),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 33),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Paren(Box::new(ParenExpr {
                             base: BaseNode {
                                 location: loc.get(2, 17, 2, 33),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lparen: None,
                             expression: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 18, 2, 32),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::EqualOperator,
                                 left: Expression::Call(Box::new(CallExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 18, 2, 21),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
-                                    arguments: vec![],
+                                    lparen: None,
                                     callee: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 18, 2, 19),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "f".to_string()
-                                    })
+                                    }),
+                                    arguments: vec![],
+                                    rparen: None,
                                 })),
                                 right: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 25, 2, 32),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::MultiplicationOperator,
                                     left: Expression::Float(FloatLit {
                                         base: BaseNode {
                                             location: loc.get(2, 25, 2, 28),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: 6.0
                                     }),
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 31, 2, 32),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "x".to_string()
                                     })
                                 }))
-                            }))
+                            })),
+                            rparen: None,
                         }))
                     })),
                     right: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(2, 37, 2, 43),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
-                        arguments: vec![],
+                        lparen: None,
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 37, 2, 41),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "fail".to_string()
-                        })
+                        }),
+                        arguments: vec![],
+                        rparen: None,
                     })),
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4466,100 +4767,109 @@ fn mix_unary_logical_and_binary_expressions_with_extra_parens() {
         File {
             base: BaseNode {
                 location: loc.get(2, 13, 2, 45),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(2, 13, 2, 45),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Paren(Box::new(ParenExpr {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 45),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     expression: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(2, 14, 2, 44),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 14, 2, 34),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::NotOperator,
                             argument: Expression::Paren(Box::new(ParenExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 18, 2, 34),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lparen: None,
                                 expression: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 19, 2, 33),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::EqualOperator,
                                     left: Expression::Call(Box::new(CallExpr {
                                         base: BaseNode {
                                             location: loc.get(2, 19, 2, 22),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
-                                        arguments: vec![],
+                                        lparen: None,
                                         callee: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 19, 2, 20),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "f".to_string()
-                                        })
+                                        }),
+                                        arguments: vec![],
+                                        rparen: None,
                                     })),
                                     right: Expression::Binary(Box::new(BinaryExpr {
                                         base: BaseNode {
                                             location: loc.get(2, 26, 2, 33),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::MultiplicationOperator,
                                         left: Expression::Float(FloatLit {
                                             base: BaseNode {
                                                 location: loc.get(2, 26, 2, 29),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             value: 6.0
                                         }),
                                         right: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 32, 2, 33),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "x".to_string()
                                         })
                                     }))
-                                }))
+                                })),
+                                rparen: None,
                             }))
                         })),
                         right: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(2, 38, 2, 44),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
-                            arguments: vec![],
+                            lparen: None,
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 38, 2, 42),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "fail".to_string()
-                            })
+                            }),
+                            arguments: vec![],
+                            rparen: None,
                         })),
-                    }))
+                    })),
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4574,39 +4884,40 @@ fn modulo_op_ints() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::ModuloOperator,
                     left: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3
                     }),
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 8
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4621,39 +4932,40 @@ fn modulo_op_floats() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::ModuloOperator,
                     left: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 8.3
                     }),
                     right: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 7, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3.1
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4668,39 +4980,40 @@ fn power_op() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::PowerOperator,
                     left: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 2
                     }),
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 4
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4715,40 +5028,40 @@ fn binary_operator_precedence() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::SubtractionOperator,
                     left: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::DivisionOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
@@ -4756,12 +5069,13 @@ fn binary_operator_precedence() {
                     right: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1.0
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4776,40 +5090,40 @@ fn binary_operator_precedence_literals_only() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::SubtractionOperator,
                     left: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::DivisionOperator,
                         left: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 2
                         }),
                         right: Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a".to_string()
                         })
@@ -4817,12 +5131,13 @@ fn binary_operator_precedence_literals_only() {
                     right: Expression::Float(FloatLit {
                         base: BaseNode {
                             location: loc.get(1, 11, 1, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1.0
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4837,40 +5152,40 @@ fn binary_operator_precedence_double_subtraction() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::SubtractionOperator,
                     left: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::SubtractionOperator,
                         left: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 1
                         }),
                         right: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 2
                         })
@@ -4878,12 +5193,13 @@ fn binary_operator_precedence_double_subtraction() {
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4898,59 +5214,62 @@ fn binary_operator_precedence_double_subtraction_with_parens() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::SubtractionOperator,
                     left: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     }),
                     right: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::SubtractionOperator,
                             left: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 2
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 10, 1, 11),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 3
                             })
-                        }))
+                        })),
+                        rparen: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -4965,40 +5284,40 @@ fn binary_operator_precedence_double_sum() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::AdditionOperator,
                     left: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::AdditionOperator,
                         left: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 1
                         }),
                         right: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 2
                         })
@@ -5006,12 +5325,13 @@ fn binary_operator_precedence_double_sum() {
                     right: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 9, 1, 10),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 3
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5026,59 +5346,62 @@ fn binary_operator_precedence_double_sum_with_parens() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Binary(Box::new(BinaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::AdditionOperator,
                     left: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
                     }),
                     right: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::AdditionOperator,
                             left: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 2
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 10, 1, 11),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 3
                             })
-                        }))
+                        })),
+                        rparen: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5093,39 +5416,39 @@ fn logical_unary_operator_precedence() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Unary(Box::new(UnaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::NotOperator,
                     argument: Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::EqualOperator,
                         left: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::SubtractionOperator,
                             argument: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 1
                             })
@@ -5133,13 +5456,14 @@ fn logical_unary_operator_precedence() {
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         })
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5157,137 +5481,143 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 72),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 2, 72),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 2, 72),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 2, 32),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 2, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::AndOperator,
                             left: Expression::Logical(Box::new(LogicalExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 55),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: LogicalOperator::AndOperator,
                                 left: Expression::Logical(Box::new(LogicalExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 1, 1, 41),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: LogicalOperator::AndOperator,
                                     left: Expression::Binary(Box::new(BinaryExpr {
                                         base: BaseNode {
                                             location: loc.get(1, 1, 1, 27),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::LessThanOperator,
                                         left: Expression::Binary(Box::new(BinaryExpr {
                                             base: BaseNode {
                                                 location: loc.get(1, 1, 1, 21),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             operator: Operator::EqualOperator,
                                             left: Expression::Call(Box::new(CallExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 1, 1, 4),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
-                                                arguments: vec![],
                                                 callee: Expression::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(1, 1, 1, 2),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "a".to_string()
-                                                })
+                                                }),
+                                                lparen: None,
+                                                arguments: vec![],
+                                                rparen: None,
                                             })),
                                             right: Expression::Binary(Box::new(BinaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 8, 1, 21),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::AdditionOperator,
                                                 left: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(1, 8, 1, 11),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(1, 8, 1, 9),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "b".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(1, 10, 1, 11),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "a".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 })),
                                                 right: Expression::Binary(Box::new(BinaryExpr {
                                                     base: BaseNode {
                                                         location: loc.get(1, 14, 1, 21),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     operator: Operator::MultiplicationOperator,
                                                     left: Expression::Member(Box::new(
                                                         MemberExpr {
                                                             base: BaseNode {
                                                                 location: loc.get(1, 14, 1, 17),
-                                                                errors: vec![]
+                                                                ..BaseNode::default()
                                                             },
                                                             object: Expression::Identifier(
                                                                 Identifier {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(1, 14, 1, 15),
-                                                                        errors: vec![]
+                                                                        ..BaseNode::default()
                                                                     },
                                                                     name: "b".to_string()
                                                                 }
                                                             ),
+                                                            lbrack: None,
                                                             property: PropertyKey::Identifier(
                                                                 Identifier {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(1, 16, 1, 17),
-                                                                        errors: vec![]
+                                                                        ..BaseNode::default()
                                                                     },
                                                                     name: "c".to_string()
                                                                 }
-                                                            )
+                                                            ),
+                                                            rbrack: None,
                                                         }
                                                     )),
                                                     right: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(1, 20, 1, 21),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "d".to_string()
                                                     })
@@ -5297,7 +5627,7 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                                         right: Expression::Integer(IntegerLit {
                                             base: BaseNode {
                                                 location: loc.get(1, 24, 1, 27),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             value: 100
                                         })
@@ -5305,68 +5635,70 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                                     right: Expression::Binary(Box::new(BinaryExpr {
                                         base: BaseNode {
                                             location: loc.get(1, 32, 1, 41),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::NotEqualOperator,
                                         left: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(1, 32, 1, 33),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "e".to_string()
                                         }),
                                         right: Expression::Index(Box::new(IndexExpr {
                                             base: BaseNode {
                                                 location: loc.get(1, 37, 1, 41),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             array: Expression::Identifier(Identifier {
                                                 base: BaseNode {
                                                     location: loc.get(1, 37, 1, 38),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 name: "f".to_string()
                                             }),
+                                            lbrack: None,
                                             index: Expression::Identifier(Identifier {
                                                 base: BaseNode {
                                                     location: loc.get(1, 39, 1, 40),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 name: "g".to_string()
-                                            })
+                                            }),
+                                            rbrack: None,
                                         }))
                                     }))
                                 })),
                                 right: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 46, 1, 55),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::GreaterThanOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 46, 1, 47),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "h".to_string()
                                     }),
                                     right: Expression::Binary(Box::new(BinaryExpr {
                                         base: BaseNode {
                                             location: loc.get(1, 50, 1, 55),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::MultiplicationOperator,
                                         left: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(1, 50, 1, 51),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "i".to_string()
                                         }),
                                         right: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(1, 54, 1, 55),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "j".to_string()
                                         })
@@ -5376,26 +5708,26 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                             right: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 1, 2, 18),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::LessThanOperator,
                                 left: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 1, 2, 6),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::DivisionOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 1, 2, 2),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "k".to_string()
                                     }),
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 5, 2, 6),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "l".to_string()
                                     })
@@ -5403,26 +5735,26 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                                 right: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 9, 2, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::SubtractionOperator,
                                     left: Expression::Binary(Box::new(BinaryExpr {
                                         base: BaseNode {
                                             location: loc.get(2, 9, 2, 14),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::AdditionOperator,
                                         left: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 9, 2, 10),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "m".to_string()
                                         }),
                                         right: Expression::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 13, 2, 14),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "n".to_string()
                                         })
@@ -5430,7 +5762,7 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 17, 2, 18),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "o".to_string()
                                     })
@@ -5440,68 +5772,72 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                         right: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 22, 2, 32),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::LessThanEqualOperator,
                             left: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 22, 2, 25),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
-                                arguments: vec![],
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 22, 2, 23),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "p".to_string()
-                                })
+                                }),
+                                lparen: None,
+                                arguments: vec![],
+                                rparen: None,
                             })),
                             right: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 29, 2, 32),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
-                                arguments: vec![],
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 29, 2, 30),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "q".to_string()
-                                })
+                                }),
+                                lparen: None,
+                                arguments: vec![],
+                                rparen: None,
                             }))
                         }))
                     })),
                     right: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(2, 36, 2, 72),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::AndOperator,
                         left: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(2, 36, 2, 59),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::AndOperator,
                             left: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 36, 2, 42),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::GreaterThanEqualOperator,
                                 left: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 36, 2, 37),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "r".to_string()
                                 }),
                                 right: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 41, 2, 42),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "s".to_string()
                                 })
@@ -5509,26 +5845,26 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                             right: Expression::Unary(Box::new(UnaryExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 47, 2, 59),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::NotOperator,
                                 argument: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 51, 2, 59),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::RegexpMatchOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 51, 2, 52),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "t".to_string()
                                     }),
                                     right: Expression::Regexp(RegexpLit {
                                         base: BaseNode {
                                             location: loc.get(2, 56, 2, 59),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "a".to_string()
                                     })
@@ -5538,27 +5874,28 @@ k / l < m + n - o or p() <= q() or r >= s and not t =~ /a/ and u !~ /a/"#,
                         right: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 64, 2, 72),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::NotRegexpMatchOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 64, 2, 65),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "u".to_string()
                             }),
                             right: Expression::Regexp(RegexpLit {
                                 base: BaseNode {
                                     location: loc.get(2, 69, 2, 72),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "a".to_string()
                             })
                         }))
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5573,33 +5910,33 @@ fn logical_operators_precedence_1() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 11),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 11),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         })
@@ -5607,12 +5944,13 @@ fn logical_operators_precedence_1() {
                     right: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 10, 1, 11),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "b".to_string()
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5627,46 +5965,47 @@ fn logical_operators_precedence_2() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 11),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 11),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 11),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
                     right: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 11),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5681,33 +6020,33 @@ fn logical_operators_precedence_3() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 6),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         })
@@ -5715,12 +6054,13 @@ fn logical_operators_precedence_3() {
                     right: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 11, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "b".to_string()
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5735,46 +6075,47 @@ fn logical_operators_precedence_4() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
                     right: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 7, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5789,40 +6130,40 @@ fn logical_operators_precedence_5() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::AndOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 2),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 7, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
@@ -5830,12 +6171,13 @@ fn logical_operators_precedence_5() {
                     right: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 12, 1, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5850,53 +6192,54 @@ fn logical_operators_precedence_6() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::OrOperator,
                     left: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
                     right: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::AndOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "c".to_string()
                         })
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5911,52 +6254,55 @@ fn logical_operators_precedence_7() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Unary(Box::new(UnaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 13),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::NotOperator,
                     argument: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::OrOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
                             right: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             })
-                        }))
+                        })),
+                        rparen: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -5971,52 +6317,55 @@ fn logical_operators_precedence_8() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Unary(Box::new(UnaryExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: Operator::NotOperator,
                     argument: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 5, 1, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::AndOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
                             right: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             })
-                        }))
+                        })),
+                        rparen: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6031,59 +6380,62 @@ fn logical_operators_precedence_9() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 15),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 15),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 15),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 9),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 8),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::OrOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 2, 1, 3),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
                             right: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 7, 1, 8),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             })
-                        }))
+                        })),
+                        rparen: None,
                     })),
                     right: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 14, 1, 15),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6098,59 +6450,62 @@ fn logical_operators_precedence_10() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 15),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 15),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 15),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     }),
                     right: Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 7, 1, 15),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 14),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::OrOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 8, 1, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
                             right: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 13, 1, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
                             })
-                        }))
+                        })),
+                        rparen: None,
                     }))
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6171,81 +6526,88 @@ fn two_logical_operations_with_parens() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 15),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 2, 15),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Logical(Box::new(LogicalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 2, 15),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     operator: LogicalOperator::AndOperator,
                     left: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 2, 9),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 5, 2, 9),
-                                errors: vec!["expected comma in property list, got OR".to_string()]
+                                errors: vec!["expected comma in property list, got OR".to_string()],
+                                ..BaseNode::default()
                             },
                             callee: Expression::Paren(Box::new(ParenExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 5, 1, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lparen: None,
                                 expression: Expression::Logical(Box::new(LogicalExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: LogicalOperator::AndOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 6, 1, 7),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "a".to_string()
                                     }),
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 12, 1, 13),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "b".to_string()
                                     })
-                                }))
+                                })),
+                                rparen: None,
                             })),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 2, 2, 8),
-                                    errors: vec![],
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![
                                     Property {
                                         base: BaseNode {
                                             location: loc.get(2, 2, 2, 3),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 2, 2, 3),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "a".to_string()
                                         }),
+                                        separator: None,
                                         value: None,
+                                        comma: None,
                                     },
                                     Property {
                                         base: BaseNode {
@@ -6253,30 +6615,36 @@ fn two_logical_operations_with_parens() {
                                             errors: vec![
                                                 "unexpected token for property key: OR (or)"
                                                     .to_string()
-                                            ]
+                                            ],
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::StringLit(StringLit {
                                             base: BaseNode {
                                                 location: loc.get(2, 4, 2, 4),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             value: "<invalid>".to_string()
                                         }),
+                                        separator: None,
                                         value: None,
+                                        comma: None,
                                     }
-                                ]
-                            }))]
+                                ],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }))
                     })),
                     right: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(2, 14, 2, 15),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "c".to_string()
                     })
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6294,7 +6662,7 @@ fn arrow_function_called() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 2, 16),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6304,104 +6672,116 @@ fn arrow_function_called() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 23),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "plusOne".to_string()
                     },
                     init: Expression::Function(Box::new(FunctionExpr {
                         base: BaseNode {
                             location: loc.get(1, 11, 1, 23),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         params: vec![Property {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 13),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }],
+                        rparen: None,
+                        arrow: None,
                         body: FunctionBody::Expr(Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 18, 1, 23),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::AdditionOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 18, 1, 19),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 22, 1, 23),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 1
                             })
-                        })))
+                        }))),
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(2, 4, 2, 16),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(2, 4, 2, 16),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(2, 4, 2, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "plusOne".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(2, 12, 2, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(2, 12, 2, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 12, 2, 13),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "r".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Integer(IntegerLit {
                                     base: BaseNode {
                                         location: loc.get(2, 14, 2, 15),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: 5
-                                }))
-                            }]
-                        }))]
+                                })),
+                                comma: None,
+                            }],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -6416,7 +6796,7 @@ fn arrow_function_return_map() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 22),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6425,69 +6805,81 @@ fn arrow_function_return_map() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 22),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "toMap".to_string()
                 },
                 init: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
                         location: loc.get(1, 9, 1, 22),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 10, 1, 11),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 10, 1, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "r".to_string()
                         }),
-                        value: None
+                        separator: None,
+                        value: None,
+                        comma: None,
                     }],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Expr(Expression::Paren(Box::new(ParenExpr {
                         base: BaseNode {
                             location: loc.get(1, 15, 1, 22),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         expression: Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 16, 1, 21),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(1, 17, 1, 20),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 17, 1, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "r".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 19, 1, 20),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "r".to_string()
-                                }))
-                            }]
-                        }))
-                    })))
+                                })),
+                                comma: None,
+                            }],
+                            rbrace: None,
+                        })),
+                        rparen: None,
+                    }))),
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6502,7 +6894,7 @@ fn arrow_function_with_default_arg() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 25),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6511,79 +6903,87 @@ fn arrow_function_with_default_arg() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 25),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 5),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "addN".to_string()
                 },
                 init: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
                         location: loc.get(1, 8, 1, 25),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 10),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 10),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "n".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 5
-                            }))
+                            })),
+                            comma: None,
                         }
                     ],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Expr(Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 20, 1, 25),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::AdditionOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 20, 1, 21),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "r".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 24, 1, 25),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "n".to_string()
                         })
-                    })))
+                    }))),
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6602,7 +7002,7 @@ fn arrow_function_called_in_binary_expression() {
         File {
             base: BaseNode {
                 location: loc.get(2, 13, 3, 39),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6612,118 +7012,129 @@ fn arrow_function_called_in_binary_expression() {
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 13, 2, 35),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 13, 2, 20),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "plusOne".to_string()
                     },
                     init: Expression::Function(Box::new(FunctionExpr {
                         base: BaseNode {
                             location: loc.get(2, 23, 2, 35),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         params: vec![Property {
                             base: BaseNode {
                                 location: loc.get(2, 24, 2, 25),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 24, 2, 25),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }],
+                        rparen: None,
+                        arrow: None,
                         body: FunctionBody::Expr(Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 30, 2, 35),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::AdditionOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 30, 2, 31),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(2, 34, 2, 35),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 1
                             })
-                        })))
+                        }))),
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(3, 13, 3, 39),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(3, 13, 3, 39),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(3, 13, 3, 30),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(3, 13, 3, 25),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(3, 13, 3, 20),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "plusOne".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(3, 21, 3, 24),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(3, 21, 3, 24),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(3, 21, 3, 22),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "r".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::Integer(IntegerLit {
                                             base: BaseNode {
                                                 location: loc.get(3, 23, 3, 24),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             value: 5
-                                        }))
-                                    }]
-                                }))]
+                                        })),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             })),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(3, 29, 3, 30),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 6
                             })
@@ -6731,20 +7142,23 @@ fn arrow_function_called_in_binary_expression() {
                         right: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(3, 34, 3, 39),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
-                            arguments: vec![],
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 34, 3, 37),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "die".to_string()
-                            })
+                            }),
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }))
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -6759,7 +7173,7 @@ fn arrow_function_as_single_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 38),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6768,70 +7182,78 @@ fn arrow_function_as_single_expression() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 38),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "f".to_string()
                 },
                 init: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 38),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "r".to_string()
                         }),
-                        value: None
+                        separator: None,
+                        value: None,
+                        comma: None,
                     }],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Expr(Expression::Binary(Box::new(BinaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 12, 1, 38),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::EqualOperator,
                         left: Expression::Member(Box::new(MemberExpr {
                             base: BaseNode {
                                 location: loc.get(1, 12, 1, 29),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             object: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 12, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "r".to_string()
                             }),
+                            lbrack: None,
                             property: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "_measurement".to_string()
-                            })
+                            }),
+                            rbrack: None,
                         })),
                         right: Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 33, 1, 38),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "cpu".to_string()
                         })
-                    })))
+                    }))),
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6851,7 +7273,7 @@ fn arrow_function_as_block() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 4, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6860,104 +7282,114 @@ fn arrow_function_as_block() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 4, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "f".to_string()
                 },
                 init: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 4, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 7),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "r".to_string()
                         }),
-                        value: None
+                        separator: None,
+                        value: None,
+                        comma: None,
                     }],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Block(Block {
                         base: BaseNode {
                             location: loc.get(1, 12, 4, 14),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         body: vec![
                             Statement::Variable(Box::new(VariableAssgn {
                                 base: BaseNode {
                                     location: loc.get(2, 17, 2, 38),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 id: Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 17, 2, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "m".to_string()
                                 },
                                 init: Expression::Member(Box::new(MemberExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 21, 2, 38),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     object: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 21, 2, 22),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "r".to_string()
                                     }),
+                                    lbrack: None,
                                     property: PropertyKey::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(2, 23, 2, 37),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "_measurement".to_string()
-                                    })
+                                    }),
+                                    rbrack: None,
                                 }))
                             })),
-                            Statement::Return(ReturnStmt {
+                            Statement::Return(Box::new(ReturnStmt {
                                 base: BaseNode {
                                     location: loc.get(3, 17, 3, 34),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 argument: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(3, 24, 3, 34),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::EqualOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(3, 24, 3, 25),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "m".to_string()
                                     }),
                                     right: Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(3, 29, 3, 34),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "cpu".to_string()
                                     })
                                 }))
-                            })
-                        ]
-                    })
+                            }))
+                        ],
+                        rbrace: None,
+                    }),
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -6972,7 +7404,7 @@ fn conditional() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 26),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -6981,43 +7413,47 @@ fn conditional() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 26),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "a".to_string()
                 },
                 init: Expression::Conditional(Box::new(ConditionalExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 26),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     test: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 8, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "true".to_string()
                     }),
                     consequent: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 18, 1, 19),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 0
                     }),
                     alternate: Expression::Integer(IntegerLit {
                         base: BaseNode {
                             location: loc.get(1, 25, 1, 26),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         value: 1
-                    })
+                    }),
+                    tk_if: None,
+                    tk_then: None,
+                    tk_else: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7034,7 +7470,7 @@ fn conditional_with_unary_logical_operators() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 85),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -7043,36 +7479,36 @@ fn conditional_with_unary_logical_operators() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 85),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "a".to_string()
                 },
                 init: Expression::Conditional(Box::new(ConditionalExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 85),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     test: Expression::Logical(Box::new(LogicalExpr {
                         base: BaseNode {
                             location: loc.get(1, 8, 1, 40),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: LogicalOperator::OrOperator,
                         left: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 16),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::ExistsOperator,
                             argument: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 15, 1, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             })
@@ -7080,26 +7516,26 @@ fn conditional_with_unary_logical_operators() {
                         right: Expression::Logical(Box::new(LogicalExpr {
                             base: BaseNode {
                                 location: loc.get(1, 20, 1, 40),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: LogicalOperator::AndOperator,
                             left: Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 20, 1, 25),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::LessThanOperator,
                                 left: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 20, 1, 21),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "c".to_string()
                                 }),
                                 right: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 24, 1, 25),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "d".to_string()
                                 })
@@ -7107,26 +7543,26 @@ fn conditional_with_unary_logical_operators() {
                             right: Expression::Unary(Box::new(UnaryExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 30, 1, 40),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::NotOperator,
                                 argument: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 34, 1, 40),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::EqualOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 34, 1, 35),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "e".to_string()
                                     }),
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 39, 1, 40),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "f".to_string()
                                     })
@@ -7137,67 +7573,73 @@ fn conditional_with_unary_logical_operators() {
                     consequent: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 46, 1, 64),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::NotOperator,
                         argument: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 50, 1, 64),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::ExistsOperator,
                             argument: Expression::Paren(Box::new(ParenExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 57, 1, 64),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lparen: None,
                                 expression: Expression::Binary(Box::new(BinaryExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 58, 1, 63),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     operator: Operator::SubtractionOperator,
                                     left: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 58, 1, 59),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "g".to_string()
                                     }),
                                     right: Expression::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 62, 1, 63),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "h".to_string()
                                     })
-                                }))
+                                })),
+                                rparen: None,
                             }))
                         }))
                     })),
                     alternate: Expression::Unary(Box::new(UnaryExpr {
                         base: BaseNode {
                             location: loc.get(1, 70, 1, 85),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::ExistsOperator,
                         argument: Expression::Unary(Box::new(UnaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 77, 1, 85),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::ExistsOperator,
                             argument: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 84, 1, 85),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "i".to_string()
                             })
                         }))
-                    }))
+                    })),
+                    tk_if: None,
+                    tk_then: None,
+                    tk_else: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7216,44 +7658,44 @@ fn nested_conditionals() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 3, 50),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 3, 50),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Conditional(Box::new(ConditionalExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 3, 50),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     test: Expression::Conditional(Box::new(ConditionalExpr {
                         base: BaseNode {
                             location: loc.get(1, 4, 1, 33),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         test: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(1, 7, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::LessThanOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 7, 1, 8),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 0
                             })
@@ -7261,40 +7703,43 @@ fn nested_conditionals() {
                         consequent: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 18, 1, 22),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "true".to_string()
                         }),
                         alternate: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 28, 1, 33),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "false".to_string()
-                        })
+                        }),
+                        tk_if: None,
+                        tk_then: None,
+                        tk_else: None,
                     })),
                     consequent: Expression::Conditional(Box::new(ConditionalExpr {
                         base: BaseNode {
                             location: loc.get(2, 24, 2, 48),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         test: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(2, 27, 2, 32),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::GreaterThanOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 27, 2, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "c".to_string()
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(2, 31, 2, 32),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 0
                             })
@@ -7302,40 +7747,43 @@ fn nested_conditionals() {
                         consequent: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(2, 38, 2, 40),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 30
                         }),
                         alternate: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(2, 46, 2, 48),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 60
-                        })
+                        }),
+                        tk_if: None,
+                        tk_then: None,
+                        tk_else: None,
                     })),
                     alternate: Expression::Conditional(Box::new(ConditionalExpr {
                         base: BaseNode {
                             location: loc.get(3, 24, 3, 50),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         test: Expression::Binary(Box::new(BinaryExpr {
                             base: BaseNode {
                                 location: loc.get(3, 27, 3, 33),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             operator: Operator::EqualOperator,
                             left: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 27, 3, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "d".to_string()
                             }),
                             right: Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(3, 32, 3, 33),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 0
                             })
@@ -7343,20 +7791,27 @@ fn nested_conditionals() {
                         consequent: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(3, 39, 3, 41),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 90
                         }),
                         alternate: Expression::Integer(IntegerLit {
                             base: BaseNode {
                                 location: loc.get(3, 47, 3, 50),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: 120
-                        })
-                    }))
+                        }),
+                        tk_if: None,
+                        tk_then: None,
+                        tk_else: None,
+                    })),
+                    tk_if: None,
+                    tk_then: None,
+                    tk_else: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7373,155 +7828,173 @@ fn from_with_filter_with_no_parens() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 114),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 114),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Call(Box::new(CallExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 114),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     callee: Expression::Member(Box::new(MemberExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 39),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         property: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 33, 1, 39),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "filter".to_string()
                         }),
+                        lbrack: None,
                         object: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 32),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 5),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 31),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 31),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 6, 1, 12),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "bucket".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(1, 13, 1, 31),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "telegraf/autogen".to_string()
-                                    }))
-                                }]
-                            }))]
+                                    })),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         })),
+                        rbrack: None,
                     })),
+                    lparen: None,
                     arguments: vec![Expression::Object(Box::new(ObjectExpr {
                         base: BaseNode {
                             location: loc.get(1, 40, 1, 113),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lbrace: None,
                         with: None,
                         properties: vec![Property {
                             base: BaseNode {
                                 location: loc.get(1, 40, 1, 113),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 40, 1, 42),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "fn".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Function(Box::new(FunctionExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 44, 1, 113),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lparen: None,
                                 params: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(1, 45, 1, 46),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 45, 1, 46),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "r".to_string()
                                     }),
-                                    value: None
+                                    separator: None,
+                                    value: None,
+                                    comma: None,
                                 }],
+                                rparen: None,
+                                arrow: None,
                                 body: FunctionBody::Expr(Expression::Logical(Box::new(
                                     LogicalExpr {
                                         base: BaseNode {
                                             location: loc.get(1, 51, 1, 113),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: LogicalOperator::OrOperator,
                                         left: Expression::Logical(Box::new(LogicalExpr {
                                             base: BaseNode {
                                                 location: loc.get(1, 51, 1, 90),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             operator: LogicalOperator::AndOperator,
                                             left: Expression::Binary(Box::new(BinaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 51, 1, 68),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::EqualOperator,
                                                 left: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(1, 51, 1, 61),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(1, 51, 1, 52),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "r".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(1, 53, 1, 60),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         value: "other".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 })),
                                                 right: Expression::StringLit(StringLit {
                                                     base: BaseNode {
                                                         location: loc.get(1, 63, 1, 68),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     value: "mem".to_string()
                                                 })
@@ -7529,33 +8002,35 @@ fn from_with_filter_with_no_parens() {
                                             right: Expression::Binary(Box::new(BinaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 73, 1, 90),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::EqualOperator,
                                                 left: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(1, 73, 1, 82),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(1, 73, 1, 74),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "r".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(1, 75, 1, 81),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         value: "this".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 })),
                                                 right: Expression::StringLit(StringLit {
                                                     base: BaseNode {
                                                         location: loc.get(1, 84, 1, 90),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     value: "that".to_string()
                                                 })
@@ -7564,44 +8039,50 @@ fn from_with_filter_with_no_parens() {
                                         right: Expression::Binary(Box::new(BinaryExpr {
                                             base: BaseNode {
                                                 location: loc.get(1, 94, 1, 113),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             operator: Operator::NotEqualOperator,
                                             left: Expression::Member(Box::new(MemberExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 94, 1, 104),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 object: Expression::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(1, 94, 1, 95),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "r".to_string()
                                                 }),
+                                                lbrack: None,
                                                 property: PropertyKey::StringLit(StringLit {
                                                     base: BaseNode {
                                                         location: loc.get(1, 96, 1, 103),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     value: "these".to_string()
-                                                })
+                                                }),
+                                                rbrack: None,
                                             })),
                                             right: Expression::StringLit(StringLit {
                                                 base: BaseNode {
                                                     location: loc.get(1, 106, 1, 113),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 value: "those".to_string()
                                             })
                                         }))
                                     }
-                                )))
-                            })))
-                        }]
-                    }))]
+                                ))),
+                            }))),
+                            comma: None,
+                        }],
+                        rbrace: None,
+                    }))],
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7616,139 +8097,154 @@ fn from_with_range() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 59),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 59),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 59),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 32),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 31),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 31),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 12),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "bucket".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(1, 13, 1, 31),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "telegraf/autogen".to_string()
-                                }))
-                            }]
-                        }))]
+                                })),
+                                comma: None,
+                            }],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 34, 1, 59),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 34, 1, 39),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "range".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 40, 1, 58),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(1, 40, 1, 49),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 40, 1, 45),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "start".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Unary(Box::new(UnaryExpr {
                                         base: BaseNode {
                                             location: loc.get(1, 46, 1, 49),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::SubtractionOperator,
                                         argument: Expression::Duration(DurationLit {
                                             base: BaseNode {
                                                 location: loc.get(1, 47, 1, 49),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             values: vec![Duration {
                                                 magnitude: 1,
                                                 unit: "h".to_string()
                                             }]
                                         })
-                                    })))
+                                    }))),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(1, 51, 1, 58),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 51, 1, 54),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "end".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Duration(DurationLit {
                                         base: BaseNode {
                                             location: loc.get(1, 55, 1, 58),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         values: vec![Duration {
                                             magnitude: 10,
                                             unit: "m".to_string()
                                         }]
-                                    }))
+                                    })),
+                                    comma: None,
                                 }
-                            ]
-                        }))]
+                            ],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7763,126 +8259,141 @@ fn from_with_limit() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 61),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 61),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 61),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 32),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
+                        lparen: None,
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "from".to_string()
                         }),
+                        rparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 31),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 31),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 12),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "bucket".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(1, 13, 1, 31),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "telegraf/autogen".to_string()
-                                }))
-                            }]
+                                })),
+                                comma: None,
+                            }],
+                            rbrace: None,
                         }))]
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 34, 1, 61),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 34, 1, 39),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "limit".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 40, 1, 60),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(1, 40, 1, 49),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 40, 1, 45),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "limit".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Integer(IntegerLit {
                                         base: BaseNode {
                                             location: loc.get(1, 46, 1, 49),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: 100
-                                    }))
+                                    })),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(1, 51, 1, 60),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 51, 1, 57),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "offset".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Integer(IntegerLit {
                                         base: BaseNode {
                                             location: loc.get(1, 58, 1, 60),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: 10
-                                    }))
+                                    })),
+                                    comma: None,
                                 }
-                            ]
-                        }))]
+                            ],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -7901,166 +8412,183 @@ fn from_with_range_and_count() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 3, 17),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 3, 17),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 3, 17),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 2, 36),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 28),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 5),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 27),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 27),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(1, 6, 1, 12),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "bucket".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(1, 13, 1, 27),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "mydb/autogen".to_string()
-                                    }))
-                                }]
-                            }))]
+                                    })),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(2, 10, 2, 36),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 10, 2, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 16, 2, 35),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![
                                     Property {
                                         base: BaseNode {
                                             location: loc.get(2, 16, 2, 25),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 16, 2, 21),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "start".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::Unary(Box::new(UnaryExpr {
                                             base: BaseNode {
                                                 location: loc.get(2, 22, 2, 25),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             operator: Operator::SubtractionOperator,
                                             argument: Expression::Duration(DurationLit {
                                                 base: BaseNode {
                                                     location: loc.get(2, 23, 2, 25),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 values: vec![Duration {
                                                     magnitude: 4,
                                                     unit: "h".to_string()
                                                 }]
                                             })
-                                        })))
+                                        }))),
+                                        comma: None,
                                     },
                                     Property {
                                         base: BaseNode {
                                             location: loc.get(2, 27, 2, 35),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 27, 2, 31),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "stop".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::Unary(Box::new(UnaryExpr {
                                             base: BaseNode {
                                                 location: loc.get(2, 32, 2, 35),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             operator: Operator::SubtractionOperator,
                                             argument: Expression::Duration(DurationLit {
                                                 base: BaseNode {
                                                     location: loc.get(2, 33, 2, 35),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 values: vec![Duration {
                                                     magnitude: 2,
                                                     unit: "h".to_string()
                                                 }]
                                             })
-                                        })))
+                                        }))),
+                                        comma: None,
                                     }
-                                ]
-                            }))]
+                                ],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(3, 10, 3, 17),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(3, 10, 3, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "count".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         }
     )
 }
@@ -8080,212 +8608,235 @@ fn from_with_range_limit_and_count() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 4, 17),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 4, 17),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 4, 17),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 3, 21),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::PipeExpr(Box::new(PipeExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 2, 36),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             argument: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 28),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 1, 1, 5),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "from".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 6, 1, 27),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(1, 6, 1, 27),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(1, 6, 1, 12),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "bucket".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::StringLit(StringLit {
                                             base: BaseNode {
                                                 location: loc.get(1, 13, 1, 27),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             value: "mydb/autogen".to_string()
-                                        }))
-                                    }]
-                                }))]
+                                        })),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             })),
                             call: CallExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 10, 2, 36),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 10, 2, 15),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "range".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 16, 2, 35),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![
                                         Property {
                                             base: BaseNode {
                                                 location: loc.get(2, 16, 2, 25),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             key: PropertyKey::Identifier(Identifier {
                                                 base: BaseNode {
                                                     location: loc.get(2, 16, 2, 21),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 name: "start".to_string()
                                             }),
+                                            separator: None,
                                             value: Some(Expression::Unary(Box::new(UnaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(2, 22, 2, 25),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::SubtractionOperator,
                                                 argument: Expression::Duration(DurationLit {
                                                     base: BaseNode {
                                                         location: loc.get(2, 23, 2, 25),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     values: vec![Duration {
                                                         magnitude: 4,
                                                         unit: "h".to_string()
                                                     }]
                                                 })
-                                            })))
+                                            }))),
+                                            comma: None,
                                         },
                                         Property {
                                             base: BaseNode {
                                                 location: loc.get(2, 27, 2, 35),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             key: PropertyKey::Identifier(Identifier {
                                                 base: BaseNode {
                                                     location: loc.get(2, 27, 2, 31),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 name: "stop".to_string()
                                             }),
+                                            separator: None,
                                             value: Some(Expression::Unary(Box::new(UnaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(2, 32, 2, 35),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::SubtractionOperator,
                                                 argument: Expression::Duration(DurationLit {
                                                     base: BaseNode {
                                                         location: loc.get(2, 33, 2, 35),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     values: vec![Duration {
                                                         magnitude: 2,
                                                         unit: "h".to_string()
                                                     }]
                                                 })
-                                            })))
+                                            }))),
+                                            comma: None,
                                         }
-                                    ]
-                                }))]
+                                    ],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             }
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(3, 10, 3, 21),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 10, 3, 15),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "limit".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(3, 16, 3, 20),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(3, 16, 3, 20),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(3, 16, 3, 17),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "n".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Integer(IntegerLit {
                                         base: BaseNode {
                                             location: loc.get(3, 18, 3, 20),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: 10
-                                    }))
-                                }]
-                            }))]
+                                    })),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(4, 10, 4, 17),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(4, 10, 4, 15),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "count".to_string()
                         }),
-                        arguments: vec![]
+                        lparen: None,
+                        arguments: vec![],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         }
     )
 }
@@ -8305,7 +8856,7 @@ join(tables:[a,b], on:["host"], fn: (a,b) => a["_field"] + b["_field"])"#,
         File {
             base: BaseNode {
                 location: loc.get(2, 1, 4, 72),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -8315,409 +8866,468 @@ join(tables:[a,b], on:["host"], fn: (a,b) => a["_field"] + b["_field"])"#,
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 1, 2, 51),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 1, 2, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(2, 5, 2, 51),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(2, 5, 2, 31),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 5, 2, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 10, 2, 30),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(2, 10, 2, 30),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 10, 2, 16),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "bucket".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(2, 17, 2, 30),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "dbA/autogen".to_string()
-                                    }))
-                                }]
-                            }))]
+                                    })),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(2, 35, 2, 51),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(2, 35, 2, 40),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 41, 2, 50),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(2, 41, 2, 50),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(2, 41, 2, 46),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "start".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Unary(Box::new(UnaryExpr {
                                         base: BaseNode {
                                             location: loc.get(2, 47, 2, 50),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::SubtractionOperator,
                                         argument: Expression::Duration(DurationLit {
                                             base: BaseNode {
                                                 location: loc.get(2, 48, 2, 50),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             values: vec![Duration {
                                                 magnitude: 1,
                                                 unit: "h".to_string()
                                             }]
                                         })
-                                    })))
-                                }]
-                            }))]
+                                    }))),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     }))
                 })),
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(3, 1, 3, 51),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(3, 1, 3, 2),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "b".to_string()
                     },
                     init: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(3, 5, 3, 51),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(3, 5, 3, 31),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 5, 3, 9),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(3, 10, 3, 30),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(3, 10, 3, 30),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(3, 10, 3, 16),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "bucket".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::StringLit(StringLit {
                                         base: BaseNode {
                                             location: loc.get(3, 17, 3, 30),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         value: "dbB/autogen".to_string()
-                                    }))
-                                }]
-                            }))]
+                                    })),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(3, 35, 3, 51),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(3, 35, 3, 40),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(3, 41, 3, 50),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(3, 41, 3, 50),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(3, 41, 3, 46),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "start".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Unary(Box::new(UnaryExpr {
                                         base: BaseNode {
                                             location: loc.get(3, 47, 3, 50),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         operator: Operator::SubtractionOperator,
                                         argument: Expression::Duration(DurationLit {
                                             base: BaseNode {
                                                 location: loc.get(3, 48, 3, 50),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             values: vec![Duration {
                                                 magnitude: 1,
                                                 unit: "h".to_string()
                                             }]
                                         })
-                                    })))
-                                }]
-                            }))]
+                                    }))),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(4, 1, 4, 72),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(4, 1, 4, 72),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(4, 1, 4, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "join".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(4, 6, 4, 71),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(4, 6, 4, 18),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(4, 6, 4, 12),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "tables".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Array(Box::new(ArrayExpr {
                                         base: BaseNode {
                                             location: loc.get(4, 13, 4, 18),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
+                                        lbrack: None,
                                         elements: vec![
-                                            Expression::Identifier(Identifier {
-                                                base: BaseNode {
-                                                    location: loc.get(4, 14, 4, 15),
-                                                    errors: vec![]
-                                                },
-                                                name: "a".to_string()
-                                            }),
-                                            Expression::Identifier(Identifier {
-                                                base: BaseNode {
-                                                    location: loc.get(4, 16, 4, 17),
-                                                    errors: vec![]
-                                                },
-                                                name: "b".to_string()
-                                            })
-                                        ]
-                                    })))
+                                            ArrayItem {
+                                                expression: Expression::Identifier(Identifier {
+                                                    base: BaseNode {
+                                                        location: loc.get(4, 14, 4, 15),
+                                                        ..BaseNode::default()
+                                                    },
+                                                    name: "a".to_string()
+                                                }),
+                                                comma: None,
+                                            },
+                                            ArrayItem {
+                                                expression: Expression::Identifier(Identifier {
+                                                    base: BaseNode {
+                                                        location: loc.get(4, 16, 4, 17),
+                                                        ..BaseNode::default()
+                                                    },
+                                                    name: "b".to_string()
+                                                }),
+                                                comma: None,
+                                            }
+                                        ],
+                                        rbrack: None,
+                                    }))),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(4, 20, 4, 31),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(4, 20, 4, 22),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "on".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Array(Box::new(ArrayExpr {
                                         base: BaseNode {
                                             location: loc.get(4, 23, 4, 31),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
-                                        elements: vec![Expression::StringLit(StringLit {
-                                            base: BaseNode {
-                                                location: loc.get(4, 24, 4, 30),
-                                                errors: vec![]
-                                            },
-                                            value: "host".to_string()
-                                        })]
-                                    })))
+                                        lbrack: None,
+                                        elements: vec![ArrayItem {
+                                            expression: Expression::StringLit(StringLit {
+                                                base: BaseNode {
+                                                    location: loc.get(4, 24, 4, 30),
+                                                    ..BaseNode::default()
+                                                },
+                                                value: "host".to_string()
+                                            }),
+                                            comma: None,
+                                        }],
+                                        rbrack: None,
+                                    }))),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(4, 33, 4, 71),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(4, 33, 4, 35),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         name: "fn".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Function(Box::new(FunctionExpr {
                                         base: BaseNode {
                                             location: loc.get(4, 37, 4, 71),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
+                                        lparen: None,
                                         params: vec![
                                             Property {
                                                 base: BaseNode {
                                                     location: loc.get(4, 38, 4, 39),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(4, 38, 4, 39),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "a".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             },
                                             Property {
                                                 base: BaseNode {
                                                     location: loc.get(4, 40, 4, 41),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(4, 40, 4, 41),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "b".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             }
                                         ],
+                                        rparen: None,
+                                        arrow: None,
                                         body: FunctionBody::Expr(Expression::Binary(Box::new(
                                             BinaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(4, 46, 4, 71),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 operator: Operator::AdditionOperator,
                                                 left: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(4, 46, 4, 57),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(4, 46, 4, 47),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "a".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(4, 48, 4, 56),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         value: "_field".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 })),
                                                 right: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(4, 60, 4, 71),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(4, 60, 4, 61),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         name: "b".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(4, 62, 4, 70),
-                                                            errors: vec![]
+                                                            ..BaseNode::default()
                                                         },
                                                         value: "_field".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 }))
                                             }
-                                        )))
-                                    })))
+                                        ))),
+                                    }))),
+                                    comma: None,
                                 }
-                            ]
-                        }))]
+                            ],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -8743,7 +9353,7 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
         File {
             base: BaseNode {
                 location: loc.get(2, 1, 10, 86),
-                errors: vec![]
+                .. BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -8753,578 +9363,656 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(2, 1, 4, 21),
-                        errors: vec![]
+                        .. BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(2, 1, 2, 2),
-                            errors: vec![]
+                            .. BaseNode::default()
                         },
                         name: "a".to_string()
                     },
                     init: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(2, 5, 4, 21),
-                            errors: vec![]
+                            .. BaseNode::default()
                         },
                         argument: Expression::PipeExpr(Box::new(PipeExpr {
                             base: BaseNode {
                                 location: loc.get(2, 5, 3, 48),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
                             argument: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(2, 5, 2, 32),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(2, 5, 2, 9),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     name: "from".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(2, 10, 2, 31),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(2, 10, 2, 31),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(2, 10, 2, 16),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             name: "bucket".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::StringLit(StringLit {
                                             base: BaseNode {
                                                 location: loc.get(2, 17, 2, 31),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             value: "Flux/autogen".to_string()
-                                        }))
-                                    }]
-                                }))]
+                                        })),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             })),
                             call: CallExpr {
                                 base: BaseNode {
                                     location: loc.get(3, 5, 3, 48),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(3, 5, 3, 11),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     name: "filter".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(3, 12, 3, 47),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(3, 12, 3, 47),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(3, 12, 3, 14),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             name: "fn".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::Function(Box::new(FunctionExpr {
                                             base: BaseNode {
                                                 location: loc.get(3, 16, 3, 47),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
+                                            lparen: None,
                                             params: vec![Property {
                                                 base: BaseNode {
                                                     location: loc.get(3, 17, 3, 18),
-                                                    errors: vec![]
+                                                    .. BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(3, 17, 3, 18),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     name: "r".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             }],
+                                            rparen: None,
+                                            arrow: None,
                                             body: FunctionBody::Expr(Expression::Binary(Box::new(
                                                 BinaryExpr {
                                                     base: BaseNode {
                                                         location: loc.get(3, 23, 3, 47),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     operator: Operator::EqualOperator,
                                                     left: Expression::Member(Box::new(
                                                         MemberExpr {
                                                             base: BaseNode {
                                                                 location: loc.get(3, 23, 3, 40),
-                                                                errors: vec![]
+                                                                .. BaseNode::default()
                                                             },
                                                             object: Expression::Identifier(
                                                                 Identifier {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(3, 23, 3, 24),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     name: "r".to_string()
                                                                 }
                                                             ),
+                                                            lbrack: None,
                                                             property: PropertyKey::StringLit(
                                                                 StringLit {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(3, 25, 3, 39),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     value: "_measurement"
                                                                         .to_string()
                                                                 }
-                                                            )
+                                                            ),
+                                                            rbrack: None,
                                                         }
                                                     )),
                                                     right: Expression::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(3, 44, 3, 47),
-                                                            errors: vec![]
+                                                            .. BaseNode::default()
                                                         },
                                                         value: "a".to_string()
                                                     })
                                                 }
-                                            )))
-                                        })))
-                                    }]
-                                }))]
+                                            ))),
+                                        }))),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             }
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(4, 5, 4, 21),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(4, 5, 4, 10),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(4, 11, 4, 20),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(4, 11, 4, 20),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(4, 11, 4, 16),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         name: "start".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Unary(Box::new(UnaryExpr {
                                         base: BaseNode {
                                             location: loc.get(4, 17, 4, 20),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         operator: Operator::SubtractionOperator,
                                         argument: Expression::Duration(DurationLit {
                                             base: BaseNode {
                                                 location: loc.get(4, 18, 4, 20),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             values: vec![Duration {
                                                 magnitude: 1,
                                                 unit: "h".to_string()
                                             }]
                                         })
-                                    })))
-                                }]
-                            }))]
+                                    }))),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     }))
                 })),
                 Statement::Variable(Box::new(VariableAssgn {
                     base: BaseNode {
                         location: loc.get(6, 1, 8, 21),
-                        errors: vec![]
+                        .. BaseNode::default()
                     },
                     id: Identifier {
                         base: BaseNode {
                             location: loc.get(6, 1, 6, 2),
-                            errors: vec![]
+                            .. BaseNode::default()
                         },
                         name: "b".to_string()
                     },
                     init: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(6, 5, 8, 21),
-                            errors: vec![]
+                            .. BaseNode::default()
                         },
                         argument: Expression::PipeExpr(Box::new(PipeExpr {
                             base: BaseNode {
                                 location: loc.get(6, 5, 7, 48),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
                             argument: Expression::Call(Box::new(CallExpr {
                                 base: BaseNode {
                                     location: loc.get(6, 5, 6, 32),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(6, 5, 6, 9),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     name: "from".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(6, 10, 6, 31),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(6, 10, 6, 31),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(6, 10, 6, 16),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             name: "bucket".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::StringLit(StringLit {
                                             base: BaseNode {
                                                 location: loc.get(6, 17, 6, 31),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             value: "Flux/autogen".to_string()
-                                        }))
-                                    }]
-                                }))]
+                                        })),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             })),
                             call: CallExpr {
                                 base: BaseNode {
                                     location: loc.get(7, 5, 7, 48),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 callee: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(7, 5, 7, 11),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     name: "filter".to_string()
                                 }),
+                                lparen: None,
                                 arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                     base: BaseNode {
                                         location: loc.get(7, 12, 7, 47),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
+                                    lbrace: None,
                                     with: None,
                                     properties: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(7, 12, 7, 47),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(7, 12, 7, 14),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             name: "fn".to_string()
                                         }),
+                                        separator: None,
                                         value: Some(Expression::Function(Box::new(FunctionExpr {
                                             base: BaseNode {
                                                 location: loc.get(7, 16, 7, 47),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
+                                            lparen: None,
                                             params: vec![Property {
                                                 base: BaseNode {
                                                     location: loc.get(7, 17, 7, 18),
-                                                    errors: vec![]
+                                                    .. BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(7, 17, 7, 18),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     name: "r".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             }],
+                                            rparen: None,
+                                            arrow: None,
                                             body: FunctionBody::Expr(Expression::Binary(Box::new(
                                                 BinaryExpr {
                                                     base: BaseNode {
                                                         location: loc.get(7, 23, 7, 47),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     operator: Operator::EqualOperator,
                                                     left: Expression::Member(Box::new(
                                                         MemberExpr {
                                                             base: BaseNode {
                                                                 location: loc.get(7, 23, 7, 40),
-                                                                errors: vec![]
+                                                                .. BaseNode::default()
                                                             },
                                                             object: Expression::Identifier(
                                                                 Identifier {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(7, 23, 7, 24),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     name: "r".to_string()
                                                                 }
                                                             ),
+                                                            lbrack: None,
                                                             property: PropertyKey::StringLit(
                                                                 StringLit {
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(7, 25, 7, 39),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     value: "_measurement"
                                                                         .to_string()
                                                                 }
-                                                            )
+                                                            ),
+                                                            rbrack: None,
                                                         }
                                                     )),
                                                     right: Expression::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(7, 44, 7, 47),
-                                                            errors: vec![]
+                                                            .. BaseNode::default()
                                                         },
                                                         value: "b".to_string()
                                                     })
                                                 }
-                                            )))
-                                        })))
-                                    }]
-                                }))]
+                                            ))),
+                                        }))),
+                                        comma: None,
+                                    }],
+                                    rbrace: None,
+                                }))],
+                                rparen: None,
                             }
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(8, 5, 8, 21),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(8, 5, 8, 10),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
+                            lparen: None,
                             arguments: vec![Expression::Object(Box::new(ObjectExpr {
                                 base: BaseNode {
                                     location: loc.get(8, 11, 8, 20),
-                                    errors: vec![]
+                                    .. BaseNode::default()
                                 },
+                                lbrace: None,
                                 with: None,
                                 properties: vec![Property {
                                     base: BaseNode {
                                         location: loc.get(8, 11, 8, 20),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(8, 11, 8, 16),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         name: "start".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Unary(Box::new(UnaryExpr {
                                         base: BaseNode {
                                             location: loc.get(8, 17, 8, 20),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         operator: Operator::SubtractionOperator,
                                         argument: Expression::Duration(DurationLit {
                                             base: BaseNode {
                                                 location: loc.get(8, 18, 8, 20),
-                                                errors: vec![]
+                                                .. BaseNode::default()
                                             },
                                             values: vec![Duration {
                                                 magnitude: 1,
                                                 unit: "h".to_string()
                                             }]
                                         })
-                                    })))
-                                }]
-                            }))]
+                                    }))),
+                                    comma: None,
+                                }],
+                                rbrace: None,
+                            }))],
+                            rparen: None,
                         }
                     }))
                 })),
-                Statement::Expr(ExprStmt {
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(10, 1, 10, 86),
-                        errors: vec![]
+                        .. BaseNode::default()
                     },
                     expression: Expression::Call(Box::new(CallExpr {
                         base: BaseNode {
                             location: loc.get(10, 1, 10, 86),
-                            errors: vec![]
+                            .. BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(10, 1, 10, 5),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
                             name: "join".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(10, 6, 10, 85),
-                                errors: vec![]
+                                .. BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(10, 6, 10, 18),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(10, 6, 10, 12),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         name: "tables".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Array(Box::new(ArrayExpr {
                                         base: BaseNode {
                                             location: loc.get(10, 13, 10, 18),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
+                                        lbrack: None,
                                         elements: vec![
-                                            Expression::Identifier(Identifier {
-                                                base: BaseNode {
-                                                    location: loc.get(10, 14, 10, 15),
-                                                    errors: vec![]
-                                                },
-                                                name: "a".to_string()
-                                            }),
-                                            Expression::Identifier(Identifier {
-                                                base: BaseNode {
-                                                    location: loc.get(10, 16, 10, 17),
-                                                    errors: vec![]
-                                                },
-                                                name: "b".to_string()
-                                            })
-                                        ]
-                                    })))
+                                            ArrayItem {
+                                                expression: Expression::Identifier(Identifier {
+                                                    base: BaseNode {
+                                                        location: loc.get(10, 14, 10, 15),
+                                                        .. BaseNode::default()
+                                                    },
+                                                    name: "a".to_string()
+                                                }),
+                                                comma: None,
+                                            },
+                                            ArrayItem {
+                                                expression: Expression::Identifier(Identifier {
+                                                    base: BaseNode {
+                                                        location: loc.get(10, 16, 10, 17),
+                                                        .. BaseNode::default()
+                                                    },
+                                                    name: "b".to_string()
+                                                }),
+                                                comma: None,
+                                            }
+                                        ],
+                                        rbrack: None,
+                                    }))),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(10, 20, 10, 29),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(10, 20, 10, 22),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         name: "on".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Array(Box::new(ArrayExpr {
                                         base: BaseNode {
                                             location: loc.get(10, 23, 10, 29),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
-                                        elements: vec![Expression::StringLit(StringLit {
-                                            base: BaseNode {
-                                                location: loc.get(10, 24, 10, 28),
-                                                errors: vec![]
-                                            },
-                                            value: "t1".to_string()
-                                        })]
-                                    })))
+                                        lbrack: None,
+                                        elements: vec![ArrayItem {
+                                            expression: Expression::StringLit(StringLit {
+                                                base: BaseNode {
+                                                    location: loc.get(10, 24, 10, 28),
+                                                    .. BaseNode::default()
+                                                },
+                                                value: "t1".to_string()
+                                            }),
+                                            comma: None,
+                                        }],
+                                        rbrack: None,
+                                    }))),
+                                    comma: None,
                                 },
                                 Property {
                                     base: BaseNode {
                                         location: loc.get(10, 31, 10, 85),
-                                        errors: vec![]
+                                        .. BaseNode::default()
                                     },
                                     key: PropertyKey::Identifier(Identifier {
                                         base: BaseNode {
                                             location: loc.get(10, 31, 10, 33),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
                                         name: "fn".to_string()
                                     }),
+                                    separator: None,
                                     value: Some(Expression::Function(Box::new(FunctionExpr {
                                         base: BaseNode {
                                             location: loc.get(10, 35, 10, 85),
-                                            errors: vec![]
+                                            .. BaseNode::default()
                                         },
+                                        lparen: None,
                                         params: vec![
                                             Property {
                                                 base: BaseNode {
                                                     location: loc.get(10, 36, 10, 37),
-                                                    errors: vec![]
+                                                    .. BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(10, 36, 10, 37),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     name: "a".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             },
                                             Property {
                                                 base: BaseNode {
                                                     location: loc.get(10, 38, 10, 39),
-                                                    errors: vec![]
+                                                    .. BaseNode::default()
                                                 },
                                                 key: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(10, 38, 10, 39),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     name: "b".to_string()
                                                 }),
-                                                value: None
+                                                separator: None,
+                                                value: None,
+                                                comma: None,
                                             }
                                         ],
+                                        rparen: None,
+                                        arrow: None,
                                         body: FunctionBody::Expr(Expression::Binary(Box::new(
                                             BinaryExpr {
                                                 base: BaseNode {
                                                     location: loc.get(10, 44, 10, 85),
-                                                    errors: vec![]
+                                                    .. BaseNode::default()
                                                 },
                                                 operator: Operator::DivisionOperator,
                                                 left: Expression::Paren(Box::new(ParenExpr {
                                                     base: BaseNode {
                                                         location: loc.get(10, 44, 10, 71),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
+                                                    lparen: None,
                                                     expression: Expression::Binary(Box::new(
                                                         BinaryExpr {
                                                             base: BaseNode {
                                                                 location: loc.get(10, 45, 10, 70),
-                                                                errors: vec![]
+                                                                .. BaseNode::default()
                                                             },
                                                             operator: Operator::SubtractionOperator,
                                                             left: Expression::Member(Box::new(
@@ -9332,7 +10020,7 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(10, 45, 10, 56),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     object: Expression::Identifier(
                                                                         Identifier {
@@ -9340,11 +10028,12 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                                 location: loc.get(
                                                                                     10, 45, 10, 46
                                                                                 ),
-                                                                                errors: vec![]
+                                                                                .. BaseNode::default()
                                                                             },
                                                                             name: "a".to_string()
                                                                         }
                                                                     ),
+                                                                    lbrack: None,
                                                                     property:
                                                                         PropertyKey::StringLit(
                                                                             StringLit {
@@ -9354,12 +10043,13 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                                             10, 47,
                                                                                             10, 55
                                                                                         ),
-                                                                                    errors: vec![]
+                                                                                    .. BaseNode::default()
                                                                                 },
                                                                                 value: "_field"
                                                                                     .to_string()
                                                                             }
-                                                                        )
+                                                                        ),
+                                                                    rbrack: None,
                                                                 }
                                                             )),
                                                             right: Expression::Member(Box::new(
@@ -9367,7 +10057,7 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                     base: BaseNode {
                                                                         location: loc
                                                                             .get(10, 59, 10, 70),
-                                                                        errors: vec![]
+                                                                        .. BaseNode::default()
                                                                     },
                                                                     object: Expression::Identifier(
                                                                         Identifier {
@@ -9375,11 +10065,12 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                                 location: loc.get(
                                                                                     10, 59, 10, 60
                                                                                 ),
-                                                                                errors: vec![]
+                                                                                .. BaseNode::default()
                                                                             },
                                                                             name: "b".to_string()
                                                                         }
                                                                     ),
+                                                                    lbrack: None,
                                                                     property:
                                                                         PropertyKey::StringLit(
                                                                             StringLit {
@@ -9389,46 +10080,54 @@ join(tables:[a,b], on:["t1"], fn: (a,b) => (a["_field"] - b["_field"]) / b["_fie
                                                                                             10, 61,
                                                                                             10, 69
                                                                                         ),
-                                                                                    errors: vec![]
+                                                                                    .. BaseNode::default()
                                                                                 },
                                                                                 value: "_field"
                                                                                     .to_string()
                                                                             }
-                                                                        )
+                                                                        ),
+                                                                    rbrack: None,
                                                                 }
                                                             ))
                                                         }
-                                                    ))
+                                                    )),
+                                                    rparen: None,
                                                 })),
                                                 right: Expression::Member(Box::new(MemberExpr {
                                                     base: BaseNode {
                                                         location: loc.get(10, 74, 10, 85),
-                                                        errors: vec![]
+                                                        .. BaseNode::default()
                                                     },
                                                     object: Expression::Identifier(Identifier {
                                                         base: BaseNode {
                                                             location: loc.get(10, 74, 10, 75),
-                                                            errors: vec![]
+                                                            .. BaseNode::default()
                                                         },
                                                         name: "b".to_string()
                                                     }),
+                                                    lbrack: None,
                                                     property: PropertyKey::StringLit(StringLit {
                                                         base: BaseNode {
                                                             location: loc.get(10, 76, 10, 84),
-                                                            errors: vec![]
+                                                            .. BaseNode::default()
                                                         },
                                                         value: "_field".to_string()
-                                                    })
+                                                    }),
+                                                    rbrack: None,
                                                 }))
                                             }
-                                        )))
-                                    })))
+                                        ))),
+                                    }))),
+                                    comma: None,
                                 }
-                            ]
-                        }))]
+                            ],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }))
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -9443,7 +10142,7 @@ fn duration_literal_all_units() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 34),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9452,19 +10151,19 @@ fn duration_literal_all_units() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 34),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "dur".to_string()
                 },
                 init: Expression::Duration(DurationLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 34),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     values: vec![
                         Duration {
@@ -9509,7 +10208,8 @@ fn duration_literal_all_units() {
                         }
                     ]
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9524,7 +10224,7 @@ fn duration_literal_months() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 10),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9533,26 +10233,27 @@ fn duration_literal_months() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 10),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "dur".to_string()
                 },
                 init: Expression::Duration(DurationLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 10),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     values: vec![Duration {
                         magnitude: 6,
                         unit: "mo".to_string()
                     }]
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9567,7 +10268,7 @@ fn duration_literal_milliseconds() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9576,26 +10277,27 @@ fn duration_literal_milliseconds() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "dur".to_string()
                 },
                 init: Expression::Duration(DurationLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     values: vec![Duration {
                         magnitude: 500,
                         unit: "ms".to_string()
                     }]
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9610,7 +10312,7 @@ fn duration_literal_months_minutes_milliseconds() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 18),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9619,19 +10321,19 @@ fn duration_literal_months_minutes_milliseconds() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 18),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "dur".to_string()
                 },
                 init: Expression::Duration(DurationLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 18),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     values: vec![
                         Duration {
@@ -9648,7 +10350,8 @@ fn duration_literal_months_minutes_milliseconds() {
                         }
                     ]
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9663,7 +10366,7 @@ fn date_literal_in_the_default_location() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 17),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9672,23 +10375,24 @@ fn date_literal_in_the_default_location() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 17),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "now".to_string()
                 },
                 init: Expression::DateTime(DateTimeLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 17),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: chrono::DateTime::parse_from_rfc3339("2018-11-29T00:00:00Z").unwrap()
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9703,7 +10407,7 @@ fn date_time_literal() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 27),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9712,23 +10416,24 @@ fn date_time_literal() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 27),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "now".to_string()
                 },
                 init: Expression::DateTime(DateTimeLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 27),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: chrono::DateTime::parse_from_rfc3339("2018-11-29T09:00:00Z").unwrap()
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9743,7 +10448,7 @@ fn date_time_literal_with_fractional_seconds() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 37),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -9752,24 +10457,25 @@ fn date_time_literal_with_fractional_seconds() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 37),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "now".to_string()
                 },
                 init: Expression::DateTime(DateTimeLit {
                     base: BaseNode {
                         location: loc.get(1, 7, 1, 37),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: chrono::DateTime::parse_from_rfc3339("2018-11-29T09:00:00.100000000Z")
                         .unwrap()
                 })
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9784,143 +10490,164 @@ fn function_call_with_unbalanced_braces() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 56),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 56),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::PipeExpr(Box::new(PipeExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 56),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     argument: Expression::PipeExpr(Box::new(PipeExpr {
                         base: BaseNode {
                             location: loc.get(1, 1, 1, 18),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         argument: Expression::Call(Box::new(CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 1, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 1, 1, 5),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "from".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         })),
                         call: CallExpr {
                             base: BaseNode {
                                 location: loc.get(1, 11, 1, 18),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             callee: Expression::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 11, 1, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "range".to_string()
                             }),
-                            arguments: vec![]
+                            lparen: None,
+                            arguments: vec![],
+                            rparen: None,
                         }
                     })),
                     call: CallExpr {
                         base: BaseNode {
                             location: loc.get(1, 22, 1, 56),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         callee: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 22, 1, 25),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "map".to_string()
                         }),
+                        lparen: None,
                         arguments: vec![Expression::Object(Box::new(ObjectExpr {
                             base: BaseNode {
                                 location: loc.get(1, 26, 1, 56),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
+                            lbrace: None,
                             with: None,
                             properties: vec![Property {
                                 base: BaseNode {
                                     location: loc.get(1, 26, 1, 56),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 key: PropertyKey::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 26, 1, 28),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "fn".to_string()
                                 }),
+                                separator: None,
                                 value: Some(Expression::Function(Box::new(FunctionExpr {
                                     base: BaseNode {
                                         location: loc.get(1, 30, 1, 56),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
+                                    lparen: None,
                                     params: vec![Property {
                                         base: BaseNode {
                                             location: loc.get(1, 31, 1, 32),
-                                            errors: vec![]
+                                            ..BaseNode::default()
                                         },
                                         key: PropertyKey::Identifier(Identifier {
                                             base: BaseNode {
                                                 location: loc.get(1, 31, 1, 32),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             name: "r".to_string()
                                         }),
-                                        value: None
+                                        separator: None,
+                                        value: None,
+                                        comma: None,
                                     }],
+                                    rparen: None,
+                                    arrow: None,
                                     body: FunctionBody::Block(Block {
                                         base: BaseNode {
                                             location: loc.get(1, 37, 1, 56),
-                                            errors: vec!["expected RBRACE, got RPAREN".to_string()]
+                                            errors: vec!["expected RBRACE, got RPAREN".to_string()],
+                                            ..BaseNode::default()
                                         },
-                                        body: vec![Statement::Return(ReturnStmt {
+                                        lbrace: None,
+                                        body: vec![Statement::Return(Box::new(ReturnStmt {
                                             base: BaseNode {
                                                 location: loc.get(1, 39, 1, 54),
-                                                errors: vec![]
+                                                ..BaseNode::default()
                                             },
                                             argument: Expression::Member(Box::new(MemberExpr {
                                                 base: BaseNode {
                                                     location: loc.get(1, 46, 1, 54),
-                                                    errors: vec![]
+                                                    ..BaseNode::default()
                                                 },
                                                 object: Expression::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(1, 46, 1, 47),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "r".to_string()
                                                 }),
+                                                lbrack: None,
                                                 property: PropertyKey::Identifier(Identifier {
                                                     base: BaseNode {
                                                         location: loc.get(1, 48, 1, 54),
-                                                        errors: vec![]
+                                                        ..BaseNode::default()
                                                     },
                                                     name: "_value".to_string()
-                                                })
+                                                }),
+                                                rbrack: None,
                                             }))
-                                        })]
-                                    })
-                                })))
-                            }]
-                        }))]
+                                        }))],
+                                        rbrace: None,
+                                    }),
+                                }))),
+                                comma: None,
+                            }],
+                            rbrace: None,
+                        }))],
+                        rparen: None,
                     }
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9935,25 +10662,26 @@ fn string_with_utf_8() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringLit(StringLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "日本語".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -9968,25 +10696,26 @@ fn string_with_byte_values() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 39),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 39),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringLit(StringLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 39),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "日本語".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10001,25 +10730,26 @@ fn string_with_mixed_values() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 63),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 63),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringLit(StringLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 63),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "hello 日x本 日本語 µs".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10039,18 +10769,19 @@ backslash \\
     assert_eq!(
         parsed,
         File {
-            base: BaseNode {location: loc.get(1, 1, 6, 2), errors: vec![] },
+            base: BaseNode {location: loc.get(1, 1, 6, 2), .. BaseNode::default() },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
-                base: BaseNode {location: loc.get(1, 1, 6, 2), errors: vec![] },
+            body: vec![Statement::Expr(Box::new(ExprStmt {
+                base: BaseNode {location: loc.get(1, 1, 6, 2), .. BaseNode::default() },
                 expression: Expression::StringLit(StringLit {
-                    base: BaseNode {location: loc.get(1, 1, 6, 2), errors: vec![] },
+                    base: BaseNode {location: loc.get(1, 1, 6, 2), .. BaseNode::default() },
                     value: "newline \n\ncarriage return \r\nhorizontal tab \t\ndouble quote \"\nbackslash \\\n".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10071,25 +10802,26 @@ string"
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 4, 8),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 4, 8),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::StringLit(StringLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 4, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     value: "\n this is a\nmultiline\nstring".to_string()
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10105,35 +10837,36 @@ fn illegal_statement_token() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 8),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
             body: vec![
-                Statement::Bad(BadStmt {
+                Statement::Bad(Box::new(BadStmt {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
                         // errors: vec!["invalid statement @1:1-1:2: @".to_string()]
-                        errors: vec![],
+                        ..BaseNode::default()
                     },
                     text: "@".to_string()
-                }),
-                Statement::Expr(ExprStmt {
+                })),
+                Statement::Expr(Box::new(ExprStmt {
                     base: BaseNode {
                         location: loc.get(1, 3, 1, 8),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     expression: Expression::Identifier(Identifier {
                         base: BaseNode {
                             location: loc.get(1, 3, 1, 8),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         name: "ident".to_string()
                     })
-                })
-            ]
+                }))
+            ],
+            eof: None,
         },
     )
 }
@@ -10149,46 +10882,49 @@ fn multiple_idents_in_parens() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Paren(Box::new(ParenExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     expression: Expression::Binary(Box::new(BinaryExpr {
                         // TODO(affo): ast.Check would add the error "expected an operator between two expressions".
                         base: BaseNode {
                             location: loc.get(1, 2, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::InvalidOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 3),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 4, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
-                    }))
+                    })),
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10205,34 +10941,35 @@ fn missing_left_hand_side() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 5),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 5),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Paren(Box::new(ParenExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 5),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     expression: Expression::Binary(Box::new(BinaryExpr {
                         // TODO(affo): this should be like this:
                         // base: BaseNode {location: ..., errors: vec!["missing left hand side of expression".to_string()] },
                         base: BaseNode {
                             location: loc.get(1, 2, 1, 4),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::MultiplicationOperator,
                         left: Expression::Bad(Box::new(BadExpr {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 3),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             text: "invalid token for primary expression: MUL".to_string(),
                             expression: None
@@ -10240,13 +10977,15 @@ fn missing_left_hand_side() {
                         right: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 3, 1, 4),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "b".to_string()
                         })
-                    }))
+                    })),
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10263,48 +11002,51 @@ fn missing_right_hand_side() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 5),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 5),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Paren(Box::new(ParenExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 5),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     expression: Expression::Binary(Box::new(BinaryExpr {
                         // TODO(affo): this should be like this:
                         // base: BaseNode {location: ..., errors: vec!["missing right hand side of expression".to_string()] },
                         base: BaseNode {
                             location: loc.get(1, 2, 1, 5),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         operator: Operator::MultiplicationOperator,
                         left: Expression::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 3),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
                         right: Expression::Bad(Box::new(BadExpr {
                             base: BaseNode {
                                 location: loc.get(1, 4, 1, 5),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             text: "invalid token for primary expression: RPAREN".to_string(),
                             expression: None
                         })),
-                    }))
+                    })),
+                    rparen: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10319,32 +11061,36 @@ fn illegal_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 4),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 4),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Paren(Box::new(ParenExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 4),
-                        errors: vec!["invalid expression @1:2-1:3: @".to_string()]
+                        errors: vec!["invalid expression @1:2-1:3: @".to_string()],
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     expression: Expression::Bad(Box::new(BadExpr {
                         base: BaseNode {
                             location: loc.get(1, 2, 1, 3),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         text: "@".to_string(),
                         expression: None
-                    }))
+                    })),
+                    rparen: None,
                 }))
-            }),]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10360,16 +11106,16 @@ fn missing_arrow_in_function_expression() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 13),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 13),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Function(Box::new(FunctionExpr {
                     base: BaseNode {
@@ -10379,48 +11125,57 @@ fn missing_arrow_in_function_expression() {
                             "expected ARROW, got ADD (+) at 1:10".to_string(),
                             "expected ARROW, got IDENT (b) at 1:12".to_string(),
                             "expected ARROW, got EOF".to_string()
-                        ]
+                        ],
+                        ..BaseNode::default()
                     },
+                    lparen: None,
                     params: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 2, 1, 3),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 2, 1, 3),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 5, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 5, 1, 6),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         }
                     ],
+                    rparen: None,
+                    arrow: None,
                     body: FunctionBody::Expr(Expression::Bad(Box::new(BadExpr {
                         base: BaseNode {
                             location: loc.get(1, 13, 1, 13),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         text: "invalid token for primary expression: EOF".to_string(),
                         expression: None
-                    })))
+                    }))),
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10435,7 +11190,7 @@ fn property_list_missing_property() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 20),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10444,79 +11199,89 @@ fn property_list_missing_property() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 20),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 20),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "a".to_string()
-                            }))
+                            })),
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 13, 1, 13),
-                                errors: vec!["missing property in property list".to_string()]
+                                errors: vec!["missing property in property list".to_string()],
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 13, 1, 13),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "<invalid>".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 15, 1, 19),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 15, 1, 16),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 18, 1, 19),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 7
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10531,7 +11296,7 @@ fn property_list_missing_key() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 12),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10540,43 +11305,49 @@ fn property_list_missing_key() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 12),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 12),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 11),
-                            errors: vec!["missing property key".to_string()]
+                            errors: vec!["missing property key".to_string()],
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 6),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "<invalid>".to_string()
                         }),
+                        separator: None,
                         value: Some(Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 8, 1, 11),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a".to_string()
-                        }))
-                    }]
+                        })),
+                        comma: None,
+                    }],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10591,7 +11362,7 @@ fn property_list_missing_value() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 9),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10600,37 +11371,43 @@ fn property_list_missing_value() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 9),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 9),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 7),
-                            errors: vec!["missing property value".to_string()]
+                            errors: vec!["missing property value".to_string()],
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
-                        value: None
-                    }]
+                        separator: None,
+                        value: None,
+                        comma: None,
+                    }],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10646,7 +11423,7 @@ fn property_list_missing_comma() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 19),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10655,82 +11432,91 @@ fn property_list_missing_comma() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 19),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 19),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 14),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
+                            separator: None,
                             // TODO(affo): ast.Check would add the error "expected an operator between two expressions".
                             value: Some(Expression::Binary(Box::new(BinaryExpr {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 operator: Operator::InvalidOperator,
                                 left: Expression::StringLit(StringLit {
                                     base: BaseNode {
                                         location: loc.get(1, 9, 1, 12),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     value: "a".to_string()
                                 }),
                                 right: Expression::Identifier(Identifier {
                                     base: BaseNode {
                                         location: loc.get(1, 13, 1, 14),
-                                        errors: vec![]
+                                        ..BaseNode::default()
                                     },
                                     name: "b".to_string()
                                 })
-                            })))
+                            }))),
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 14, 1, 18),
-                                errors: vec!["missing property key".to_string()]
+                                errors: vec!["missing property key".to_string()],
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "<invalid>".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 16, 1, 18),
                                     errors: vec![
                                         "expected comma in property list, got COLON".to_string()
-                                    ]
+                                    ],
+                                    ..BaseNode::default()
                                 },
                                 value: 30
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10745,7 +11531,7 @@ fn property_list_trailing_comma() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 14),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10754,43 +11540,48 @@ fn property_list_trailing_comma() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 14),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 14),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![Property {
                         base: BaseNode {
                             location: loc.get(1, 6, 1, 12),
-                            errors: vec![]
+                            ..BaseNode::default()
                         },
                         key: PropertyKey::Identifier(Identifier {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 7),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             name: "a".to_string()
                         }),
+                        separator: None,
                         value: Some(Expression::StringLit(StringLit {
                             base: BaseNode {
                                 location: loc.get(1, 9, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             value: "a".to_string()
-                        }))
-                    }]
+                        })),
+                        comma: None,
+                    }],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10805,7 +11596,7 @@ fn property_list_bad_property() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 23),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
@@ -10814,81 +11605,91 @@ fn property_list_bad_property() {
             body: vec![Statement::Variable(Box::new(VariableAssgn {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 23),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 id: Identifier {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 2),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
                     name: "o".to_string()
                 },
                 init: Expression::Object(Box::new(ObjectExpr {
                     base: BaseNode {
                         location: loc.get(1, 5, 1, 23),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
+                    lbrace: None,
                     with: None,
                     properties: vec![
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 6, 1, 12),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 6, 1, 7),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "a".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 9, 1, 12),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "a".to_string()
-                            }))
+                            })),
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 14, 1, 16),
                                 errors: vec![
                                     "unexpected token for property key: INT (30)".to_string()
-                                ]
+                                ],
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::StringLit(StringLit {
                                 base: BaseNode {
                                     location: loc.get(1, 14, 1, 14),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: "<invalid>".to_string()
                             }),
-                            value: None
+                            separator: None,
+                            value: None,
+                            comma: None,
                         },
                         Property {
                             base: BaseNode {
                                 location: loc.get(1, 18, 1, 22),
-                                errors: vec![]
+                                ..BaseNode::default()
                             },
                             key: PropertyKey::Identifier(Identifier {
                                 base: BaseNode {
                                     location: loc.get(1, 18, 1, 19),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 name: "b".to_string()
                             }),
+                            separator: None,
                             value: Some(Expression::Integer(IntegerLit {
                                 base: BaseNode {
                                     location: loc.get(1, 21, 1, 22),
-                                    errors: vec![]
+                                    ..BaseNode::default()
                                 },
                                 value: 7
-                            }))
+                            })),
+                            comma: None,
                         }
-                    ]
+                    ],
+                    rbrace: None,
                 }))
-            }))]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10905,31 +11706,37 @@ fn invalid_expression_in_array() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 6),
-                errors: vec![]
+                ..BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 6),
-                    errors: vec![]
+                    ..BaseNode::default()
                 },
                 expression: Expression::Array(Box::new(ArrayExpr {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 6),
-                        errors: vec![]
+                        ..BaseNode::default()
                     },
-                    elements: vec![Expression::Identifier(Identifier {
-                        base: BaseNode {
-                            location: loc.get(1, 3, 1, 4),
-                            errors: vec![]
-                        },
-                        name: "a".to_string()
-                    })]
+                    lbrack: None,
+                    elements: vec![ArrayItem {
+                        expression: Expression::Identifier(Identifier {
+                            base: BaseNode {
+                                location: loc.get(1, 3, 1, 4),
+                                ..BaseNode::default()
+                            },
+                            name: "a".to_string()
+                        }),
+                        comma: None,
+                    }],
+                    rbrack: None,
                 }))
-            })]
+            }))],
+            eof: None,
         },
     )
 }
@@ -10944,24 +11751,50 @@ fn integer_literal_overflow() {
         File {
             base: BaseNode {
                 location: loc.get(1, 1, 1, 31),
-                errors: vec![]
+                .. BaseNode::default()
             },
             name: "".to_string(),
             metadata: "parser-type=rust".to_string(),
             package: None,
             imports: vec![],
-            body: vec![Statement::Expr(ExprStmt {
+            body: vec![Statement::Expr(Box::new(ExprStmt {
                 base: BaseNode {
                     location: loc.get(1, 1, 1, 31),
-                    errors: vec![] },
+                    .. BaseNode::default() },
                 expression: Expression::Integer(IntegerLit {
                     base: BaseNode {
                         location: loc.get(1, 1, 1, 31),
-                        errors: vec!["invalid integer literal \"100000000000000000000000000000\": value out of range".to_string()]
+                        errors: vec!["invalid integer literal \"100000000000000000000000000000\": value out of range".to_string()],
+                        .. BaseNode::default()
                     },
                     value: 0,
                 })
-            })]
+            }))],
+            eof: None,
         },
     )
+}
+
+#[test]
+fn parse_string_literal() {
+    let errors: Vec<String> = vec![];
+
+    let mut p = Parser::new(r#""Hello world""#);
+    let result = p.parse_string_literal();
+    assert_eq!("Hello world".to_string(), result.value);
+    assert_eq!(errors, result.base.errors);
+}
+
+#[test]
+fn parse_string_literal_invalid_string() {
+    let errors = vec![
+        "expected STRING, got QUOTE (\") at 1:1",
+        "expected STRING, got EOF",
+        "invalid string literal",
+    ];
+
+    let mut p = Parser::new(r#"""#);
+    let result = p.parse_string_literal();
+    assert_eq!("".to_string(), result.value);
+    assert_eq!(errors, result.base.errors);
 }

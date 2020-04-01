@@ -13,7 +13,7 @@ import (
 	"github.com/influxdata/flux/codes"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/internal/errors"
-	"github.com/influxdata/flux/internal/execute/tableutil"
+	"github.com/influxdata/flux/internal/execute/table"
 	"github.com/influxdata/flux/interpreter"
 	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
@@ -435,6 +435,9 @@ type pivotTransformation2 struct {
 	alloc  *memory.Allocator
 	spec   PivotProcedureSpec
 	groups *execute.GroupLookup
+
+	watermark  execute.Time
+	processing execute.Time
 }
 
 func newPivotTransformation2(ctx context.Context, spec PivotProcedureSpec, id execute.DatasetID, alloc *memory.Allocator) (execute.Transformation, execute.Dataset, error) {
@@ -609,11 +612,13 @@ func (t *pivotTransformation2) getColumn(cr flux.ColReader, j int) array.Interfa
 }
 
 func (t *pivotTransformation2) UpdateWatermark(id execute.DatasetID, mark execute.Time) error {
-	return t.d.UpdateWatermark(mark)
+	t.watermark = mark
+	return nil
 }
 
 func (t *pivotTransformation2) UpdateProcessingTime(id execute.DatasetID, mark execute.Time) error {
-	return t.d.UpdateProcessingTime(mark)
+	t.processing = mark
+	return nil
 }
 
 func (t *pivotTransformation2) Finish(id execute.DatasetID, err error) {
@@ -628,7 +633,15 @@ func (t *pivotTransformation2) Finish(id execute.DatasetID, err error) {
 		if err != nil {
 			return
 		}
-		err = t.d.Process(tbl)
+		if err = t.d.Process(tbl); err != nil {
+			return
+		}
+		if err = t.d.UpdateWatermark(t.watermark); err != nil {
+			return
+		}
+		if err = t.d.UpdateProcessingTime(t.processing); err != nil {
+			return
+		}
 	})
 	t.groups.Clear()
 
@@ -705,5 +718,5 @@ func (gr *pivotTableGroup) doPivot(key flux.GroupKey, mem arrowmemory.Allocator)
 	if err := tb.Validate(); err != nil {
 		return nil, err
 	}
-	return tableutil.FromBuffer(tb), nil
+	return table.FromBuffer(tb), nil
 }

@@ -1092,8 +1092,8 @@ func TestFilter_Process(t *testing.T) {
 }
 
 func BenchmarkFilter_Values(b *testing.B) {
-	b.Run("1000", func(b *testing.B) {
-		benchmarkFilter(b, 1000, &semantic.FunctionExpression{
+	b.Run("500", func(b *testing.B) {
+		benchmarkFilter(b, 500, &semantic.FunctionExpression{
 			Block: &semantic.FunctionBlock{
 				Parameters: &semantic.FunctionParameters{
 					List: []*semantic.FunctionParameter{
@@ -1121,28 +1121,26 @@ func benchmarkFilter(b *testing.B, n int, fn *semantic.FunctionExpression) {
 			Scope: values.NewScope(),
 		},
 	}
-	for i := 0; i < b.N; i++ {
-		executetest.ProcessBenchmarkHelper(b,
-			func(alloc *memory.Allocator) (flux.TableIterator, error) {
-				schema := gen.Schema{
-					NumPoints: n,
-					Alloc:     alloc,
-					Tags: []gen.Tag{
-						{Name: "_measurement", Cardinality: 1},
-						{Name: "_field", Cardinality: 6},
-						{Name: "t0", Cardinality: 100},
-						{Name: "t1", Cardinality: 50},
-					},
-				}
-				return gen.Input(schema)
-			},
-			func(id execute.DatasetID, alloc *memory.Allocator) (execute.Transformation, execute.Dataset) {
-				t, d, err := universe.NewFilterTransformation(context.Background(), spec, id, alloc)
-				if err != nil {
-					b.Fatal(err)
-				}
-				return t, d
-			},
-		)
-	}
+	executetest.ProcessBenchmarkHelper(b,
+		func(alloc *memory.Allocator) (flux.TableIterator, error) {
+			schema := gen.Schema{
+				NumPoints: n,
+				Alloc:     alloc,
+				Tags: []gen.Tag{
+					{Name: "_measurement", Cardinality: 1},
+					{Name: "_field", Cardinality: 6},
+					{Name: "t0", Cardinality: 100},
+					{Name: "t1", Cardinality: 50},
+				},
+			}
+			return gen.Input(schema)
+		},
+		func(id execute.DatasetID, alloc *memory.Allocator) (execute.Transformation, execute.Dataset) {
+			t, d, err := universe.NewFilterTransformation(context.Background(), spec, id, alloc)
+			if err != nil {
+				b.Fatal(err)
+			}
+			return t, d
+		},
+	)
 }

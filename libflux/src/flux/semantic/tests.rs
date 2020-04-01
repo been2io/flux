@@ -23,8 +23,8 @@
 //!
 use std::collections::HashMap;
 
-use crate::semantic::analyze::analyze_with;
 use crate::semantic::bootstrap::build_polytype;
+use crate::semantic::convert::convert_with;
 use crate::semantic::env::Environment;
 use crate::semantic::fresh::Fresher;
 use crate::semantic::import::Importer;
@@ -76,8 +76,11 @@ fn parse_map(m: HashMap<&str, &str>) -> HashMap<String, PolyType> {
 }
 
 impl Importer for HashMap<&str, PolyType> {
-    fn import(&self, name: &str) -> Option<&PolyType> {
-        self.get(name)
+    fn import(&self, name: &str) -> Option<PolyType> {
+        match self.get(name) {
+            Some(pty) => Some(pty.clone()),
+            None => None,
+        }
     }
 }
 
@@ -118,7 +121,7 @@ fn infer_types(
     let pkg = parse_program(src);
 
     let got = match nodes::infer_pkg_types(
-        &mut analyze_with(pkg, &mut f).expect("analysis failed"),
+        &mut convert_with(pkg, &mut f).expect("analysis failed"),
         Environment::new(env.into()),
         &mut f,
         &importer,
@@ -841,14 +844,17 @@ fn binary_expr_subtraction() {
             a - b
         "#,
     }
-    test_infer_err! {
+    test_infer! {
         env: map![
             "a" => "forall [] uint",
             "b" => "forall [] uint",
         ],
         src: r#"
-            a - b
+            c = a - b
         "#,
+        exp: map![
+            "c" => "forall [] uint",
+        ],
     }
     test_infer_err! {
         env: map![
@@ -1440,17 +1446,37 @@ fn binary_expr_comparison() {
             ],
             src: &src,
         }
-        test_infer_err! {
+        test_infer! {
             env: map![
                 "a" => "forall [] {a: int | b: float}",
                 "b" => "forall [] {a: int | b: float}",
             ],
             src: &src,
+            exp: map![
+                "c" => "forall [] bool",
+            ],
         }
         test_infer_err! {
             env: map![
+                "a" => "forall [] {a: int | b: float | c: regexp}",
+                "b" => "forall [] {a: int | b: float | c: regexp}",
+            ],
+            src: &src,
+        }
+        test_infer! {
+            env: map![
                 "a" => "forall [] [int]",
                 "b" => "forall [] [int]",
+            ],
+            src: &src,
+            exp: map![
+                "c" => "forall [] bool",
+            ],
+        }
+        test_infer_err! {
+            env: map![
+                "a" => "forall [] [regexp]",
+                "b" => "forall [] [regexp]",
             ],
             src: &src,
         }
@@ -2199,11 +2225,14 @@ fn unary_add() {
         ],
         src: "+a",
     }
-    test_infer_err! {
+    test_infer! {
         env: map![
             "a" => "forall [] uint",
         ],
-        src: "+a",
+        src: "b = +a",
+        exp: map![
+            "b" => "forall [] uint",
+        ],
     }
     test_infer_err! {
         env: map![
@@ -2271,11 +2300,14 @@ fn unary_sub() {
         ],
         src: "-a",
     }
-    test_infer_err! {
+    test_infer! {
         env: map![
             "a" => "forall [] uint",
         ],
-        src: "-a",
+        src: "b = -a",
+        exp: map![
+            "b" => "forall [] uint",
+        ],
     }
     test_infer_err! {
         env: map![

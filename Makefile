@@ -24,10 +24,14 @@ export GO_GENERATE=go generate $(GO_ARGS)
 export GO_VET=env FLUX_PARSER_TYPE=rust GO111MODULE=on go vet $(GO_ARGS)
 export CARGO=cargo
 export CARGO_ARGS=
+export VALGRIND=valgrind
+export VALGRIND_ARGS=--leak-check=full --error-exitcode=1
 
 define go_deps
 	$(shell env GO111MODULE=on go list -f "{{range .GoFiles}} {{$$.Dir}}/{{.}}{{end}}" $(1))
 endef
+
+LIBFLUX_MEMTEST_BIN=libflux/c/libflux_memory_tester
 
 default: build
 
@@ -70,7 +74,7 @@ internal/scanner/unicode.rl: internal/scanner/unicode2ragel.rb
 internal/scanner/scanner.gen.go: internal/scanner/gen.go internal/scanner/scanner.rl internal/scanner/unicode.rl
 	$(GO_GENERATE) ./internal/scanner
 
-libflux: libflux/target/debug/libflux.a
+libflux: libflux/target/debug/libflux.a libflux/target/debug/liblibstd.a
 
 # Build the rust static library. Afterwards, fix the .d file that
 # rust generates so it references the correct targets.
@@ -78,6 +82,9 @@ libflux: libflux/target/debug/libflux.a
 # command line interface than the gnu equivalent.
 libflux/target/debug/libflux.a:
 	cd libflux && $(CARGO) build -p flux $(CARGO_ARGS)
+
+libflux/target/debug/liblibstd.a:
+	cd libflux && $(CARGO) build -p libstd $(CARGO_ARGS)
 
 libflux/go/libflux/flux.h: libflux/include/influxdata/flux.h
 	$(GO_GENERATE) ./libflux/go/libflux
@@ -115,6 +122,7 @@ build: libflux
 clean:
 	rm -rf bin
 	cd libflux && $(CARGO) clean && rm -rf pkg
+	rm -f $(LIBFLUX_MEMTEST_BIN)
 
 cleangenerate:
 	rm -rf $(GENERATED_TARGETS)
@@ -135,9 +143,14 @@ checktidy:
 checkgenerate:
 	./etc/checkgenerate.sh
 
+# Run this in two passes to to keep memory usage down. As of this commit,
+# running on everything (./...) uses just over 4G of memory. Breaking stdlib
+# out keeps memory under 3G.
 staticcheck:
 	GO111MODULE=on go mod vendor # staticcheck looks in vendor for dependencies.
-	GO111MODULE=on ./gotool.sh honnef.co/go/tools/cmd/staticcheck ./...
+	GO111MODULE=on ./gotool.sh honnef.co/go/tools/cmd/staticcheck \
+		`go list ./... | grep -v '\/flux\/stdlib\>'`
+	GO111MODULE=on ./gotool.sh honnef.co/go/tools/cmd/staticcheck ./stdlib/...
 
 test: test-go test-rust
 
@@ -168,6 +181,19 @@ libflux/scanner.c: libflux/src/flux/scanner/scanner.rl
 libflux-wasm:
 	cd libflux/src/flux && CC=clang AR=llvm-ar wasm-pack build --scope influxdata --dev
 
+build-wasm:
+	cd libflux/src/flux && CC=clang AR=llvm-ar wasm-pack build --scope influxdata
+
+publish-wasm: build-wasm
+	cd libflux/src/flux/pkg && npm publish --access public
+
+test-valgrind: $(LIBFLUX_MEMTEST_BIN)
+	LD_LIBRARY_PATH=$(PWD)/libflux/target/debug $(VALGRIND) $(VALGRIND_ARGS) $^
+
+LIBFLUX_MEMTEST_SOURCES=libflux/c/*.c
+$(LIBFLUX_MEMTEST_BIN): libflux $(LIBFLUX_MEMTEST_SOURCES)
+	$(CC) -g -Wall -Werror $(LIBFLUX_MEMTEST_SOURCES) -I./libflux/include -L./libflux/target/debug -lflux -llibstd -o $@
+
 .PHONY: generate \
 	clean \
 	cleangenerate \
@@ -186,6 +212,7 @@ libflux-wasm:
 	test-rust \
 	test-race \
 	test-bench \
+	test-valgrind \
 	vet \
 	bench \
 	checkfmt \

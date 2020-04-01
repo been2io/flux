@@ -5,8 +5,8 @@ use std::path::PathBuf;
 
 use crate::ast;
 use crate::parser;
-use crate::semantic::analyze::analyze_file;
 use crate::semantic::builtins::builtins;
+use crate::semantic::convert::convert_file;
 use crate::semantic::env::Environment;
 use crate::semantic::fresh::Fresher;
 use crate::semantic::import::Importer;
@@ -79,7 +79,7 @@ pub fn infer_stdlib() -> Result<
 > {
     let (builtins, mut f) = builtin_types()?;
 
-    let files = file_map(parse_flux_files("../../../stdlib")?);
+    let files = file_map(parse_flux_files("../../stdlib")?);
 
     let (prelude, importer) = infer_pre(&mut f, &files, &builtins)?;
     let importer = infer_std(&mut f, &files, &builtins, prelude.clone(), importer)?;
@@ -91,18 +91,19 @@ pub fn infer_stdlib() -> Result<
 fn builtin_types() -> Result<(HashMap<String, HashMap<String, PolyType>>, Fresher), Error> {
     let mut tv = Tvar(0);
     let mut ty = HashMap::new();
-    for (mut path, expr) in builtins().iter() {
-        let name = path.pop().unwrap();
-        let expr = parse(expr)?;
+    for (path, values) in builtins().iter() {
+        for (name, expr) in values {
+            let expr = parse(expr)?;
 
-        let tvar = expr.max_tvar();
-        if tvar > tv {
-            tv = tvar;
+            let tvar = expr.max_tvar();
+            if tvar > tv {
+                tv = tvar;
+            }
+
+            ty.entry((*path).to_string())
+                .or_insert_with(HashMap::new)
+                .insert((*name).to_string(), expr);
         }
-
-        ty.entry(path.join("/"))
-            .or_insert_with(HashMap::new)
-            .insert(name.to_string(), expr);
     }
     Ok((ty, Fresher::from(tv.0 + 1)))
 }
@@ -289,7 +290,7 @@ fn infer_pkg<I: Importer>(
 
             let env = if let Some(builtins) = builtin.get(pkg) {
                 infer_file(
-                    &mut analyze_file(file, f)?,
+                    &mut convert_file(file, f)?,
                     Environment::new(prelude.clone().into()),
                     f,
                     &imports,
@@ -298,7 +299,7 @@ fn infer_pkg<I: Importer>(
                 .0
             } else {
                 infer_file(
-                    &mut analyze_file(file, f)?,
+                    &mut convert_file(file, f)?,
                     Environment::new(prelude.clone().into()),
                     f,
                     &imports,
@@ -321,7 +322,7 @@ fn infer_pkg<I: Importer>(
 
     let env = if let Some(builtins) = builtin.get(name) {
         infer_file(
-            &mut analyze_file(file, f)?,
+            &mut convert_file(file, f)?,
             Environment::new(prelude.into()),
             f,
             &imports,
@@ -330,7 +331,7 @@ fn infer_pkg<I: Importer>(
         .0
     } else {
         infer_file(
-            &mut analyze_file(file, f)?,
+            &mut convert_file(file, f)?,
             Environment::new(prelude.into()),
             f,
             &imports,

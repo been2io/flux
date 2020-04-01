@@ -23,7 +23,7 @@ use chrono::TimeZone;
 */
 #[test]
 fn test_string_interpolation() {
-    let n = StringExpr {
+    let n = Expression::StringExpr(Box::new(StringExpr {
         base: BaseNode::default(),
         parts: vec![
             StringExprPart::Text(TextPart {
@@ -38,13 +38,13 @@ fn test_string_interpolation() {
                 }),
             }),
         ],
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"StringExpression","parts":[{"type":"TextPart","value":"a = "},{"type":"InterpolatedPart","expression":{"type":"Identifier","name":"a"}}]}"#
     );
-    let deserialized: StringExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -69,8 +69,9 @@ fn test_string_interpolation() {
 */
 #[test]
 fn test_paren_expression() {
-    let n = ParenExpr {
+    let n = Expression::Paren(Box::new(ParenExpr {
         base: BaseNode::default(),
+        lparen: None,
         expression: Expression::StringExpr(Box::new(StringExpr {
             base: BaseNode::default(),
             parts: vec![
@@ -87,13 +88,14 @@ fn test_paren_expression() {
                 }),
             ],
         })),
-    };
+        rparen: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ParenExpression","expression":{"type":"StringExpression","parts":[{"type":"TextPart","value":"a = "},{"type":"InterpolatedPart","expression":{"type":"Identifier","name":"a"}}]}}"#
     );
-    let deserialized: ParenExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -168,13 +170,14 @@ fn test_json_simple_file() {
         imports: Vec::new(),
         name: String::new(),
         metadata: String::new(),
-        body: vec![Statement::Expr(ExprStmt {
+        body: vec![Statement::Expr(Box::new(ExprStmt {
             base: BaseNode::default(),
             expression: Expression::StringLit(StringLit {
                 base: Default::default(),
                 value: "hello".to_string(),
             }),
-        })],
+        }))],
+        eof: None,
     };
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
@@ -228,18 +231,19 @@ fn test_json_file() {
         }],
         name: String::new(),
         metadata: String::from("parser-type=none"),
-        body: vec![Statement::Expr(ExprStmt {
+        body: vec![Statement::Expr(Box::new(ExprStmt {
             base: BaseNode::default(),
             expression: Expression::StringLit(StringLit {
                 base: Default::default(),
                 value: "hello".to_string(),
             }),
-        })],
+        }))],
+        eof: None,
     };
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"File","metadata":"parser-type=none","package":{"type":"PackageClause","name":{"type":"Identifier","name":"foo"}},"imports":[{"type":"ImportDeclaration","as":{"type":"Identifier","name":"b"},"path":{"type":"StringLiteral","value":"path/bar"}}],"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}"#
+        r#"{"type":"File","metadata":"parser-type=none","package":{"type":"PackageClause","name":{"name":"foo"}},"imports":[{"type":"ImportDeclaration","as":{"name":"b"},"path":{"value":"path/bar"}}],"body":[{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}]}"#
     );
     let deserialized: File = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
@@ -261,13 +265,15 @@ fn test_json_file() {
 fn test_json_block() {
     let n = Block {
         base: BaseNode::default(),
-        body: vec![Statement::Expr(ExprStmt {
+        lbrace: None,
+        body: vec![Statement::Expr(Box::new(ExprStmt {
             base: BaseNode::default(),
             expression: Expression::StringLit(StringLit {
                 base: Default::default(),
                 value: "hello".to_string(),
             }),
-        })],
+        }))],
+        rbrace: None,
     };
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
@@ -288,19 +294,19 @@ fn test_json_block() {
 */
 #[test]
 fn test_json_expression_statement() {
-    let n = ExprStmt {
+    let n = Statement::Expr(Box::new(ExprStmt {
         base: BaseNode::default(),
         expression: Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "hello".to_string(),
         }),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ExpressionStatement","expression":{"type":"StringLiteral","value":"hello"}}"#
     );
-    let deserialized: ExprStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -314,19 +320,19 @@ fn test_json_expression_statement() {
 */
 #[test]
 fn test_json_return_statement() {
-    let n = ReturnStmt {
+    let n = Statement::Return(Box::new(ReturnStmt {
         base: BaseNode::default(),
         argument: Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "hello".to_string(),
         }),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ReturnStatement","argument":{"type":"StringLiteral","value":"hello"}}"#
     );
-    let deserialized: ReturnStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -361,7 +367,7 @@ fn test_json_return_statement() {
 */
 #[test]
 fn test_json_option_statement() {
-    let n = OptionStmt {
+    let n = Statement::Option(Box::new(OptionStmt {
         base: BaseNode::default(),
         assignment: Assignment::Variable(Box::new(VariableAssgn {
             base: BaseNode::default(),
@@ -371,6 +377,7 @@ fn test_json_option_statement() {
             },
             init: Expression::Object(Box::new(ObjectExpr {
                 base: BaseNode::default(),
+                lbrace: None,
                 with: None,
                 properties: vec![
                     Property {
@@ -379,10 +386,12 @@ fn test_json_option_statement() {
                             base: BaseNode::default(),
                             name: "name".to_string(),
                         }),
+                        separator: None,
                         value: Some(Expression::StringLit(StringLit {
                             base: Default::default(),
                             value: "foo".to_string(),
                         })),
+                        comma: None,
                     },
                     Property {
                         base: BaseNode::default(),
@@ -390,6 +399,7 @@ fn test_json_option_statement() {
                             base: BaseNode::default(),
                             name: "every".to_string(),
                         }),
+                        separator: None,
                         value: Some(Expression::Duration(DurationLit {
                             base: Default::default(),
                             values: vec![Duration {
@@ -397,17 +407,19 @@ fn test_json_option_statement() {
                                 unit: "h".to_string(),
                             }],
                         })),
+                        comma: None,
                     },
                 ],
+                rbrace: None,
             })),
         })),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"OptionStatement","assignment":{"type":"VariableAssignment","id":{"type":"Identifier","name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}]}}}"#
+        r#"{"type":"OptionStatement","assignment":{"type":"VariableAssignment","id":{"name":"task"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"name"},"value":{"type":"StringLiteral","value":"foo"}},{"type":"Property","key":{"type":"Identifier","name":"every"},"value":{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"}]}}]}}}"#
     );
-    let deserialized: OptionStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -421,19 +433,19 @@ fn test_json_option_statement() {
 */
 #[test]
 fn test_json_builtin_statement() {
-    let n = BuiltinStmt {
+    let n = Statement::Builtin(Box::new(BuiltinStmt {
         base: BaseNode::default(),
         id: Identifier {
             base: BaseNode::default(),
             name: "task".to_string(),
         },
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"BuiltinStatement","id":{"type":"Identifier","name":"task"}}"#
+        r#"{"type":"BuiltinStatement","id":{"name":"task"}}"#
     );
-    let deserialized: BuiltinStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -469,7 +481,7 @@ fn test_json_builtin_statement() {
 */
 #[test]
 fn test_json_test_statement() {
-    let n = TestStmt {
+    let n = Statement::Test(Box::new(TestStmt {
         base: BaseNode::default(),
         assignment: VariableAssgn {
             base: BaseNode::default(),
@@ -479,6 +491,7 @@ fn test_json_test_statement() {
             },
             init: Expression::Object(Box::new(ObjectExpr {
                 base: BaseNode::default(),
+                lbrace: None,
                 with: None,
                 properties: vec![
                     Property {
@@ -487,10 +500,12 @@ fn test_json_test_statement() {
                             base: BaseNode::default(),
                             name: "want".to_string(),
                         }),
+                        separator: None,
                         value: Some(Expression::Integer(IntegerLit {
                             base: Default::default(),
                             value: 0,
                         })),
+                        comma: None,
                     },
                     Property {
                         base: BaseNode::default(),
@@ -498,21 +513,24 @@ fn test_json_test_statement() {
                             base: BaseNode::default(),
                             name: "got".to_string(),
                         }),
+                        separator: None,
                         value: Some(Expression::Integer(IntegerLit {
                             base: Default::default(),
                             value: 0,
                         })),
+                        comma: None,
                     },
                 ],
+                rbrace: None,
             })),
         },
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"TestStatement","assignment":{"type":"VariableAssignment","id":{"type":"Identifier","name":"mean"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"want"},"value":{"type":"IntegerLiteral","value":"0"}},{"type":"Property","key":{"type":"Identifier","name":"got"},"value":{"type":"IntegerLiteral","value":"0"}}]}}}"#
+        r#"{"type":"TestStatement","assignment":{"id":{"name":"mean"},"init":{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"want"},"value":{"type":"IntegerLiteral","value":"0"}},{"type":"Property","key":{"type":"Identifier","name":"got"},"value":{"type":"IntegerLiteral","value":"0"}}]}}}"#
     );
-    let deserialized: TestStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -538,7 +556,7 @@ fn test_json_test_statement() {
 */
 #[test]
 fn test_json_qualified_option_statement() {
-    let n = OptionStmt {
+    let n = Statement::Option(Box::new(OptionStmt {
         base: BaseNode::default(),
         assignment: Assignment::Member(Box::new(MemberAssgn {
             base: BaseNode::default(),
@@ -548,23 +566,25 @@ fn test_json_qualified_option_statement() {
                     base: BaseNode::default(),
                     name: "alert".to_string(),
                 }),
+                lbrack: None,
                 property: PropertyKey::Identifier(Identifier {
                     base: BaseNode::default(),
                     name: "state".to_string(),
                 }),
+                rbrack: None,
             },
             init: Expression::StringLit(StringLit {
                 base: Default::default(),
                 value: "Warning".to_string(),
             }),
         })),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"OptionStatement","assignment":{"type":"MemberAssignment","member":{"type":"MemberExpression","object":{"type":"Identifier","name":"alert"},"property":{"type":"Identifier","name":"state"}},"init":{"type":"StringLiteral","value":"Warning"}}}"#
+        r#"{"type":"OptionStatement","assignment":{"type":"MemberAssignment","member":{"object":{"type":"Identifier","name":"alert"},"property":{"type":"Identifier","name":"state"}},"init":{"type":"StringLiteral","value":"Warning"}}}"#
     );
-    let deserialized: OptionStmt = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -579,7 +599,7 @@ fn test_json_qualified_option_statement() {
 */
 #[test]
 fn test_json_variable_assignment() {
-    let n = VariableAssgn {
+    let n = Statement::Variable(Box::new(VariableAssgn {
         base: BaseNode::default(),
         id: Identifier {
             base: BaseNode::default(),
@@ -589,13 +609,13 @@ fn test_json_variable_assignment() {
             base: BaseNode::default(),
             value: "hello".to_string(),
         }),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"VariableAssignment","id":{"type":"Identifier","name":"a"},"init":{"type":"StringLiteral","value":"hello"}}"#
+        r#"{"type":"VariableAssignment","id":{"name":"a"},"init":{"type":"StringLiteral","value":"hello"}}"#
     );
-    let deserialized: VariableAssgn = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Statement = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -610,23 +630,55 @@ fn test_json_variable_assignment() {
 */
 #[test]
 fn test_json_call_expression() {
-    let n = CallExpr {
+    let n = Expression::Call(Box::new(CallExpr {
         base: BaseNode::default(),
         callee: Expression::Identifier(Identifier {
             base: BaseNode::default(),
             name: "a".to_string(),
         }),
+        lparen: None,
         arguments: vec![Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "hello".to_string(),
         })],
-    };
+        rparen: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"CallExpression","callee":{"type":"Identifier","name":"a"},"arguments":[{"type":"StringLiteral","value":"hello"}]}"#
     );
-    let deserialized: CallExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
+    assert_eq!(deserialized, n)
+}
+/*
+{
+    name: "call expression",
+    node: &ast.CallExpression{
+        Callee:    &ast.Identifier{Name: "a"},
+        Arguments: []ast.Expression{&ast.StringLiteral{Value: "hello"}},
+    },
+    want: `{"type":"CallExpression","callee":{"type":"Identifier","name":"a"},"arguments":[{"type":"StringLiteral","value":"hello"}]}`,
+},
+*/
+#[test]
+fn test_json_call_expression_empty_arguments() {
+    let n = Expression::Call(Box::new(CallExpr {
+        base: BaseNode::default(),
+        callee: Expression::Identifier(Identifier {
+            base: BaseNode::default(),
+            name: "a".to_string(),
+        }),
+        lparen: None,
+        arguments: vec![],
+        rparen: None,
+    }));
+    let serialized = serde_json::to_string(&n).unwrap();
+    assert_eq!(
+        serialized,
+        r#"{"type":"CallExpression","callee":{"type":"Identifier","name":"a"}}"#
+    );
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -644,7 +696,7 @@ fn test_json_call_expression() {
 */
 #[test]
 fn test_json_pipe_expression() {
-    let n = PipeExpr {
+    let n = Expression::PipeExpr(Box::new(PipeExpr {
         base: BaseNode::default(),
         argument: Expression::Identifier(Identifier {
             base: BaseNode::default(),
@@ -656,18 +708,20 @@ fn test_json_pipe_expression() {
                 base: BaseNode::default(),
                 name: "a".to_string(),
             }),
+            lparen: None,
             arguments: vec![Expression::StringLit(StringLit {
                 base: BaseNode::default(),
                 value: "hello".to_string(),
             })],
+            rparen: None,
         },
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"PipeExpression","argument":{"type":"Identifier","name":"a"},"call":{"type":"CallExpression","callee":{"type":"Identifier","name":"a"},"arguments":[{"type":"StringLiteral","value":"hello"}]}}"#
+        r#"{"type":"PipeExpression","argument":{"type":"Identifier","name":"a"},"call":{"callee":{"type":"Identifier","name":"a"},"arguments":[{"type":"StringLiteral","value":"hello"}]}}"#
     );
-    let deserialized: PipeExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -682,23 +736,25 @@ fn test_json_pipe_expression() {
 */
 #[test]
 fn test_json_member_expression_with_identifier() {
-    let n = MemberExpr {
+    let n = Expression::Member(Box::new(MemberExpr {
         base: BaseNode::default(),
         object: Expression::Identifier(Identifier {
             base: BaseNode::default(),
             name: "a".to_string(),
         }),
+        lbrack: None,
         property: PropertyKey::Identifier(Identifier {
             base: BaseNode::default(),
             name: "b".to_string(),
         }),
-    };
+        rbrack: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"MemberExpression","object":{"type":"Identifier","name":"a"},"property":{"type":"Identifier","name":"b"}}"#
     );
-    let deserialized: MemberExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -713,23 +769,25 @@ fn test_json_member_expression_with_identifier() {
 */
 #[test]
 fn test_json_member_expression_with_string_literal() {
-    let n = MemberExpr {
+    let n = Expression::Member(Box::new(MemberExpr {
         base: BaseNode::default(),
         object: Expression::Identifier(Identifier {
             base: BaseNode::default(),
             name: "a".to_string(),
         }),
+        lbrack: None,
         property: PropertyKey::StringLit(StringLit {
             base: BaseNode::default(),
             value: "b".to_string(),
         }),
-    };
+        rbrack: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"MemberExpression","object":{"type":"Identifier","name":"a"},"property":{"type":"StringLiteral","value":"b"}}"#
     );
-    let deserialized: MemberExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -744,23 +802,25 @@ fn test_json_member_expression_with_string_literal() {
 */
 #[test]
 fn test_json_index_expression() {
-    let n = IndexExpr {
+    let n = Expression::Index(Box::new(IndexExpr {
         base: BaseNode::default(),
         array: Expression::Identifier(Identifier {
             base: BaseNode::default(),
             name: "a".to_string(),
         }),
+        lbrack: None,
         index: Expression::Integer(IntegerLit {
             base: BaseNode::default(),
             value: 3,
         }),
-    };
+        rbrack: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"IndexExpression","array":{"type":"Identifier","name":"a"},"index":{"type":"IntegerLiteral","value":"3"}}"#
     );
-    let deserialized: IndexExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -775,27 +835,32 @@ fn test_json_index_expression() {
 */
 #[test]
 fn test_json_arrow_function_expression() {
-    let n = FunctionExpr {
+    let n = Expression::Function(Box::new(FunctionExpr {
         base: BaseNode::default(),
+        lparen: None,
         params: vec![Property {
             base: BaseNode::default(),
             key: PropertyKey::Identifier(Identifier {
                 base: BaseNode::default(),
                 name: "a".to_string(),
             }),
+            separator: None,
             value: None,
+            comma: None,
         }],
+        rparen: None,
+        arrow: None,
         body: FunctionBody::Expr(Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "hello".to_string(),
         })),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"FunctionExpression","params":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}],"body":{"type":"StringLiteral","value":"hello"}}"#
     );
-    let deserialized: FunctionExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -872,7 +937,7 @@ fn test_json_unary_expression() {
 */
 #[test]
 fn test_json_logical_expression() {
-    let n = LogicalExpr {
+    let n = Expression::Logical(Box::new(LogicalExpr {
         base: BaseNode::default(),
         operator: LogicalOperator::OrOperator,
         left: Expression::Boolean(BooleanLit {
@@ -883,13 +948,13 @@ fn test_json_logical_expression() {
             base: BaseNode::default(),
             value: true,
         }),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"LogicalExpression","operator":"or","left":{"type":"BooleanLiteral","value":false},"right":{"type":"BooleanLiteral","value":true}}"#
     );
-    let deserialized: LogicalExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -903,19 +968,24 @@ fn test_json_logical_expression() {
 */
 #[test]
 fn test_json_array_expression() {
-    let n = ArrayExpr {
+    let n = Expression::Array(Box::new(ArrayExpr {
         base: BaseNode::default(),
-        elements: vec![Expression::StringLit(StringLit {
-            base: BaseNode::default(),
-            value: "hello".to_string(),
-        })],
-    };
+        lbrack: None,
+        elements: vec![ArrayItem {
+            expression: Expression::StringLit(StringLit {
+                base: BaseNode::default(),
+                value: "hello".to_string(),
+            }),
+            comma: None,
+        }],
+        rbrack: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ArrayExpression","elements":[{"type":"StringLiteral","value":"hello"}]}"#
     );
-    let deserialized: ArrayExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -932,8 +1002,9 @@ fn test_json_array_expression() {
 */
 #[test]
 fn test_json_object_expression() {
-    let n = ObjectExpr {
+    let n = Expression::Object(Box::new(ObjectExpr {
         base: BaseNode::default(),
+        lbrace: None,
         with: None,
         properties: vec![Property {
             base: BaseNode::default(),
@@ -941,18 +1012,21 @@ fn test_json_object_expression() {
                 base: BaseNode::default(),
                 name: "a".to_string(),
             }),
+            separator: None,
             value: Some(Expression::StringLit(StringLit {
                 base: BaseNode::default(),
                 value: "hello".to_string(),
             })),
+            comma: None,
         }],
-    };
+        rbrace: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":{"type":"StringLiteral","value":"hello"}}]}"#
     );
-    let deserialized: ObjectExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -969,8 +1043,9 @@ fn test_json_object_expression() {
 */
 #[test]
 fn test_json_object_expression_with_string_literal_key() {
-    let n = ObjectExpr {
+    let n = Expression::Object(Box::new(ObjectExpr {
         base: BaseNode::default(),
+        lbrace: None,
         with: None,
         properties: vec![Property {
             base: BaseNode::default(),
@@ -978,18 +1053,21 @@ fn test_json_object_expression_with_string_literal_key() {
                 base: BaseNode::default(),
                 value: "a".to_string(),
             }),
+            separator: None,
             value: Some(Expression::StringLit(StringLit {
                 base: BaseNode::default(),
                 value: "hello".to_string(),
             })),
+            comma: None,
         }],
-    };
+        rbrace: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"StringLiteral","value":"a"},"value":{"type":"StringLiteral","value":"hello"}}]}"#
     );
-    let deserialized: ObjectExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1005,8 +1083,9 @@ fn test_json_object_expression_with_string_literal_key() {
 */
 #[test]
 fn test_json_object_expression_implicit_keys() {
-    let n = ObjectExpr {
+    let n = Expression::Object(Box::new(ObjectExpr {
         base: BaseNode::default(),
+        lbrace: None,
         with: None,
         properties: vec![Property {
             base: BaseNode::default(),
@@ -1014,25 +1093,32 @@ fn test_json_object_expression_implicit_keys() {
                 base: BaseNode::default(),
                 name: "a".to_string(),
             }),
+            separator: None,
             value: None,
+            comma: None,
         }],
-    };
+        rbrace: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ObjectExpression","properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}]}"#
     );
-    let deserialized: ObjectExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 
 #[test]
 fn test_json_object_expression_implicit_keys_and_with() {
-    let n = ObjectExpr {
+    let n = Expression::Object(Box::new(ObjectExpr {
         base: BaseNode::default(),
-        with: Some(Identifier {
-            base: BaseNode::default(),
-            name: "a".to_string(),
+        lbrace: None,
+        with: Some(WithSource {
+            source: Identifier {
+                base: BaseNode::default(),
+                name: "a".to_string(),
+            },
+            with: None,
         }),
         properties: vec![Property {
             base: BaseNode::default(),
@@ -1040,15 +1126,18 @@ fn test_json_object_expression_implicit_keys_and_with() {
                 base: BaseNode::default(),
                 name: "a".to_string(),
             }),
+            separator: None,
             value: None,
+            comma: None,
         }],
-    };
+        rbrace: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
-        r#"{"type":"ObjectExpression","with":{"type":"Identifier","name":"a"},"properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}]}"#
+        r#"{"type":"ObjectExpression","with":{"name":"a"},"properties":[{"type":"Property","key":{"type":"Identifier","name":"a"},"value":null}]}"#
     );
-    let deserialized: ObjectExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1064,27 +1153,30 @@ fn test_json_object_expression_implicit_keys_and_with() {
 */
 #[test]
 fn test_json_conditional_expression() {
-    let n = ConditionalExpr {
+    let n = Expression::Conditional(Box::new(ConditionalExpr {
         base: BaseNode::default(),
+        tk_if: None,
         test: Expression::Boolean(BooleanLit {
             base: BaseNode::default(),
             value: true,
         }),
+        tk_then: None,
         alternate: Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "false".to_string(),
         }),
+        tk_else: None,
         consequent: Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "true".to_string(),
         }),
-    };
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"ConditionalExpression","test":{"type":"BooleanLiteral","value":true},"consequent":{"type":"StringLiteral","value":"true"},"alternate":{"type":"StringLiteral","value":"false"}}"#
     );
-    let deserialized: ConditionalExpr = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1105,10 +1197,12 @@ fn test_json_property() {
             base: BaseNode::default(),
             name: "a".to_string(),
         }),
+        separator: None,
         value: Some(Expression::StringLit(StringLit {
             base: BaseNode::default(),
             value: "hello".to_string(),
         })),
+        comma: None,
     };
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
@@ -1129,13 +1223,13 @@ fn test_json_property() {
 */
 #[test]
 fn test_json_identifier() {
-    let n = Identifier {
+    let n = Expression::Identifier(Identifier {
         base: BaseNode::default(),
         name: "a".to_string(),
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(serialized, r#"{"type":"Identifier","name":"a"}"#);
-    let deserialized: Identifier = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1149,13 +1243,13 @@ fn test_json_identifier() {
 */
 #[test]
 fn test_json_string_literal() {
-    let n = StringLit {
+    let n = Expression::StringLit(StringLit {
         base: BaseNode::default(),
         value: "hello".to_string(),
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(serialized, r#"{"type":"StringLiteral","value":"hello"}"#);
-    let deserialized: StringLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1169,13 +1263,13 @@ fn test_json_string_literal() {
 */
 #[test]
 fn test_json_boolean_literal() {
-    let n = BooleanLit {
+    let n = Expression::Boolean(BooleanLit {
         base: BaseNode::default(),
         value: true,
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(serialized, r#"{"type":"BooleanLiteral","value":true}"#);
-    let deserialized: BooleanLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1189,13 +1283,13 @@ fn test_json_boolean_literal() {
 */
 #[test]
 fn test_json_float_literal() {
-    let n = FloatLit {
+    let n = Expression::Float(FloatLit {
         base: BaseNode::default(),
         value: 42.1,
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(serialized, r#"{"type":"FloatLiteral","value":42.1}"#);
-    let deserialized: FloatLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1209,16 +1303,16 @@ fn test_json_float_literal() {
 */
 #[test]
 fn test_json_integer_literal() {
-    let n = IntegerLit {
+    let n = Expression::Integer(IntegerLit {
         base: BaseNode::default(),
         value: 9223372036854775807,
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"IntegerLiteral","value":"9223372036854775807"}"#
     );
-    let deserialized: IntegerLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1232,16 +1326,16 @@ fn test_json_integer_literal() {
 */
 #[test]
 fn test_json_unsigned_integer_literal() {
-    let n = UintLit {
+    let n = Expression::Uint(UintLit {
         base: BaseNode::default(),
         value: 18446744073709551615,
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"UnsignedIntegerLiteral","value":"18446744073709551615"}"#
     );
-    let deserialized: UintLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1255,13 +1349,13 @@ fn test_json_unsigned_integer_literal() {
 */
 #[test]
 fn test_json_regexp_literal() {
-    let n = RegexpLit {
+    let n = Expression::Regexp(RegexpLit {
         base: BaseNode::default(),
         value: ".*".to_string(),
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(serialized, r#"{"type":"RegexpLiteral","value":".*"}"#);
-    let deserialized: RegexpLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1284,7 +1378,7 @@ fn test_json_regexp_literal() {
 */
 #[test]
 fn test_json_duration_literal() {
-    let n = DurationLit {
+    let n = Expression::Duration(DurationLit {
         base: BaseNode::default(),
         values: vec![
             Duration {
@@ -1296,13 +1390,13 @@ fn test_json_duration_literal() {
                 unit: "h".to_string(),
             },
         ],
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"DurationLiteral","values":[{"magnitude":1,"unit":"h"},{"magnitude":1,"unit":"h"}]}"#
     );
-    let deserialized: DurationLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 /*
@@ -1319,24 +1413,24 @@ fn test_json_duration_literal() {
 // and it will be parsed by the Go backend.
 #[test]
 fn test_json_datetime_literal() {
-    let n = DateTimeLit {
+    let n = Expression::DateTime(DateTimeLit {
         base: BaseNode::default(),
         value: FixedOffset::east(0)
             .ymd(2017, 8, 8)
             .and_hms_nano(8, 8, 8, 8),
-    };
+    });
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
         r#"{"type":"DateTimeLiteral","value":"2017-08-08T08:08:08.000000008+00:00"}"#
     );
-    let deserialized: DateTimeLit = serde_json::from_str(serialized.as_str()).unwrap();
+    let deserialized: Expression = serde_json::from_str(serialized.as_str()).unwrap();
     assert_eq!(deserialized, n)
 }
 
 #[test]
 fn test_object_expression_with_source_locations_and_errors() {
-    let n = ObjectExpr {
+    let n = Expression::Object(Box::new(ObjectExpr {
         base: BaseNode {
             location: SourceLocation {
                 file: Some("foo.flux".to_string()),
@@ -1347,8 +1441,9 @@ fn test_object_expression_with_source_locations_and_errors() {
                 },
                 source: Some("{a: \"hello\"}".to_string()),
             },
-            errors: vec![],
+            ..BaseNode::default()
         },
+        lbrace: None,
         with: None,
         properties: vec![Property {
             base: BaseNode {
@@ -1362,6 +1457,7 @@ fn test_object_expression_with_source_locations_and_errors() {
                     source: Some("a: \"hello\"".to_string()),
                 },
                 errors: vec!["an error".to_string()],
+                ..BaseNode::default()
             },
             key: PropertyKey::Identifier(Identifier {
                 base: BaseNode {
@@ -1371,10 +1467,11 @@ fn test_object_expression_with_source_locations_and_errors() {
                         end: Position { line: 1, column: 3 },
                         source: Some("a".to_string()),
                     },
-                    errors: vec![],
+                    ..BaseNode::default()
                 },
                 name: "a".to_string(),
             }),
+            separator: None,
             value: Some(Expression::StringLit(StringLit {
                 base: BaseNode {
                     location: SourceLocation {
@@ -1387,11 +1484,14 @@ fn test_object_expression_with_source_locations_and_errors() {
                         source: Some("\"hello\"".to_string()),
                     },
                     errors: vec!["an error".to_string(), "another error".to_string()],
+                    ..BaseNode::default()
                 },
                 value: "hello".to_string(),
             })),
+            comma: None,
         }],
-    };
+        rbrace: None,
+    }));
     let serialized = serde_json::to_string(&n).unwrap();
     assert_eq!(
         serialized,
