@@ -127,7 +127,7 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		})
 		root.Spec = stageSpec
 	}
-	skipped := []flux.OperationKind{flux.OperationKind("group"), flux.OperationKind("filter")}
+	skipped := []flux.OperationKind{flux.OperationKind("group"), flux.OperationKind("filter"),flux.OperationKind("window")}
 
 	for _, op := range markedOp {
 		for _, skip := range skipped {
