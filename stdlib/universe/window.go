@@ -236,7 +236,23 @@ func NewFixedWindowTransformation(
 
 	return t
 }
-
+func (t *fixedWindowTransformation) newWindowGroupKey2(tbl flux.Table, keyCols []flux.ColMeta, bnds execute.Bounds, keyColMap []int) flux.GroupKey {
+	keyCols=tbl.Key().Cols()
+	cols := make([]flux.ColMeta, len(keyCols))
+	vs := make([]values.Value, len(keyCols))
+	for j, c := range keyCols {
+		cols[j] = c
+		switch c.Label {
+		case t.startCol:
+			vs[j] = values.NewTime(bnds.Start)
+		case t.stopCol:
+			vs[j] = values.NewTime(bnds.Stop)
+		default:
+			vs[j] = tbl.Key().Value(j)
+		}
+	}
+	return execute.NewGroupKey(cols, vs)
+}
 func (t *fixedWindowTransformation) RetractTable(id execute.DatasetID, key flux.GroupKey) (err error) {
 	panic("not implemented")
 }
@@ -296,7 +312,7 @@ func (t *fixedWindowTransformation) Process(id execute.DatasetID, tbl flux.Table
 	}
 
 	for _, bnds := range t.allBounds {
-		key := t.newWindowGroupKey(tbl, keyCols, bnds, keyColMap)
+		key := t.newWindowGroupKey2(tbl, keyCols, bnds, keyColMap)
 		builder, created := t.cache.TableBuilder(key)
 		if created {
 			for _, c := range newCols {
@@ -315,7 +331,7 @@ func (t *fixedWindowTransformation) Process(id execute.DatasetID, tbl flux.Table
 			bounds := t.getWindowBounds(tm)
 
 			for _, bnds := range bounds {
-				key := t.newWindowGroupKey(tbl, keyCols, bnds, keyColMap)
+				key := t.newWindowGroupKey2(tbl, keyCols, bnds, keyColMap)
 				builder, created := t.cache.TableBuilder(key)
 				if created {
 					for _, c := range newCols {
