@@ -322,3 +322,11 @@ toUInt     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: uint(v:r._v
 toFloat    = (tables=<-) => tables |> map(fn:(r) => ({r with _value: float(v:r._value)}))
 toBool     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: bool(v:r._value)}))
 toTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._value)}))
+
+rate = (group_columns,every) =>
+    tables
+        |> sum()
+        |> stage()
+        |> sum()
+        |> group(columns: group_columns)
+        |> derivative(unit: every, nonNegative: true)
