@@ -831,6 +831,19 @@ func (e *ResultEncoder) Encode(w io.Writer, result flux.Result) (int64, error) {
 		e.written = true
 		// Update cols with table cols
 		cols := metaCols
+		for _, c := range tbl.Key().Cols() {
+			if c.Label == "_start" {
+				continue
+			}
+			if c.Label == "_stop" {
+				continue
+			}
+			cm := colMeta{ColMeta: c}
+			if c.Type == flux.TTime {
+				cm.fmt = time.RFC3339Nano
+			}
+			cols = append(cols, cm)
+		}
 		for _, c := range tbl.Cols() {
 			cm := colMeta{ColMeta: c}
 			if c.Type == flux.TTime {
@@ -838,6 +851,7 @@ func (e *ResultEncoder) Encode(w io.Writer, result flux.Result) (int64, error) {
 			}
 			cols = append(cols, cm)
 		}
+
 		// pre-allocate row slice
 		row := make([]string, len(cols))
 
@@ -881,12 +895,32 @@ func (e *ResultEncoder) Encode(w io.Writer, result flux.Result) (int64, error) {
 				}
 			}
 		}
+		startIdx := recordStartIdx
+		for i, c := range tbl.Key().Cols() {
+			if c.Label == "_start" {
+				continue
+			}
+			if c.Label == "_stop" {
+				continue
+			}
 
+			cm := colMeta{ColMeta: c}
+			if c.Type == flux.TTime {
+				cm.fmt = time.RFC3339Nano
+			}
+			str, err := encodeValue(tbl.Key().Value(i), cm)
+			if err != nil {
+				return err
+			}
+			row[startIdx] = str
+			startIdx = startIdx + 1
+
+		}
 		if err := tbl.Do(func(cr flux.ColReader) error {
-			record := row[recordStartIdx:]
+			record := row[startIdx:]
 			l := cr.Len()
 			for i := 0; i < l; i++ {
-				for j, c := range cols[recordStartIdx:] {
+				for j, c := range cols[startIdx:] {
 					v, err := encodeValueFrom(i, j, c, cr)
 					if err != nil {
 						return wrapEncodingError(err)
