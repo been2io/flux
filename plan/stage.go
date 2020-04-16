@@ -1,15 +1,28 @@
 package plan
 
 import (
+	"errors"
 	"github.com/influxdata/flux"
 )
 
 const StageKind = "stage"
 
 func init() {
+	rangeSignature := flux.FunctionSignature(
+		nil,
+		nil,
+	)
+
+	flux.RegisterPackageValue("universe", StageKind, flux.FunctionValue(StageKind, createStageOpSpec, rangeSignature))
 	flux.RegisterOpSpec(StageKind, newStageOp)
 	RegisterProcedureSpec(StageKind, createStageProcedureSpec, StageKind)
 
+}
+func createStageOpSpec(args flux.Arguments, a *flux.Administration) (flux.OperationSpec, error) {
+	if err := a.AddParentFromArgs(args); err != nil {
+		return nil, err
+	}
+	return &StageOperationSpec{}, nil
 }
 func newStageOp() flux.OperationSpec {
 	return StageOperationSpec{}
@@ -56,6 +69,7 @@ func (spec StageProcedureSpec) Copy() ProcedureSpec {
 }
 
 type StagePlanner struct {
+	timeRange *flux.Operation
 }
 
 type stageMarkVisitor struct {
@@ -104,6 +118,64 @@ func edge(parent *flux.Operation, child *flux.Operation) flux.Edge {
 	return flux.Edge{Parent: parent.ID, Child: child.ID}
 }
 func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
+	var err error
+	spec, err = sp.setup(spec)
+	if err != nil {
+		return nil, err
+	}
+	spec, err = sp.plan(spec)
+	if err != nil {
+		return nil, err
+	}
+	return spec, nil
+}
+func (sp StagePlanner) setup(spec *flux.Spec) (*flux.Spec, error) {
+	var stages []*flux.Operation
+
+	spec.Walk(func(o *flux.Operation) error {
+		if o.Spec.Kind() == StageKind {
+			stages = append(stages, o)
+		}
+		if sp.timeRange == nil && o.Spec.Kind() == "range" {
+			sp.timeRange = o
+		}
+		return nil
+	})
+	parents, children, _, err := spec.DetermineParentsChildrenAndRoots()
+	if err != nil {
+		return nil, err
+	}
+	for _, root := range stages {
+		stageSpec, ok := root.Spec.(*StageOperationSpec)
+		stageSpec.Spec.Now = spec.Now
+		if !ok {
+			return nil, errors.New("not StageOperationSpec")
+		}
+		v := stageMarkVisitor{children: parents}
+		v.walk(root, func(p, n *flux.Operation) {
+			stageSpec.AddOperation(n)
+			if p.Spec.Kind() != StageKind {
+				stageSpec.AddEdge(edge(p, n))
+			}
+		})
+		if err := stageSpec.Spec.Validate(); err != nil {
+			return nil, err
+		}
+		err := stageSpec.Spec.Walk(func(o *flux.Operation) error {
+			return spec.RemoveOperation(o)
+		})
+		if err != nil {
+			return nil, err
+		}
+		for _, child := range children[root.ID] {
+			if err := spec.AddOperationBetween(sp.timeRange, child.ID, root.ID); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return spec, nil
+}
+func (sp StagePlanner) plan(spec *flux.Spec) (*flux.Spec, error) {
 	_, children, roots, err := spec.DetermineParentsChildrenAndRoots()
 	if err != nil {
 		return nil, err
@@ -113,6 +185,9 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		children: children,
 	}
 	for _, root := range roots {
+		if root.Spec.Kind() == StageKind {
+			continue
+		}
 		stageSpec := &StageOperationSpec{
 			Spec: flux.Spec{
 				Now:       spec.Now,
@@ -127,38 +202,12 @@ func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 		})
 		root.Spec = stageSpec
 	}
-	skipped := []flux.OperationKind{flux.OperationKind("group"), flux.OperationKind("filter"),flux.OperationKind("window")}
+	skipped := []flux.OperationKind{flux.OperationKind("group"), flux.OperationKind("filter"), flux.OperationKind("window")}
 
 	for _, op := range markedOp {
 		for _, skip := range skipped {
 			if skip == op.Spec.Kind() {
-				var ops []*flux.Operation
-				var edges []flux.Edge
-				//rm operations
-				for _, o := range spec.Operations {
-					if o.ID != op.ID {
-						ops = append(ops, o)
-					}
-				}
-				// rm edge
-				c := spec.Children(op.ID)
-				ps := spec.Parents(op.ID)
-
-				for _, edge := range spec.Edges {
-					if edge.Child != op.ID && edge.Parent != op.ID {
-						edges = append(edges, edge)
-					}
-				}
-				for _, p := range ps {
-					for _, child := range c {
-						edges = append(edges, edge(p, child))
-					}
-				}
-				spec.Operations = ops
-				spec.Edges = edges
-				if err := spec.Validate(); err != nil {
-					return nil,err
-				}
+				spec.RemoveOperation(op)
 			}
 		}
 	}
