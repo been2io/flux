@@ -326,7 +326,9 @@ toTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._v
 
 rate = (columns,every,tables=<-) =>
     tables
-        |> derivative(unit: every, nonNegative: true)
+        |> window(every:every)
+        |> last()
+        |> derivative(unit: 1s, nonNegative: true)
         |> group(columns: columns)
         |> sum()
         |> stage()

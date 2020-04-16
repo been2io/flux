@@ -90,27 +90,11 @@ func (v *stageMarkVisitor) walk(op *flux.Operation, f func(p, n *flux.Operation)
 
 type visitor struct {
 	relations map[flux.OperationID][]*flux.Operation
-	skipKinds []flux.OperationKind
-	last      *flux.Operation
 }
 
 func (v *visitor) walk(operation *flux.Operation, f func(first, second *flux.Operation)) {
-	if v.last == nil {
-		v.last = operation
-	}
-	parent := operation
-	skipped := false
-	for _, skip := range v.skipKinds {
-		if skip == v.last.Spec.Kind() {
-			skipped = true
-			break
-		}
-	}
-	if skipped {
-		parent = v.last
-	}
 	for _, op := range v.relations[operation.ID] {
-		f(parent, op)
+		f(operation, op)
 		v.walk(op, f)
 	}
 }
@@ -151,11 +135,11 @@ func (sp StagePlanner) setup(spec *flux.Spec) (*flux.Spec, error) {
 		if !ok {
 			return nil, errors.New("not StageOperationSpec")
 		}
-		v := stageMarkVisitor{children: parents}
+		v := visitor{relations: parents}
 		v.walk(root, func(p, n *flux.Operation) {
 			stageSpec.AddOperation(n)
 			if p.Spec.Kind() != StageKind {
-				stageSpec.AddEdge(edge(p, n))
+				stageSpec.AddEdge(edge(n, p))
 			}
 		})
 		if err := stageSpec.Spec.Validate(); err != nil {
