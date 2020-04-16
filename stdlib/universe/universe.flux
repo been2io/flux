@@ -95,6 +95,7 @@ builtin linearBins
 builtin logarithmicBins
 builtin sleep // sleep is the identity function with the side effect of delaying execution by a specified duration
 
+builtin stage
 // covariance function with automatic join
 cov = (x,y,on,pearsonr=false) =>
     join(
@@ -322,3 +323,11 @@ toUInt     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: uint(v:r._v
 toFloat    = (tables=<-) => tables |> map(fn:(r) => ({r with _value: float(v:r._value)}))
 toBool     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: bool(v:r._value)}))
 toTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._value)}))
+
+rate = (columns,every,tables=<-) =>
+    tables
+        |> derivative(unit: every, nonNegative: true)
+        |> group(columns: columns)
+        |> sum()
+        |> stage()
+        |> sum()

@@ -61,3 +61,110 @@ func TestStagePlanner_Plan(t *testing.T) {
 	}
 
 }
+
+func TestStagePlanner_Stage(t *testing.T) {
+	planner := plan2.StagePlanner{}
+	expQ := flux.Spec{
+		Now:time.Now(),
+		Operations: []*flux.Operation{
+			{
+				ID: "from",
+				Spec: &influxdb.FromOpSpec{
+					Bucket: "mybucket",
+				},
+			},
+			{
+				ID: "range",
+				Spec: &universe.RangeOpSpec{
+					Start: flux.Time{
+						Relative:   -4 * time.Hour,
+						IsRelative: true,
+					},
+					Stop: flux.Time{
+						IsRelative: true,
+					},
+				},
+			},
+			{
+				ID:   "filter",
+				Spec: &universe.FilterOpSpec{},
+			},
+			{
+				ID:   "group",
+				Spec: &plan2.StageOperationSpec{},
+			},
+			{
+				ID:   "sum",
+				Spec: &universe.SumOpSpec{},
+			},
+		},
+		Edges: []flux.Edge{
+			{Parent: "from", Child: "range"},
+			{Parent: "range", Child: "filter"},
+			{Parent: "filter", Child: "group"},
+			{Parent: "group", Child: "sum"},
+		},
+	}
+	sp, err := planner.Plan(&expQ)
+	if err != nil {
+		panic(err)
+	}
+	if len(sp.Operations) !=3{
+		t.Error("fail")
+	}
+
+}
+
+func TestStagePlanner_Setup(t *testing.T) {
+	planner := plan2.StagePlanner{}
+	expQ := flux.Spec{
+		Now:time.Now(),
+		Operations: []*flux.Operation{
+			{
+				ID: "from",
+				Spec: &influxdb.FromOpSpec{
+					Bucket: "mybucket",
+				},
+			},
+			{
+				ID: "range",
+				Spec: &universe.RangeOpSpec{
+					Start: flux.Time{
+						Relative:   -4 * time.Hour,
+						IsRelative: true,
+					},
+					Stop: flux.Time{
+						IsRelative: true,
+					},
+				},
+			},
+			{
+				ID:   "filter",
+				Spec: &universe.FilterOpSpec{},
+			},
+			{
+				ID:   "stage",
+				Spec: &plan2.StageOperationSpec{},
+			},
+			{
+				ID:   "sum",
+				Spec: &universe.SumOpSpec{},
+			},
+		},
+		Edges: []flux.Edge{
+			{Parent: "from", Child: "range"},
+			{Parent: "range", Child: "filter"},
+			{Parent: "filter", Child: "stage"},
+			{Parent: "stage", Child: "sum"},
+		},
+	}
+	sp, err := planner.Plan(&expQ)
+	if err != nil {
+		panic(err)
+	}
+	if len(sp.Operations) !=2{
+		t.Error("fail")
+	}
+
+}
+
