@@ -162,7 +162,7 @@ func TestStagePlanner_Setup(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	if len(sp.Operations) !=2{
+	if len(sp.Operations) !=3{
 		t.Error("fail")
 	}
 
