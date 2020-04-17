@@ -324,12 +324,13 @@ toFloat    = (tables=<-) => tables |> map(fn:(r) => ({r with _value: float(v:r._
 toBool     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: bool(v:r._value)}))
 toTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._value)}))
 
-rate = (columns,every,tables=<-) =>
+rate = (columns,every,timeSrc="_start",timeDst="_time",tables=<-) =>
     tables
-        |> window(every:every)
-        |> last()
         |> derivative(unit: 1s, nonNegative: true)
         |> group(columns: columns)
+        |> window(every:every)
         |> sum()
         |> stage()
         |> sum()
+        |> duplicate(column:timeSrc,as:timeDst)
+        |> window(every:inf, timeColumn:timeDst)

@@ -21,11 +21,11 @@ var pkgAST = &ast.Package{
 			Errors: nil,
 			Loc: &ast.SourceLocation{
 				End: ast.Position{
-					Column: 17,
-					Line:   335,
+					Column: 49,
+					Line:   336,
 				},
 				File:   "universe.flux",
-				Source: "package universe\n\nimport \"system\"\nimport \"date\"\nimport \"math\"\nimport \"strings\"\nimport \"regexp\"\n\n// now is a function option whose default behaviour is to return the current system time\noption now = system.time\n\n// Booleans\nbuiltin true\nbuiltin false\n\n// Transformation functions\nbuiltin chandeMomentumOscillator\nbuiltin columns\nbuiltin count\nbuiltin covariance\nbuiltin cumulativeSum\nbuiltin derivative\nbuiltin difference\nbuiltin distinct\nbuiltin drop\nbuiltin duplicate\nbuiltin elapsed\nbuiltin exponentialMovingAverage\nbuiltin fill\nbuiltin filter\nbuiltin first\nbuiltin group\nbuiltin histogram\nbuiltin histogramQuantile\nbuiltin holtWinters\nbuiltin hourSelection\nbuiltin integral\nbuiltin join\nbuiltin kaufmansAMA\nbuiltin keep\nbuiltin keyValues\nbuiltin keys\nbuiltin last\nbuiltin limit\nbuiltin map\nbuiltin max\nbuiltin mean\nbuiltin min\nbuiltin mode\nbuiltin movingAverage\nbuiltin quantile\nbuiltin pivot\nbuiltin range\nbuiltin reduce\nbuiltin relativeStrengthIndex\nbuiltin rename\nbuiltin sample\nbuiltin set\nbuiltin tail\nbuiltin timeShift\nbuiltin skew\nbuiltin spread\nbuiltin sort\nbuiltin stateTracking\nbuiltin stddev\nbuiltin sum\nbuiltin tripleExponentialDerivative\nbuiltin union\nbuiltin unique\nbuiltin window\nbuiltin yield\n\n// stream/table index functions\nbuiltin tableFind\nbuiltin getColumn\nbuiltin getRecord\n\n// type conversion functions\nbuiltin bool\nbuiltin bytes\nbuiltin duration\nbuiltin float\nbuiltin int\nbuiltin string\nbuiltin time\nbuiltin uint\n\n// contains function\nbuiltin contains\n\n// other builtins\nbuiltin inf\nbuiltin length // length function for arrays\nbuiltin linearBins\nbuiltin logarithmicBins\nbuiltin sleep // sleep is the identity function with the side effect of delaying execution by a specified duration\n\nbuiltin stage\n// covariance function with automatic join\ncov = (x,y,on,pearsonr=false) =>\n    join(\n        tables:{x:x, y:y},\n        on:on,\n    )\n    |> covariance(pearsonr:pearsonr, columns:[\"_value_x\",\"_value_y\"])\n\npearsonr = (x,y,on) => cov(x:x, y:y, on:on, pearsonr:true)\n\n// AggregateWindow applies an aggregate function to fixed windows of time.\n// The procedure is to window the data, perform an aggregate operation,\n// and then undo the windowing to produce an output table for every input table.\naggregateWindow = (every, fn, column=\"_value\", timeSrc=\"_stop\",timeDst=\"_time\", createEmpty=true, tables=<-) =>\n    tables\n        |> window(every:every, createEmpty: createEmpty)\n        |> fn(column:column)\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)\n\n// AggregateWindow applies an aggregate function to fixed windows of time.\n// The procedure is to window the data, perform an aggregate operation,\n// and then undo the windowing to produce an output table for every input table.\nagg = (every, fn, column=\"_value\", timeSrc=\"_start\",timeDst=\"_time\", createEmpty=true, tables=<-) =>\n    tables\n        |> window(every:every, createEmpty: createEmpty)\n        |> fn(column:column)\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)\n\n// Increase returns the total non-negative difference between values in a table.\n// A main usage case is tracking changes in counter values which may wrap over time when they hit\n// a threshold or are reset. In the case of a wrap/reset,\n// we can assume that the absolute delta between two points will be at least their non-negative difference.\nincrease = (tables=<-, columns=[\"_value\"]) =>\n    tables\n        |> difference(nonNegative: true, columns:columns)\n        |> cumulativeSum(columns: columns)\n\n// median returns the 50th percentile.\nmedian = (method=\"estimate_tdigest\", compression=0.0, column=\"_value\", tables=<-) =>\n    tables\n        |> quantile(q:0.5, method: method, compression: compression, column: column)\n\n// stateCount computes the number of consecutive records in a given state.\n// The state is defined via the function fn. For each consecutive point for\n// which the expression evaluates as true, the state count will be incremented\n// When a point evaluates as false, the state count is reset.\n//\n// The state count will be added as an additional column to each record. If the\n// expression evaluates as false, the value will be -1. If the expression\n// generates an error during evaluation, the point is discarded, and does not\n// affect the state count.\nstateCount = (fn, column=\"stateCount\", tables=<-) =>\n    tables\n        |> stateTracking(countColumn:column, fn:fn)\n\n// stateDuration computes the duration of a given state.\n// The state is defined via the function fn. For each consecutive point for\n// which the expression evaluates as true, the state duration will be\n// incremented by the duration between points. When a point evaluates as false,\n// the state duration is reset.\n//\n// The state duration will be added as an additional column to each record. If the\n// expression evaluates as false, the value will be -1. If the expression\n// generates an error during evaluation, the point is discarded, and does not\n// affect the state duration.\n//\n// Note that as the first point in the given state has no previous point, its\n// state duration will be 0.\n//\n// The duration is represented as an integer in the units specified.\nstateDuration = (fn, column=\"stateDuration\", timeColumn=\"_time\", unit=1s, tables=<-) =>\n    tables\n        |> stateTracking(durationColumn:column, timeColumn:timeColumn, fn:fn, durationUnit:unit)\n\n// _sortLimit is a helper function, which sorts and limits a table.\n_sortLimit = (n, desc, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> sort(columns:columns, desc:desc)\n        |> limit(n:n)\n\n// top sorts a table by columns and keeps only the top n records.\ntop = (n, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> _sortLimit(n:n, columns:columns, desc:true)\n\n// top sorts a table by columns and keeps only the bottom n records.\nbottom = (n, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> _sortLimit(n:n, columns:columns, desc:false)\n\n// _highestOrLowest is a helper function, which reduces all groups into a single group by specific tags and a reducer function,\n// then it selects the highest or lowest records based on the column and the _sortLimit function.\n// The default reducer assumes no reducing needs to be performed.\n_highestOrLowest = (n, _sortLimit, reducer, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> group(columns:groupColumns)\n        |> reducer()\n        |> group(columns:[])\n        |> _sortLimit(n:n, columns:[column])\n\n// highestMax returns the top N records from all groups using the maximum of each group.\nhighestMax = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.\n                reducer: (tables=<-) => tables |> max(column:column),\n                _sortLimit: top,\n            )\n\n// highestAverage returns the top N records from all groups using the average of each group.\nhighestAverage = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> mean(column:column),\n                _sortLimit: top,\n            )\n\n// highestCurrent returns the top N records from all groups using the last value of each group.\nhighestCurrent = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> last(column:column),\n                _sortLimit: top,\n            )\n\n// lowestMin returns the bottom N records from all groups using the minimum of each group.\nlowestMin = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.\n                reducer: (tables=<-) => tables |> min(column:column),\n                _sortLimit: bottom,\n            )\n\n// lowestAverage returns the bottom N records from all groups using the average of each group.\nlowestAverage = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> mean(column:column),\n                _sortLimit: bottom,\n            )\n\n// lowestCurrent returns the bottom N records from all groups using the last value of each group.\nlowestCurrent = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> last(column:column),\n                _sortLimit: bottom,\n            )\n\n// timedMovingAverage constructs a simple moving average over windows of 'period' duration\n// eg: A 5 year moving average would be called as such:\n//    movingAverage(1y, 5y)\ntimedMovingAverage = (every, period, column=\"_value\", tables=<-) =>\n    tables\n        |> window(every: every, period: period)\n        |> mean(column:column)\n        |> duplicate(column: \"_stop\", as: \"_time\")\n        |> window(every: inf)\n\n// Double Exponential Moving Average computes the double exponential moving averages of the `_value` column.\n// eg: A 5 point double exponential moving average would be called as such:\n// from(bucket: \"telegraf/autogen\"):\n//    |> range(start: -7d)\n//    |> doubleEMA(n: 5)\ndoubleEMA = (n, tables=<-) =>\n    tables\n          |> exponentialMovingAverage(n:n)\n          |> duplicate(column:\"_value\", as:\"__ema\")\n          |> exponentialMovingAverage(n:n)\n          |> map(fn: (r) => ({r with _value: 2.0*r.__ema - r._value}))\n          |> drop(columns: [\"__ema\"])\n\n\n// Triple Exponential Moving Average computes the triple exponential moving averages of the `_value` column.\n// eg: A 5 point triple exponential moving average would be called as such:\n// from(bucket: \"telegraf/autogen\"):\n//    |> range(start: -7d)\n//    |> tripleEMA(n: 5)\ntripleEMA = (n, tables=<-) =>\n\ttables\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> duplicate(column:\"_value\", as:\"__ema1\")\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> duplicate(column:\"_value\", as:\"__ema2\")\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> map(fn: (r) => ({r with _value: 3.0*r.__ema1 - 3.0*r.__ema2 + r._value}))\n\t\t|> drop(columns: [\"__ema1\", \"__ema2\"])\n\n// truncateTimeColumn takes in a time column t and a Duration unit and truncates each value of t to the given unit via map\n// Change from _time to timeColumn once Flux Issue 1122 is resolved\ntruncateTimeColumn = (timeColumn=\"_time\", unit, tables=<-) =>\n    tables\n        |> map(fn:(r) => ({r with _time: date.truncate(t: r._time, unit: unit)}))\n\n// kaufmansER computes Kaufman's Efficiency Ratios of the `_value` column\nkaufmansER = (n, tables=<-) =>\n    tables\n        |> chandeMomentumOscillator(n: n)\n        |> map(fn:(r) => ({r with _value: (math.abs(x: r._value)/100.0)}))\n\ntoString   = (tables=<-) => tables |> map(fn:(r) => ({r with _value: string(v:r._value)}))\ntoInt      = (tables=<-) => tables |> map(fn:(r) => ({r with _value: int(v:r._value)}))\ntoUInt     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: uint(v:r._value)}))\ntoFloat    = (tables=<-) => tables |> map(fn:(r) => ({r with _value: float(v:r._value)}))\ntoBool     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: bool(v:r._value)}))\ntoTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._value)}))\n\nrate = (columns,every,tables=<-) =>\n    tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()\n        |> stage()\n        |> sum()",
+				Source: "package universe\n\nimport \"system\"\nimport \"date\"\nimport \"math\"\nimport \"strings\"\nimport \"regexp\"\n\n// now is a function option whose default behaviour is to return the current system time\noption now = system.time\n\n// Booleans\nbuiltin true\nbuiltin false\n\n// Transformation functions\nbuiltin chandeMomentumOscillator\nbuiltin columns\nbuiltin count\nbuiltin covariance\nbuiltin cumulativeSum\nbuiltin derivative\nbuiltin difference\nbuiltin distinct\nbuiltin drop\nbuiltin duplicate\nbuiltin elapsed\nbuiltin exponentialMovingAverage\nbuiltin fill\nbuiltin filter\nbuiltin first\nbuiltin group\nbuiltin histogram\nbuiltin histogramQuantile\nbuiltin holtWinters\nbuiltin hourSelection\nbuiltin integral\nbuiltin join\nbuiltin kaufmansAMA\nbuiltin keep\nbuiltin keyValues\nbuiltin keys\nbuiltin last\nbuiltin limit\nbuiltin map\nbuiltin max\nbuiltin mean\nbuiltin min\nbuiltin mode\nbuiltin movingAverage\nbuiltin quantile\nbuiltin pivot\nbuiltin range\nbuiltin reduce\nbuiltin relativeStrengthIndex\nbuiltin rename\nbuiltin sample\nbuiltin set\nbuiltin tail\nbuiltin timeShift\nbuiltin skew\nbuiltin spread\nbuiltin sort\nbuiltin stateTracking\nbuiltin stddev\nbuiltin sum\nbuiltin tripleExponentialDerivative\nbuiltin union\nbuiltin unique\nbuiltin window\nbuiltin yield\n\n// stream/table index functions\nbuiltin tableFind\nbuiltin getColumn\nbuiltin getRecord\n\n// type conversion functions\nbuiltin bool\nbuiltin bytes\nbuiltin duration\nbuiltin float\nbuiltin int\nbuiltin string\nbuiltin time\nbuiltin uint\n\n// contains function\nbuiltin contains\n\n// other builtins\nbuiltin inf\nbuiltin length // length function for arrays\nbuiltin linearBins\nbuiltin logarithmicBins\nbuiltin sleep // sleep is the identity function with the side effect of delaying execution by a specified duration\n\nbuiltin stage\n// covariance function with automatic join\ncov = (x,y,on,pearsonr=false) =>\n    join(\n        tables:{x:x, y:y},\n        on:on,\n    )\n    |> covariance(pearsonr:pearsonr, columns:[\"_value_x\",\"_value_y\"])\n\npearsonr = (x,y,on) => cov(x:x, y:y, on:on, pearsonr:true)\n\n// AggregateWindow applies an aggregate function to fixed windows of time.\n// The procedure is to window the data, perform an aggregate operation,\n// and then undo the windowing to produce an output table for every input table.\naggregateWindow = (every, fn, column=\"_value\", timeSrc=\"_stop\",timeDst=\"_time\", createEmpty=true, tables=<-) =>\n    tables\n        |> window(every:every, createEmpty: createEmpty)\n        |> fn(column:column)\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)\n\n// AggregateWindow applies an aggregate function to fixed windows of time.\n// The procedure is to window the data, perform an aggregate operation,\n// and then undo the windowing to produce an output table for every input table.\nagg = (every, fn, column=\"_value\", timeSrc=\"_start\",timeDst=\"_time\", createEmpty=true, tables=<-) =>\n    tables\n        |> window(every:every, createEmpty: createEmpty)\n        |> fn(column:column)\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)\n\n// Increase returns the total non-negative difference between values in a table.\n// A main usage case is tracking changes in counter values which may wrap over time when they hit\n// a threshold or are reset. In the case of a wrap/reset,\n// we can assume that the absolute delta between two points will be at least their non-negative difference.\nincrease = (tables=<-, columns=[\"_value\"]) =>\n    tables\n        |> difference(nonNegative: true, columns:columns)\n        |> cumulativeSum(columns: columns)\n\n// median returns the 50th percentile.\nmedian = (method=\"estimate_tdigest\", compression=0.0, column=\"_value\", tables=<-) =>\n    tables\n        |> quantile(q:0.5, method: method, compression: compression, column: column)\n\n// stateCount computes the number of consecutive records in a given state.\n// The state is defined via the function fn. For each consecutive point for\n// which the expression evaluates as true, the state count will be incremented\n// When a point evaluates as false, the state count is reset.\n//\n// The state count will be added as an additional column to each record. If the\n// expression evaluates as false, the value will be -1. If the expression\n// generates an error during evaluation, the point is discarded, and does not\n// affect the state count.\nstateCount = (fn, column=\"stateCount\", tables=<-) =>\n    tables\n        |> stateTracking(countColumn:column, fn:fn)\n\n// stateDuration computes the duration of a given state.\n// The state is defined via the function fn. For each consecutive point for\n// which the expression evaluates as true, the state duration will be\n// incremented by the duration between points. When a point evaluates as false,\n// the state duration is reset.\n//\n// The state duration will be added as an additional column to each record. If the\n// expression evaluates as false, the value will be -1. If the expression\n// generates an error during evaluation, the point is discarded, and does not\n// affect the state duration.\n//\n// Note that as the first point in the given state has no previous point, its\n// state duration will be 0.\n//\n// The duration is represented as an integer in the units specified.\nstateDuration = (fn, column=\"stateDuration\", timeColumn=\"_time\", unit=1s, tables=<-) =>\n    tables\n        |> stateTracking(durationColumn:column, timeColumn:timeColumn, fn:fn, durationUnit:unit)\n\n// _sortLimit is a helper function, which sorts and limits a table.\n_sortLimit = (n, desc, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> sort(columns:columns, desc:desc)\n        |> limit(n:n)\n\n// top sorts a table by columns and keeps only the top n records.\ntop = (n, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> _sortLimit(n:n, columns:columns, desc:true)\n\n// top sorts a table by columns and keeps only the bottom n records.\nbottom = (n, columns=[\"_value\"], tables=<-) =>\n    tables\n        |> _sortLimit(n:n, columns:columns, desc:false)\n\n// _highestOrLowest is a helper function, which reduces all groups into a single group by specific tags and a reducer function,\n// then it selects the highest or lowest records based on the column and the _sortLimit function.\n// The default reducer assumes no reducing needs to be performed.\n_highestOrLowest = (n, _sortLimit, reducer, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> group(columns:groupColumns)\n        |> reducer()\n        |> group(columns:[])\n        |> _sortLimit(n:n, columns:[column])\n\n// highestMax returns the top N records from all groups using the maximum of each group.\nhighestMax = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.\n                reducer: (tables=<-) => tables |> max(column:column),\n                _sortLimit: top,\n            )\n\n// highestAverage returns the top N records from all groups using the average of each group.\nhighestAverage = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> mean(column:column),\n                _sortLimit: top,\n            )\n\n// highestCurrent returns the top N records from all groups using the last value of each group.\nhighestCurrent = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> last(column:column),\n                _sortLimit: top,\n            )\n\n// lowestMin returns the bottom N records from all groups using the minimum of each group.\nlowestMin = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                // TODO(nathanielc): Once max/min support selecting based on multiple columns change this to pass all columns.\n                reducer: (tables=<-) => tables |> min(column:column),\n                _sortLimit: bottom,\n            )\n\n// lowestAverage returns the bottom N records from all groups using the average of each group.\nlowestAverage = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> mean(column:column),\n                _sortLimit: bottom,\n            )\n\n// lowestCurrent returns the bottom N records from all groups using the last value of each group.\nlowestCurrent = (n, column=\"_value\", groupColumns=[], tables=<-) =>\n    tables\n        |> _highestOrLowest(\n                n:n,\n                column:column,\n                groupColumns:groupColumns,\n                reducer: (tables=<-) => tables |> last(column:column),\n                _sortLimit: bottom,\n            )\n\n// timedMovingAverage constructs a simple moving average over windows of 'period' duration\n// eg: A 5 year moving average would be called as such:\n//    movingAverage(1y, 5y)\ntimedMovingAverage = (every, period, column=\"_value\", tables=<-) =>\n    tables\n        |> window(every: every, period: period)\n        |> mean(column:column)\n        |> duplicate(column: \"_stop\", as: \"_time\")\n        |> window(every: inf)\n\n// Double Exponential Moving Average computes the double exponential moving averages of the `_value` column.\n// eg: A 5 point double exponential moving average would be called as such:\n// from(bucket: \"telegraf/autogen\"):\n//    |> range(start: -7d)\n//    |> doubleEMA(n: 5)\ndoubleEMA = (n, tables=<-) =>\n    tables\n          |> exponentialMovingAverage(n:n)\n          |> duplicate(column:\"_value\", as:\"__ema\")\n          |> exponentialMovingAverage(n:n)\n          |> map(fn: (r) => ({r with _value: 2.0*r.__ema - r._value}))\n          |> drop(columns: [\"__ema\"])\n\n\n// Triple Exponential Moving Average computes the triple exponential moving averages of the `_value` column.\n// eg: A 5 point triple exponential moving average would be called as such:\n// from(bucket: \"telegraf/autogen\"):\n//    |> range(start: -7d)\n//    |> tripleEMA(n: 5)\ntripleEMA = (n, tables=<-) =>\n\ttables\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> duplicate(column:\"_value\", as:\"__ema1\")\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> duplicate(column:\"_value\", as:\"__ema2\")\n\t\t|> exponentialMovingAverage(n:n)\n\t\t|> map(fn: (r) => ({r with _value: 3.0*r.__ema1 - 3.0*r.__ema2 + r._value}))\n\t\t|> drop(columns: [\"__ema1\", \"__ema2\"])\n\n// truncateTimeColumn takes in a time column t and a Duration unit and truncates each value of t to the given unit via map\n// Change from _time to timeColumn once Flux Issue 1122 is resolved\ntruncateTimeColumn = (timeColumn=\"_time\", unit, tables=<-) =>\n    tables\n        |> map(fn:(r) => ({r with _time: date.truncate(t: r._time, unit: unit)}))\n\n// kaufmansER computes Kaufman's Efficiency Ratios of the `_value` column\nkaufmansER = (n, tables=<-) =>\n    tables\n        |> chandeMomentumOscillator(n: n)\n        |> map(fn:(r) => ({r with _value: (math.abs(x: r._value)/100.0)}))\n\ntoString   = (tables=<-) => tables |> map(fn:(r) => ({r with _value: string(v:r._value)}))\ntoInt      = (tables=<-) => tables |> map(fn:(r) => ({r with _value: int(v:r._value)}))\ntoUInt     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: uint(v:r._value)}))\ntoFloat    = (tables=<-) => tables |> map(fn:(r) => ({r with _value: float(v:r._value)}))\ntoBool     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: bool(v:r._value)}))\ntoTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._value)}))\n\nrate = (columns,every,timeSrc=\"_start\",timeDst=\"_time\",tables=<-) =>\n    tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)",
 				Start: ast.Position{
 					Column: 1,
 					Line:   1,
@@ -22802,11 +22802,11 @@ var pkgAST = &ast.Package{
 				Errors: nil,
 				Loc: &ast.SourceLocation{
 					End: ast.Position{
-						Column: 17,
-						Line:   335,
+						Column: 49,
+						Line:   336,
 					},
 					File:   "universe.flux",
-					Source: "rate = (columns,every,tables=<-) =>\n    tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()\n        |> stage()\n        |> sum()",
+					Source: "rate = (columns,every,timeSrc=\"_start\",timeDst=\"_time\",tables=<-) =>\n    tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)",
 					Start: ast.Position{
 						Column: 1,
 						Line:   327,
@@ -22836,11 +22836,11 @@ var pkgAST = &ast.Package{
 					Errors: nil,
 					Loc: &ast.SourceLocation{
 						End: ast.Position{
-							Column: 17,
-							Line:   335,
+							Column: 49,
+							Line:   336,
 						},
 						File:   "universe.flux",
-						Source: "(columns,every,tables=<-) =>\n    tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()\n        |> stage()\n        |> sum()",
+						Source: "(columns,every,timeSrc=\"_start\",timeDst=\"_time\",tables=<-) =>\n    tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)",
 						Start: ast.Position{
 							Column: 8,
 							Line:   327,
@@ -22854,33 +22854,211 @@ var pkgAST = &ast.Package{
 								Argument: &ast.PipeExpression{
 									Argument: &ast.PipeExpression{
 										Argument: &ast.PipeExpression{
-											Argument: &ast.Identifier{
+											Argument: &ast.PipeExpression{
+												Argument: &ast.Identifier{
+													BaseNode: ast.BaseNode{
+														Errors: nil,
+														Loc: &ast.SourceLocation{
+															End: ast.Position{
+																Column: 11,
+																Line:   328,
+															},
+															File:   "universe.flux",
+															Source: "tables",
+															Start: ast.Position{
+																Column: 5,
+																Line:   328,
+															},
+														},
+													},
+													Name: "tables",
+												},
 												BaseNode: ast.BaseNode{
 													Errors: nil,
 													Loc: &ast.SourceLocation{
 														End: ast.Position{
-															Column: 11,
-															Line:   328,
+															Column: 51,
+															Line:   329,
 														},
 														File:   "universe.flux",
-														Source: "tables",
+														Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)",
 														Start: ast.Position{
 															Column: 5,
 															Line:   328,
 														},
 													},
 												},
-												Name: "tables",
+												Call: &ast.CallExpression{
+													Arguments: []ast.Expression{&ast.ObjectExpression{
+														BaseNode: ast.BaseNode{
+															Errors: nil,
+															Loc: &ast.SourceLocation{
+																End: ast.Position{
+																	Column: 50,
+																	Line:   329,
+																},
+																File:   "universe.flux",
+																Source: "unit: 1s, nonNegative: true",
+																Start: ast.Position{
+																	Column: 23,
+																	Line:   329,
+																},
+															},
+														},
+														Properties: []*ast.Property{&ast.Property{
+															BaseNode: ast.BaseNode{
+																Errors: nil,
+																Loc: &ast.SourceLocation{
+																	End: ast.Position{
+																		Column: 31,
+																		Line:   329,
+																	},
+																	File:   "universe.flux",
+																	Source: "unit: 1s",
+																	Start: ast.Position{
+																		Column: 23,
+																		Line:   329,
+																	},
+																},
+															},
+															Key: &ast.Identifier{
+																BaseNode: ast.BaseNode{
+																	Errors: nil,
+																	Loc: &ast.SourceLocation{
+																		End: ast.Position{
+																			Column: 27,
+																			Line:   329,
+																		},
+																		File:   "universe.flux",
+																		Source: "unit",
+																		Start: ast.Position{
+																			Column: 23,
+																			Line:   329,
+																		},
+																	},
+																},
+																Name: "unit",
+															},
+															Value: &ast.DurationLiteral{
+																BaseNode: ast.BaseNode{
+																	Errors: nil,
+																	Loc: &ast.SourceLocation{
+																		End: ast.Position{
+																			Column: 31,
+																			Line:   329,
+																		},
+																		File:   "universe.flux",
+																		Source: "1s",
+																		Start: ast.Position{
+																			Column: 29,
+																			Line:   329,
+																		},
+																	},
+																},
+																Values: []ast.Duration{ast.Duration{
+																	Magnitude: int64(1),
+																	Unit:      "s",
+																}},
+															},
+														}, &ast.Property{
+															BaseNode: ast.BaseNode{
+																Errors: nil,
+																Loc: &ast.SourceLocation{
+																	End: ast.Position{
+																		Column: 50,
+																		Line:   329,
+																	},
+																	File:   "universe.flux",
+																	Source: "nonNegative: true",
+																	Start: ast.Position{
+																		Column: 33,
+																		Line:   329,
+																	},
+																},
+															},
+															Key: &ast.Identifier{
+																BaseNode: ast.BaseNode{
+																	Errors: nil,
+																	Loc: &ast.SourceLocation{
+																		End: ast.Position{
+																			Column: 44,
+																			Line:   329,
+																		},
+																		File:   "universe.flux",
+																		Source: "nonNegative",
+																		Start: ast.Position{
+																			Column: 33,
+																			Line:   329,
+																		},
+																	},
+																},
+																Name: "nonNegative",
+															},
+															Value: &ast.Identifier{
+																BaseNode: ast.BaseNode{
+																	Errors: nil,
+																	Loc: &ast.SourceLocation{
+																		End: ast.Position{
+																			Column: 50,
+																			Line:   329,
+																		},
+																		File:   "universe.flux",
+																		Source: "true",
+																		Start: ast.Position{
+																			Column: 46,
+																			Line:   329,
+																		},
+																	},
+																},
+																Name: "true",
+															},
+														}},
+														With: nil,
+													}},
+													BaseNode: ast.BaseNode{
+														Errors: nil,
+														Loc: &ast.SourceLocation{
+															End: ast.Position{
+																Column: 51,
+																Line:   329,
+															},
+															File:   "universe.flux",
+															Source: "derivative(unit: 1s, nonNegative: true)",
+															Start: ast.Position{
+																Column: 12,
+																Line:   329,
+															},
+														},
+													},
+													Callee: &ast.Identifier{
+														BaseNode: ast.BaseNode{
+															Errors: nil,
+															Loc: &ast.SourceLocation{
+																End: ast.Position{
+																	Column: 22,
+																	Line:   329,
+																},
+																File:   "universe.flux",
+																Source: "derivative",
+																Start: ast.Position{
+																	Column: 12,
+																	Line:   329,
+																},
+															},
+														},
+														Name: "derivative",
+													},
+												},
 											},
 											BaseNode: ast.BaseNode{
 												Errors: nil,
 												Loc: &ast.SourceLocation{
 													End: ast.Position{
-														Column: 31,
-														Line:   329,
+														Column: 35,
+														Line:   330,
 													},
 													File:   "universe.flux",
-													Source: "tables\n        |> window(every:every)",
+													Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)",
 													Start: ast.Position{
 														Column: 5,
 														Line:   328,
@@ -22893,14 +23071,14 @@ var pkgAST = &ast.Package{
 														Errors: nil,
 														Loc: &ast.SourceLocation{
 															End: ast.Position{
-																Column: 30,
-																Line:   329,
+																Column: 34,
+																Line:   330,
 															},
 															File:   "universe.flux",
-															Source: "every:every",
+															Source: "columns: columns",
 															Start: ast.Position{
-																Column: 19,
-																Line:   329,
+																Column: 18,
+																Line:   330,
 															},
 														},
 													},
@@ -22909,14 +23087,14 @@ var pkgAST = &ast.Package{
 															Errors: nil,
 															Loc: &ast.SourceLocation{
 																End: ast.Position{
-																	Column: 30,
-																	Line:   329,
+																	Column: 34,
+																	Line:   330,
 																},
 																File:   "universe.flux",
-																Source: "every:every",
+																Source: "columns: columns",
 																Start: ast.Position{
-																	Column: 19,
-																	Line:   329,
+																	Column: 18,
+																	Line:   330,
 																},
 															},
 														},
@@ -22925,36 +23103,36 @@ var pkgAST = &ast.Package{
 																Errors: nil,
 																Loc: &ast.SourceLocation{
 																	End: ast.Position{
-																		Column: 24,
-																		Line:   329,
+																		Column: 25,
+																		Line:   330,
 																	},
 																	File:   "universe.flux",
-																	Source: "every",
+																	Source: "columns",
 																	Start: ast.Position{
-																		Column: 19,
-																		Line:   329,
+																		Column: 18,
+																		Line:   330,
 																	},
 																},
 															},
-															Name: "every",
+															Name: "columns",
 														},
 														Value: &ast.Identifier{
 															BaseNode: ast.BaseNode{
 																Errors: nil,
 																Loc: &ast.SourceLocation{
 																	End: ast.Position{
-																		Column: 30,
-																		Line:   329,
+																		Column: 34,
+																		Line:   330,
 																	},
 																	File:   "universe.flux",
-																	Source: "every",
+																	Source: "columns",
 																	Start: ast.Position{
-																		Column: 25,
-																		Line:   329,
+																		Column: 27,
+																		Line:   330,
 																	},
 																},
 															},
-															Name: "every",
+															Name: "columns",
 														},
 													}},
 													With: nil,
@@ -22963,14 +23141,14 @@ var pkgAST = &ast.Package{
 													Errors: nil,
 													Loc: &ast.SourceLocation{
 														End: ast.Position{
-															Column: 31,
-															Line:   329,
+															Column: 35,
+															Line:   330,
 														},
 														File:   "universe.flux",
-														Source: "window(every:every)",
+														Source: "group(columns: columns)",
 														Start: ast.Position{
 															Column: 12,
-															Line:   329,
+															Line:   330,
 														},
 													},
 												},
@@ -22979,18 +23157,18 @@ var pkgAST = &ast.Package{
 														Errors: nil,
 														Loc: &ast.SourceLocation{
 															End: ast.Position{
-																Column: 18,
-																Line:   329,
+																Column: 17,
+																Line:   330,
 															},
 															File:   "universe.flux",
-															Source: "window",
+															Source: "group",
 															Start: ast.Position{
 																Column: 12,
-																Line:   329,
+																Line:   330,
 															},
 														},
 													},
-													Name: "window",
+													Name: "group",
 												},
 											},
 										},
@@ -22998,11 +23176,11 @@ var pkgAST = &ast.Package{
 											Errors: nil,
 											Loc: &ast.SourceLocation{
 												End: ast.Position{
-													Column: 18,
-													Line:   330,
+													Column: 31,
+													Line:   331,
 												},
 												File:   "universe.flux",
-												Source: "tables\n        |> window(every:every)\n        |> last()",
+												Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)",
 												Start: ast.Position{
 													Column: 5,
 													Line:   328,
@@ -23010,19 +23188,89 @@ var pkgAST = &ast.Package{
 											},
 										},
 										Call: &ast.CallExpression{
-											Arguments: nil,
+											Arguments: []ast.Expression{&ast.ObjectExpression{
+												BaseNode: ast.BaseNode{
+													Errors: nil,
+													Loc: &ast.SourceLocation{
+														End: ast.Position{
+															Column: 30,
+															Line:   331,
+														},
+														File:   "universe.flux",
+														Source: "every:every",
+														Start: ast.Position{
+															Column: 19,
+															Line:   331,
+														},
+													},
+												},
+												Properties: []*ast.Property{&ast.Property{
+													BaseNode: ast.BaseNode{
+														Errors: nil,
+														Loc: &ast.SourceLocation{
+															End: ast.Position{
+																Column: 30,
+																Line:   331,
+															},
+															File:   "universe.flux",
+															Source: "every:every",
+															Start: ast.Position{
+																Column: 19,
+																Line:   331,
+															},
+														},
+													},
+													Key: &ast.Identifier{
+														BaseNode: ast.BaseNode{
+															Errors: nil,
+															Loc: &ast.SourceLocation{
+																End: ast.Position{
+																	Column: 24,
+																	Line:   331,
+																},
+																File:   "universe.flux",
+																Source: "every",
+																Start: ast.Position{
+																	Column: 19,
+																	Line:   331,
+																},
+															},
+														},
+														Name: "every",
+													},
+													Value: &ast.Identifier{
+														BaseNode: ast.BaseNode{
+															Errors: nil,
+															Loc: &ast.SourceLocation{
+																End: ast.Position{
+																	Column: 30,
+																	Line:   331,
+																},
+																File:   "universe.flux",
+																Source: "every",
+																Start: ast.Position{
+																	Column: 25,
+																	Line:   331,
+																},
+															},
+														},
+														Name: "every",
+													},
+												}},
+												With: nil,
+											}},
 											BaseNode: ast.BaseNode{
 												Errors: nil,
 												Loc: &ast.SourceLocation{
 													End: ast.Position{
-														Column: 18,
-														Line:   330,
+														Column: 31,
+														Line:   331,
 													},
 													File:   "universe.flux",
-													Source: "last()",
+													Source: "window(every:every)",
 													Start: ast.Position{
 														Column: 12,
-														Line:   330,
+														Line:   331,
 													},
 												},
 											},
@@ -23031,18 +23279,18 @@ var pkgAST = &ast.Package{
 													Errors: nil,
 													Loc: &ast.SourceLocation{
 														End: ast.Position{
-															Column: 16,
-															Line:   330,
+															Column: 18,
+															Line:   331,
 														},
 														File:   "universe.flux",
-														Source: "last",
+														Source: "window",
 														Start: ast.Position{
 															Column: 12,
-															Line:   330,
+															Line:   331,
 														},
 													},
 												},
-												Name: "last",
+												Name: "window",
 											},
 										},
 									},
@@ -23050,11 +23298,11 @@ var pkgAST = &ast.Package{
 										Errors: nil,
 										Loc: &ast.SourceLocation{
 											End: ast.Position{
-												Column: 51,
-												Line:   331,
+												Column: 17,
+												Line:   332,
 											},
 											File:   "universe.flux",
-											Source: "tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)",
+											Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()",
 											Start: ast.Position{
 												Column: 5,
 												Line:   328,
@@ -23062,144 +23310,19 @@ var pkgAST = &ast.Package{
 										},
 									},
 									Call: &ast.CallExpression{
-										Arguments: []ast.Expression{&ast.ObjectExpression{
-											BaseNode: ast.BaseNode{
-												Errors: nil,
-												Loc: &ast.SourceLocation{
-													End: ast.Position{
-														Column: 50,
-														Line:   331,
-													},
-													File:   "universe.flux",
-													Source: "unit: 1s, nonNegative: true",
-													Start: ast.Position{
-														Column: 23,
-														Line:   331,
-													},
-												},
-											},
-											Properties: []*ast.Property{&ast.Property{
-												BaseNode: ast.BaseNode{
-													Errors: nil,
-													Loc: &ast.SourceLocation{
-														End: ast.Position{
-															Column: 31,
-															Line:   331,
-														},
-														File:   "universe.flux",
-														Source: "unit: 1s",
-														Start: ast.Position{
-															Column: 23,
-															Line:   331,
-														},
-													},
-												},
-												Key: &ast.Identifier{
-													BaseNode: ast.BaseNode{
-														Errors: nil,
-														Loc: &ast.SourceLocation{
-															End: ast.Position{
-																Column: 27,
-																Line:   331,
-															},
-															File:   "universe.flux",
-															Source: "unit",
-															Start: ast.Position{
-																Column: 23,
-																Line:   331,
-															},
-														},
-													},
-													Name: "unit",
-												},
-												Value: &ast.DurationLiteral{
-													BaseNode: ast.BaseNode{
-														Errors: nil,
-														Loc: &ast.SourceLocation{
-															End: ast.Position{
-																Column: 31,
-																Line:   331,
-															},
-															File:   "universe.flux",
-															Source: "1s",
-															Start: ast.Position{
-																Column: 29,
-																Line:   331,
-															},
-														},
-													},
-													Values: []ast.Duration{ast.Duration{
-														Magnitude: int64(1),
-														Unit:      "s",
-													}},
-												},
-											}, &ast.Property{
-												BaseNode: ast.BaseNode{
-													Errors: nil,
-													Loc: &ast.SourceLocation{
-														End: ast.Position{
-															Column: 50,
-															Line:   331,
-														},
-														File:   "universe.flux",
-														Source: "nonNegative: true",
-														Start: ast.Position{
-															Column: 33,
-															Line:   331,
-														},
-													},
-												},
-												Key: &ast.Identifier{
-													BaseNode: ast.BaseNode{
-														Errors: nil,
-														Loc: &ast.SourceLocation{
-															End: ast.Position{
-																Column: 44,
-																Line:   331,
-															},
-															File:   "universe.flux",
-															Source: "nonNegative",
-															Start: ast.Position{
-																Column: 33,
-																Line:   331,
-															},
-														},
-													},
-													Name: "nonNegative",
-												},
-												Value: &ast.Identifier{
-													BaseNode: ast.BaseNode{
-														Errors: nil,
-														Loc: &ast.SourceLocation{
-															End: ast.Position{
-																Column: 50,
-																Line:   331,
-															},
-															File:   "universe.flux",
-															Source: "true",
-															Start: ast.Position{
-																Column: 46,
-																Line:   331,
-															},
-														},
-													},
-													Name: "true",
-												},
-											}},
-											With: nil,
-										}},
+										Arguments: nil,
 										BaseNode: ast.BaseNode{
 											Errors: nil,
 											Loc: &ast.SourceLocation{
 												End: ast.Position{
-													Column: 51,
-													Line:   331,
+													Column: 17,
+													Line:   332,
 												},
 												File:   "universe.flux",
-												Source: "derivative(unit: 1s, nonNegative: true)",
+												Source: "sum()",
 												Start: ast.Position{
 													Column: 12,
-													Line:   331,
+													Line:   332,
 												},
 											},
 										},
@@ -23208,18 +23331,18 @@ var pkgAST = &ast.Package{
 												Errors: nil,
 												Loc: &ast.SourceLocation{
 													End: ast.Position{
-														Column: 22,
-														Line:   331,
+														Column: 15,
+														Line:   332,
 													},
 													File:   "universe.flux",
-													Source: "derivative",
+													Source: "sum",
 													Start: ast.Position{
 														Column: 12,
-														Line:   331,
+														Line:   332,
 													},
 												},
 											},
-											Name: "derivative",
+											Name: "sum",
 										},
 									},
 								},
@@ -23227,11 +23350,11 @@ var pkgAST = &ast.Package{
 									Errors: nil,
 									Loc: &ast.SourceLocation{
 										End: ast.Position{
-											Column: 35,
-											Line:   332,
+											Column: 19,
+											Line:   333,
 										},
 										File:   "universe.flux",
-										Source: "tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)",
+										Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()",
 										Start: ast.Position{
 											Column: 5,
 											Line:   328,
@@ -23239,89 +23362,19 @@ var pkgAST = &ast.Package{
 									},
 								},
 								Call: &ast.CallExpression{
-									Arguments: []ast.Expression{&ast.ObjectExpression{
-										BaseNode: ast.BaseNode{
-											Errors: nil,
-											Loc: &ast.SourceLocation{
-												End: ast.Position{
-													Column: 34,
-													Line:   332,
-												},
-												File:   "universe.flux",
-												Source: "columns: columns",
-												Start: ast.Position{
-													Column: 18,
-													Line:   332,
-												},
-											},
-										},
-										Properties: []*ast.Property{&ast.Property{
-											BaseNode: ast.BaseNode{
-												Errors: nil,
-												Loc: &ast.SourceLocation{
-													End: ast.Position{
-														Column: 34,
-														Line:   332,
-													},
-													File:   "universe.flux",
-													Source: "columns: columns",
-													Start: ast.Position{
-														Column: 18,
-														Line:   332,
-													},
-												},
-											},
-											Key: &ast.Identifier{
-												BaseNode: ast.BaseNode{
-													Errors: nil,
-													Loc: &ast.SourceLocation{
-														End: ast.Position{
-															Column: 25,
-															Line:   332,
-														},
-														File:   "universe.flux",
-														Source: "columns",
-														Start: ast.Position{
-															Column: 18,
-															Line:   332,
-														},
-													},
-												},
-												Name: "columns",
-											},
-											Value: &ast.Identifier{
-												BaseNode: ast.BaseNode{
-													Errors: nil,
-													Loc: &ast.SourceLocation{
-														End: ast.Position{
-															Column: 34,
-															Line:   332,
-														},
-														File:   "universe.flux",
-														Source: "columns",
-														Start: ast.Position{
-															Column: 27,
-															Line:   332,
-														},
-													},
-												},
-												Name: "columns",
-											},
-										}},
-										With: nil,
-									}},
+									Arguments: nil,
 									BaseNode: ast.BaseNode{
 										Errors: nil,
 										Loc: &ast.SourceLocation{
 											End: ast.Position{
-												Column: 35,
-												Line:   332,
+												Column: 19,
+												Line:   333,
 											},
 											File:   "universe.flux",
-											Source: "group(columns: columns)",
+											Source: "stage()",
 											Start: ast.Position{
 												Column: 12,
-												Line:   332,
+												Line:   333,
 											},
 										},
 									},
@@ -23331,17 +23384,17 @@ var pkgAST = &ast.Package{
 											Loc: &ast.SourceLocation{
 												End: ast.Position{
 													Column: 17,
-													Line:   332,
+													Line:   333,
 												},
 												File:   "universe.flux",
-												Source: "group",
+												Source: "stage",
 												Start: ast.Position{
 													Column: 12,
-													Line:   332,
+													Line:   333,
 												},
 											},
 										},
-										Name: "group",
+										Name: "stage",
 									},
 								},
 							},
@@ -23350,10 +23403,10 @@ var pkgAST = &ast.Package{
 								Loc: &ast.SourceLocation{
 									End: ast.Position{
 										Column: 17,
-										Line:   333,
+										Line:   334,
 									},
 									File:   "universe.flux",
-									Source: "tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()",
+									Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()",
 									Start: ast.Position{
 										Column: 5,
 										Line:   328,
@@ -23367,13 +23420,13 @@ var pkgAST = &ast.Package{
 									Loc: &ast.SourceLocation{
 										End: ast.Position{
 											Column: 17,
-											Line:   333,
+											Line:   334,
 										},
 										File:   "universe.flux",
 										Source: "sum()",
 										Start: ast.Position{
 											Column: 12,
-											Line:   333,
+											Line:   334,
 										},
 									},
 								},
@@ -23383,13 +23436,13 @@ var pkgAST = &ast.Package{
 										Loc: &ast.SourceLocation{
 											End: ast.Position{
 												Column: 15,
-												Line:   333,
+												Line:   334,
 											},
 											File:   "universe.flux",
 											Source: "sum",
 											Start: ast.Position{
 												Column: 12,
-												Line:   333,
+												Line:   334,
 											},
 										},
 									},
@@ -23401,11 +23454,11 @@ var pkgAST = &ast.Package{
 							Errors: nil,
 							Loc: &ast.SourceLocation{
 								End: ast.Position{
-									Column: 19,
-									Line:   334,
+									Column: 48,
+									Line:   335,
 								},
 								File:   "universe.flux",
-								Source: "tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()\n        |> stage()",
+								Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()\n        |> duplicate(column:timeSrc,as:timeDst)",
 								Start: ast.Position{
 									Column: 5,
 									Line:   328,
@@ -23413,19 +23466,141 @@ var pkgAST = &ast.Package{
 							},
 						},
 						Call: &ast.CallExpression{
-							Arguments: nil,
+							Arguments: []ast.Expression{&ast.ObjectExpression{
+								BaseNode: ast.BaseNode{
+									Errors: nil,
+									Loc: &ast.SourceLocation{
+										End: ast.Position{
+											Column: 47,
+											Line:   335,
+										},
+										File:   "universe.flux",
+										Source: "column:timeSrc,as:timeDst",
+										Start: ast.Position{
+											Column: 22,
+											Line:   335,
+										},
+									},
+								},
+								Properties: []*ast.Property{&ast.Property{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 36,
+												Line:   335,
+											},
+											File:   "universe.flux",
+											Source: "column:timeSrc",
+											Start: ast.Position{
+												Column: 22,
+												Line:   335,
+											},
+										},
+									},
+									Key: &ast.Identifier{
+										BaseNode: ast.BaseNode{
+											Errors: nil,
+											Loc: &ast.SourceLocation{
+												End: ast.Position{
+													Column: 28,
+													Line:   335,
+												},
+												File:   "universe.flux",
+												Source: "column",
+												Start: ast.Position{
+													Column: 22,
+													Line:   335,
+												},
+											},
+										},
+										Name: "column",
+									},
+									Value: &ast.Identifier{
+										BaseNode: ast.BaseNode{
+											Errors: nil,
+											Loc: &ast.SourceLocation{
+												End: ast.Position{
+													Column: 36,
+													Line:   335,
+												},
+												File:   "universe.flux",
+												Source: "timeSrc",
+												Start: ast.Position{
+													Column: 29,
+													Line:   335,
+												},
+											},
+										},
+										Name: "timeSrc",
+									},
+								}, &ast.Property{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 47,
+												Line:   335,
+											},
+											File:   "universe.flux",
+											Source: "as:timeDst",
+											Start: ast.Position{
+												Column: 37,
+												Line:   335,
+											},
+										},
+									},
+									Key: &ast.Identifier{
+										BaseNode: ast.BaseNode{
+											Errors: nil,
+											Loc: &ast.SourceLocation{
+												End: ast.Position{
+													Column: 39,
+													Line:   335,
+												},
+												File:   "universe.flux",
+												Source: "as",
+												Start: ast.Position{
+													Column: 37,
+													Line:   335,
+												},
+											},
+										},
+										Name: "as",
+									},
+									Value: &ast.Identifier{
+										BaseNode: ast.BaseNode{
+											Errors: nil,
+											Loc: &ast.SourceLocation{
+												End: ast.Position{
+													Column: 47,
+													Line:   335,
+												},
+												File:   "universe.flux",
+												Source: "timeDst",
+												Start: ast.Position{
+													Column: 40,
+													Line:   335,
+												},
+											},
+										},
+										Name: "timeDst",
+									},
+								}},
+								With: nil,
+							}},
 							BaseNode: ast.BaseNode{
 								Errors: nil,
 								Loc: &ast.SourceLocation{
 									End: ast.Position{
-										Column: 19,
-										Line:   334,
+										Column: 48,
+										Line:   335,
 									},
 									File:   "universe.flux",
-									Source: "stage()",
+									Source: "duplicate(column:timeSrc,as:timeDst)",
 									Start: ast.Position{
 										Column: 12,
-										Line:   334,
+										Line:   335,
 									},
 								},
 							},
@@ -23434,18 +23609,18 @@ var pkgAST = &ast.Package{
 									Errors: nil,
 									Loc: &ast.SourceLocation{
 										End: ast.Position{
-											Column: 17,
-											Line:   334,
+											Column: 21,
+											Line:   335,
 										},
 										File:   "universe.flux",
-										Source: "stage",
+										Source: "duplicate",
 										Start: ast.Position{
 											Column: 12,
-											Line:   334,
+											Line:   335,
 										},
 									},
 								},
-								Name: "stage",
+								Name: "duplicate",
 							},
 						},
 					},
@@ -23453,11 +23628,11 @@ var pkgAST = &ast.Package{
 						Errors: nil,
 						Loc: &ast.SourceLocation{
 							End: ast.Position{
-								Column: 17,
-								Line:   335,
+								Column: 49,
+								Line:   336,
 							},
 							File:   "universe.flux",
-							Source: "tables\n        |> window(every:every)\n        |> last()\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> sum()\n        |> stage()\n        |> sum()",
+							Source: "tables\n        |> derivative(unit: 1s, nonNegative: true)\n        |> group(columns: columns)\n        |> window(every:every)\n        |> sum()\n        |> stage()\n        |> sum()\n        |> duplicate(column:timeSrc,as:timeDst)\n        |> window(every:inf, timeColumn:timeDst)",
 							Start: ast.Position{
 								Column: 5,
 								Line:   328,
@@ -23465,19 +23640,141 @@ var pkgAST = &ast.Package{
 						},
 					},
 					Call: &ast.CallExpression{
-						Arguments: nil,
+						Arguments: []ast.Expression{&ast.ObjectExpression{
+							BaseNode: ast.BaseNode{
+								Errors: nil,
+								Loc: &ast.SourceLocation{
+									End: ast.Position{
+										Column: 48,
+										Line:   336,
+									},
+									File:   "universe.flux",
+									Source: "every:inf, timeColumn:timeDst",
+									Start: ast.Position{
+										Column: 19,
+										Line:   336,
+									},
+								},
+							},
+							Properties: []*ast.Property{&ast.Property{
+								BaseNode: ast.BaseNode{
+									Errors: nil,
+									Loc: &ast.SourceLocation{
+										End: ast.Position{
+											Column: 28,
+											Line:   336,
+										},
+										File:   "universe.flux",
+										Source: "every:inf",
+										Start: ast.Position{
+											Column: 19,
+											Line:   336,
+										},
+									},
+								},
+								Key: &ast.Identifier{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 24,
+												Line:   336,
+											},
+											File:   "universe.flux",
+											Source: "every",
+											Start: ast.Position{
+												Column: 19,
+												Line:   336,
+											},
+										},
+									},
+									Name: "every",
+								},
+								Value: &ast.Identifier{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 28,
+												Line:   336,
+											},
+											File:   "universe.flux",
+											Source: "inf",
+											Start: ast.Position{
+												Column: 25,
+												Line:   336,
+											},
+										},
+									},
+									Name: "inf",
+								},
+							}, &ast.Property{
+								BaseNode: ast.BaseNode{
+									Errors: nil,
+									Loc: &ast.SourceLocation{
+										End: ast.Position{
+											Column: 48,
+											Line:   336,
+										},
+										File:   "universe.flux",
+										Source: "timeColumn:timeDst",
+										Start: ast.Position{
+											Column: 30,
+											Line:   336,
+										},
+									},
+								},
+								Key: &ast.Identifier{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 40,
+												Line:   336,
+											},
+											File:   "universe.flux",
+											Source: "timeColumn",
+											Start: ast.Position{
+												Column: 30,
+												Line:   336,
+											},
+										},
+									},
+									Name: "timeColumn",
+								},
+								Value: &ast.Identifier{
+									BaseNode: ast.BaseNode{
+										Errors: nil,
+										Loc: &ast.SourceLocation{
+											End: ast.Position{
+												Column: 48,
+												Line:   336,
+											},
+											File:   "universe.flux",
+											Source: "timeDst",
+											Start: ast.Position{
+												Column: 41,
+												Line:   336,
+											},
+										},
+									},
+									Name: "timeDst",
+								},
+							}},
+							With: nil,
+						}},
 						BaseNode: ast.BaseNode{
 							Errors: nil,
 							Loc: &ast.SourceLocation{
 								End: ast.Position{
-									Column: 17,
-									Line:   335,
+									Column: 49,
+									Line:   336,
 								},
 								File:   "universe.flux",
-								Source: "sum()",
+								Source: "window(every:inf, timeColumn:timeDst)",
 								Start: ast.Position{
 									Column: 12,
-									Line:   335,
+									Line:   336,
 								},
 							},
 						},
@@ -23486,18 +23783,18 @@ var pkgAST = &ast.Package{
 								Errors: nil,
 								Loc: &ast.SourceLocation{
 									End: ast.Position{
-										Column: 15,
-										Line:   335,
+										Column: 18,
+										Line:   336,
 									},
 									File:   "universe.flux",
-									Source: "sum",
+									Source: "window",
 									Start: ast.Position{
 										Column: 12,
-										Line:   335,
+										Line:   336,
 									},
 								},
 							},
-							Name: "sum",
+							Name: "window",
 						},
 					},
 				},
@@ -23576,11 +23873,11 @@ var pkgAST = &ast.Package{
 						Errors: nil,
 						Loc: &ast.SourceLocation{
 							End: ast.Position{
-								Column: 32,
+								Column: 39,
 								Line:   327,
 							},
 							File:   "universe.flux",
-							Source: "tables=<-",
+							Source: "timeSrc=\"_start\"",
 							Start: ast.Position{
 								Column: 23,
 								Line:   327,
@@ -23592,13 +23889,117 @@ var pkgAST = &ast.Package{
 							Errors: nil,
 							Loc: &ast.SourceLocation{
 								End: ast.Position{
-									Column: 29,
+									Column: 30,
+									Line:   327,
+								},
+								File:   "universe.flux",
+								Source: "timeSrc",
+								Start: ast.Position{
+									Column: 23,
+									Line:   327,
+								},
+							},
+						},
+						Name: "timeSrc",
+					},
+					Value: &ast.StringLiteral{
+						BaseNode: ast.BaseNode{
+							Errors: nil,
+							Loc: &ast.SourceLocation{
+								End: ast.Position{
+									Column: 39,
+									Line:   327,
+								},
+								File:   "universe.flux",
+								Source: "\"_start\"",
+								Start: ast.Position{
+									Column: 31,
+									Line:   327,
+								},
+							},
+						},
+						Value: "_start",
+					},
+				}, &ast.Property{
+					BaseNode: ast.BaseNode{
+						Errors: nil,
+						Loc: &ast.SourceLocation{
+							End: ast.Position{
+								Column: 55,
+								Line:   327,
+							},
+							File:   "universe.flux",
+							Source: "timeDst=\"_time\"",
+							Start: ast.Position{
+								Column: 40,
+								Line:   327,
+							},
+						},
+					},
+					Key: &ast.Identifier{
+						BaseNode: ast.BaseNode{
+							Errors: nil,
+							Loc: &ast.SourceLocation{
+								End: ast.Position{
+									Column: 47,
+									Line:   327,
+								},
+								File:   "universe.flux",
+								Source: "timeDst",
+								Start: ast.Position{
+									Column: 40,
+									Line:   327,
+								},
+							},
+						},
+						Name: "timeDst",
+					},
+					Value: &ast.StringLiteral{
+						BaseNode: ast.BaseNode{
+							Errors: nil,
+							Loc: &ast.SourceLocation{
+								End: ast.Position{
+									Column: 55,
+									Line:   327,
+								},
+								File:   "universe.flux",
+								Source: "\"_time\"",
+								Start: ast.Position{
+									Column: 48,
+									Line:   327,
+								},
+							},
+						},
+						Value: "_time",
+					},
+				}, &ast.Property{
+					BaseNode: ast.BaseNode{
+						Errors: nil,
+						Loc: &ast.SourceLocation{
+							End: ast.Position{
+								Column: 65,
+								Line:   327,
+							},
+							File:   "universe.flux",
+							Source: "tables=<-",
+							Start: ast.Position{
+								Column: 56,
+								Line:   327,
+							},
+						},
+					},
+					Key: &ast.Identifier{
+						BaseNode: ast.BaseNode{
+							Errors: nil,
+							Loc: &ast.SourceLocation{
+								End: ast.Position{
+									Column: 62,
 									Line:   327,
 								},
 								File:   "universe.flux",
 								Source: "tables",
 								Start: ast.Position{
-									Column: 23,
+									Column: 56,
 									Line:   327,
 								},
 							},
@@ -23609,13 +24010,13 @@ var pkgAST = &ast.Package{
 						Errors: nil,
 						Loc: &ast.SourceLocation{
 							End: ast.Position{
-								Column: 32,
+								Column: 65,
 								Line:   327,
 							},
 							File:   "universe.flux",
 							Source: "<-",
 							Start: ast.Position{
-								Column: 30,
+								Column: 63,
 								Line:   327,
 							},
 						},
