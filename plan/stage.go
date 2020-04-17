@@ -101,6 +101,19 @@ func (v *visitor) walk(operation *flux.Operation, f func(first, second *flux.Ope
 func edge(parent *flux.Operation, child *flux.Operation) flux.Edge {
 	return flux.Edge{Parent: parent.ID, Child: child.ID}
 }
+
+var enableStagePlan bool
+
+func EnableStagePlan() {
+	enableStagePlan = true
+}
+func PlanStage(spec *flux.Spec) (*flux.Spec, error) {
+	if enableStagePlan {
+		return StagePlanner{}.Plan(spec)
+	}
+	return spec, nil
+
+}
 func (sp StagePlanner) Plan(spec *flux.Spec) (*flux.Spec, error) {
 	var err error
 	spec, err = sp.setup(spec)
