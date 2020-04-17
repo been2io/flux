@@ -238,6 +238,18 @@ func NewFixedWindowTransformation(
 }
 func (t *fixedWindowTransformation) newWindowGroupKey2(tbl flux.Table, keyCols []flux.ColMeta, bnds execute.Bounds, keyColMap []int) flux.GroupKey {
 	keyCols=tbl.Key().Cols()
+	if !execute.HasCol(execute.DefaultStartColLabel,keyCols){
+		keyCols = append(keyCols,flux.ColMeta{
+			Label: execute.DefaultStartColLabel,
+			Type: flux.TTime,
+		})
+	}
+	if !execute.HasCol(execute.DefaultStopColLabel,keyCols){
+		keyCols = append(keyCols,flux.ColMeta{
+			Label: execute.DefaultStopColLabel,
+			Type: flux.TTime,
+		})
+	}
 	cols := make([]flux.ColMeta, len(keyCols))
 	vs := make([]values.Value, len(keyCols))
 	for j, c := range keyCols {
