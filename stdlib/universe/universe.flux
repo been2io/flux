@@ -96,6 +96,7 @@ builtin logarithmicBins
 builtin sleep // sleep is the identity function with the side effect of delaying execution by a specified duration
 
 builtin stage
+builtin derivativeWindow
 // covariance function with automatic join
 cov = (x,y,on,pearsonr=false) =>
     join(
@@ -326,11 +327,10 @@ toTime     = (tables=<-) => tables |> map(fn:(r) => ({r with _value: time(v:r._v
 
 rate = (columns,every,timeSrc="_start",timeDst="_time",tables=<-) =>
     tables
-        |> derivative(unit: 1s, nonNegative: true)
+        |> derivativeWindow(unit: 1s, nonNegative: true,every:every)
         |> group(columns: columns)
         |> window(every:every)
         |> sum()
         |> stage()
         |> sum()
-        |> duplicate(column:timeSrc,as:timeDst)
         |> window(every:inf, timeColumn:timeDst)

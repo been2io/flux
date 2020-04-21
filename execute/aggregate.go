@@ -1,6 +1,7 @@
 package execute
 
 import (
+	"fmt"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/influxdata/flux"
 	"github.com/influxdata/flux/codes"
@@ -83,7 +84,7 @@ func (t *aggregateTransformation) Process(id DatasetID, tbl flux.Table) error {
 		return errors.Newf(codes.FailedPrecondition, "aggregate found duplicate table with key: %v", tbl.Key())
 	}
 
-	if err := AddTableKeyCols(tbl.Key(), builder); err != nil {
+	if err := AddTableKeyTimeCols(tbl.Key(), builder); err != nil {
 		return err
 	}
 
@@ -202,9 +203,31 @@ func (t *aggregateTransformation) Process(id DatasetID, tbl flux.Table) error {
 		}
 	}
 
-	return AppendKeyValues(tbl.Key(), builder)
+	return AppendKeyTimeValues(tbl.Key(), builder)
 }
-
+func AddTableKeyTimeCols(key flux.GroupKey, builder TableBuilder) error {
+	if _, err := builder.AddCol(flux.ColMeta{
+		Label: DefaultTimeColLabel,
+		Type: flux.TTime,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+func AppendKeyTimeValues(key flux.GroupKey, builder TableBuilder) error {
+	idx := ColIdx(DefaultStartColLabel, key.Cols())
+	if idx < 0 {
+		return fmt.Errorf("group key column %s not found in key", "_start")
+	}
+	cIdx:=ColIdx(DefaultTimeColLabel,builder.Cols())
+	if idx < 0 {
+		return fmt.Errorf("group key column %s not found in output table", "_time")
+	}
+	if err := builder.AppendValue(cIdx, key.Value(idx)); err != nil {
+		return err
+	}
+	return nil
+}
 func (t *aggregateTransformation) UpdateWatermark(id DatasetID, mark Time) error {
 	return t.d.UpdateWatermark(mark)
 }

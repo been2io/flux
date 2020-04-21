@@ -198,10 +198,12 @@ func (t *groupTransformation) getTableKey(tbl flux.Table) (flux.GroupKey, bool, 
 	case flux.GroupModeBy:
 		indices = make([]int, 0, len(t.keys))
 		for _, label := range t.keys {
+			/*
 			if execute.ColIdx(label, tbl.Cols()) < 0 {
 				// Skip past this label since it doesn't exist in the table.
 				continue
 			}
+			 */
 
 			// If this column is in the table but not part of the group key,
 			// return false since this table cannot be easily categorized.
