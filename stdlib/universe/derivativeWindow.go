@@ -1,6 +1,7 @@
 package universe
 
 import (
+	"log"
 	"time"
 
 	"github.com/apache/arrow/go/arrow/array"
@@ -260,32 +261,26 @@ func (t *derivativeWindowWindowTransformation) Process(id execute.DatasetID, tbl
 			return errors.New(codes.FailedPrecondition, "derivativeWindow found null time in time column")
 		}
 		var index []int
-		var last int
+		last := -1
 		var lastTs int64
 		var bns execute.Bounds
 		for i, tt := range ts.Int64Values() {
-			lastTs = tt
 			if tt < lastTs {
 				errors.New(codes.FailedPrecondition, "derivativeWindow found disorder timestamp")
 			}
 			ttt := execute.Time(tt)
 			if bns.IsEmpty() {
 				bns = t.window.GetEarliestBounds(ttt)
-				last = i
-				continue
+			} else if !bns.Contains(ttt) {
+				index = append(index, last)
+				for ; !bns.Contains(ttt); bns = bns.Shift(t.window.Every) {
+				}
 			}
-			if bns.Contains(ttt) {
-				last = i
-				continue
-			}
-			index = append(index, last)
+			log.Println(ttt.String(),bns.String())
 			last = i
-			for ; !bns.Contains(ttt); bns = bns.Shift(t.window.Every) {
-			}
+			lastTs = tt
 		}
-		if len(index) < 3 {
-			return nil
-		}
+		index = append(index, last)
 		for j, d := range doDerivative {
 			d.index = index
 			vs := table.Values(cr, j)
@@ -360,17 +355,17 @@ func (d *derivativeWindow) Do(ts *array.Int64, vs array.Interface, b execute.Tab
 
 func (d *derivativeWindow) doInts(ts, vs *array.Int64, b execute.TableBuilder, j int) error {
 
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -440,17 +435,17 @@ func (d *derivativeWindow) doInts(ts, vs *array.Int64, b execute.TableBuilder, j
 }
 
 func (d *derivativeWindow) doUints(ts *array.Int64, vs *array.Uint64, b execute.TableBuilder, j int) error {
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -526,30 +521,19 @@ func (d *derivativeWindow) doUints(ts *array.Int64, vs *array.Uint64, b execute.
 	}
 	return nil
 }
-func (d *derivativeWindow) skipped(t execute.Time) bool {
-	if d.bns.IsEmpty() {
-		d.bns = d.window.GetEarliestBounds(t)
-		return false
-	}
-	if d.bns.Contains(t) {
-		return true
-	}
-	for ; !d.bns.Contains(t); d.bns = d.bns.Shift(d.window.Every) {
-	}
-	return false
-}
+
 func (d *derivativeWindow) doFloats(ts *array.Int64, vs *array.Float64, b execute.TableBuilder, j int) error {
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -619,17 +603,17 @@ func (d *derivativeWindow) doFloats(ts *array.Int64, vs *array.Float64, b execut
 }
 
 func (d *derivativeWindow) doStrings(ts *array.Int64, vs *array.Binary, b execute.TableBuilder, j int) error {
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -656,17 +640,17 @@ func (d *derivativeWindow) doStrings(ts *array.Int64, vs *array.Binary, b execut
 }
 
 func (d *derivativeWindow) doBools(ts *array.Int64, vs *array.Boolean, b execute.TableBuilder, j int) error {
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -693,17 +677,17 @@ func (d *derivativeWindow) doBools(ts *array.Int64, vs *array.Boolean, b execute
 }
 
 func (d *derivativeWindow) doTimes(ts, vs *array.Int64, b execute.TableBuilder, j int) error {
-	i := d.index[0]
+	index:=d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
+		i := index[0]
 		d.t = ts.Value(i)
 		if vs.IsValid(i) {
 			d.v = vs.Value(i)
 		}
 		d.initialized = true
-		i++
+		index = index[1:]
 	}
-	index := d.index[1:]
 
 	// Process the rest of the rows.
 	for _, i := range index {
@@ -712,9 +696,6 @@ func (d *derivativeWindow) doTimes(ts, vs *array.Int64, b execute.TableBuilder, 
 			return errors.New(codes.FailedPrecondition, derivativeWindowUnsortedTimeErr)
 		} else if t == d.t {
 			// If time did not increase with this row, ignore it.
-			continue
-		}
-		if d.skipped(execute.Time(t)) {
 			continue
 		}
 		if vs.IsNull(i) {
