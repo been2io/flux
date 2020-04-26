@@ -1,7 +1,6 @@
 package universe
 
 import (
-	"log"
 	"time"
 
 	"github.com/apache/arrow/go/arrow/array"
@@ -184,6 +183,26 @@ func createDerivativeWindowTransformation(id execute.DatasetID, mode execute.Acc
 	return t, d, nil
 }
 
+type Last struct {
+	last       int
+	lastTs     int64
+	lastBounds execute.Bounds
+	window     execute.Window
+}
+
+func (l *Last) shifted(tt int64) bool {
+	ttt := execute.Time(tt)
+	if l.lastBounds.IsEmpty() {
+		l.lastBounds = l.window.GetEarliestBounds(ttt)
+	} else if !l.lastBounds.Contains(ttt) {
+		for ; !l.lastBounds.Contains(ttt); l.lastBounds = l.lastBounds.Shift(l.window.Every) {
+		}
+		return true
+	}
+	l.lastTs = tt
+	return false
+}
+
 type derivativeWindowWindowTransformation struct {
 	d     execute.Dataset
 	cache execute.TableBuilderCache
@@ -193,6 +212,7 @@ type derivativeWindowWindowTransformation struct {
 	columns     []string
 	timeCol     string
 	window      execute.Window
+	last        Last
 }
 
 func NewDerivativeWindowTransformation(d execute.Dataset, cache execute.TableBuilderCache, spec *DerivativeWindowProcedureSpec) *derivativeWindowWindowTransformation {
@@ -251,6 +271,8 @@ func (t *derivativeWindowWindowTransformation) Process(id execute.DatasetID, tbl
 			return err
 		}
 	}
+	var lastTs int64
+	var bns execute.Bounds
 	return tbl.Do(func(cr flux.ColReader) error {
 		if cr.Len() == 0 {
 			return nil
@@ -261,26 +283,27 @@ func (t *derivativeWindowWindowTransformation) Process(id execute.DatasetID, tbl
 			return errors.New(codes.FailedPrecondition, "derivativeWindow found null time in time column")
 		}
 		var index []int
-		last := -1
-		var lastTs int64
-		var bns execute.Bounds
-		for i, tt := range ts.Int64Values() {
+
+		for i := 0; i < ts.Len(); i++ {
+			if ts.IsNull(i) {
+				continue
+			}
+			tt := ts.Value(i)
 			if tt < lastTs {
 				errors.New(codes.FailedPrecondition, "derivativeWindow found disorder timestamp")
 			}
+
 			ttt := execute.Time(tt)
 			if bns.IsEmpty() {
 				bns = t.window.GetEarliestBounds(ttt)
+				index = append(index, i)
 			} else if !bns.Contains(ttt) {
-				index = append(index, last)
+				index = append(index, i)
 				for ; !bns.Contains(ttt); bns = bns.Shift(t.window.Every) {
 				}
 			}
-			log.Println(ttt.String(),bns.String())
-			last = i
 			lastTs = tt
 		}
-		index = append(index, last)
 		for j, d := range doDerivative {
 			d.index = index
 			vs := table.Values(cr, j)
@@ -316,6 +339,7 @@ type derivativeWindow struct {
 	index       []int
 	window      execute.Window
 	bns         execute.Bounds
+	last        Last
 }
 
 // Type will return the type for this column given the input type.
@@ -355,7 +379,7 @@ func (d *derivativeWindow) Do(ts *array.Int64, vs array.Interface, b execute.Tab
 
 func (d *derivativeWindow) doInts(ts, vs *array.Int64, b execute.TableBuilder, j int) error {
 
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -435,7 +459,7 @@ func (d *derivativeWindow) doInts(ts, vs *array.Int64, b execute.TableBuilder, j
 }
 
 func (d *derivativeWindow) doUints(ts *array.Int64, vs *array.Uint64, b execute.TableBuilder, j int) error {
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -523,7 +547,7 @@ func (d *derivativeWindow) doUints(ts *array.Int64, vs *array.Uint64, b execute.
 }
 
 func (d *derivativeWindow) doFloats(ts *array.Int64, vs *array.Float64, b execute.TableBuilder, j int) error {
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -603,7 +627,7 @@ func (d *derivativeWindow) doFloats(ts *array.Int64, vs *array.Float64, b execut
 }
 
 func (d *derivativeWindow) doStrings(ts *array.Int64, vs *array.Binary, b execute.TableBuilder, j int) error {
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -640,7 +664,7 @@ func (d *derivativeWindow) doStrings(ts *array.Int64, vs *array.Binary, b execut
 }
 
 func (d *derivativeWindow) doBools(ts *array.Int64, vs *array.Boolean, b execute.TableBuilder, j int) error {
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -677,7 +701,7 @@ func (d *derivativeWindow) doBools(ts *array.Int64, vs *array.Boolean, b execute
 }
 
 func (d *derivativeWindow) doTimes(ts, vs *array.Int64, b execute.TableBuilder, j int) error {
-	index:=d.index
+	index := d.index
 	// Initialize by reading the first value.
 	if !d.initialized {
 		i := index[0]
@@ -703,7 +727,7 @@ func (d *derivativeWindow) doTimes(ts, vs *array.Int64, b execute.TableBuilder, 
 				return err
 			}
 		} else {
-			if err := b.AppendTime(j, execute.Time(vs.Value(i))); err != nil {
+			if err := b.AppendTime(j, execute.Time(d.t)); err != nil {
 				return err
 			}
 		}
