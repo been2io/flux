@@ -334,3 +334,9 @@ rate = (columns,every,timeSrc="_start",timeDst="_time",tables=<-) =>
         |> stage()
         |> sum()
         |> window(every:inf, timeColumn:timeDst)
+
+percentile = (percentile,method="estimate_tdigest", compression=0.0, column="_value",tables=<-) =>
+    tables
+        |> quantile(q: percentile,method:method,compression:compression,column:column)
+        |> stage()
+        |> quantile(q: percentile,method:method,compression:compression,column:column)
