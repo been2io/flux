@@ -120,11 +120,13 @@ aggregateWindow = (every, fn, column="_value", timeSrc="_stop",timeDst="_time", 
 // AggregateWindow applies an aggregate function to fixed windows of time.
 // The procedure is to window the data, perform an aggregate operation,
 // and then undo the windowing to produce an output table for every input table.
-agg = (every, fn, column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
+agg = (every, fn, groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
     tables
+        |>group(columns:groupBy)
         |> window(every:every, createEmpty: createEmpty)
         |> fn(column:column)
-        |> duplicate(column:timeSrc,as:timeDst)
+        |> stage()
+        |> fn(column:column)
         |> window(every:inf, timeColumn:timeDst)
 
 // Increase returns the total non-negative difference between values in a table.
