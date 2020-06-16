@@ -1,5 +1,3 @@
-// +build libflux
-
 package libflux_test
 
 import (
@@ -26,6 +24,9 @@ func BenchmarkRustParse(b *testing.B) {
 			_ = f.Close()
 		}()
 		bs, err := ioutil.ReadAll(f)
+		if err != nil {
+			b.Fatal(err)
+		}
 		fluxFile = string(bs)
 	}()
 
@@ -44,6 +45,10 @@ func BenchmarkRustParse(b *testing.B) {
 		{
 			name: "rust parse and deserialize JSON",
 			fn:   ParseAndDeserializeJSON,
+		},
+		{
+			name: "rust parse and return flatbuffer",
+			fn:   ParseAndReturnFB,
 		},
 		{
 			name: "rust parse and deserialize flatbuffer",
@@ -69,13 +74,13 @@ func BenchmarkRustParse(b *testing.B) {
 }
 
 func ParseReturnHandle(fluxFile string) error {
-	 p := libflux.Parse(fluxFile)
-	 p.Free()
+	p := libflux.ParseString(fluxFile)
+	p.Free()
 	return nil
 }
 
 func ParseReturnJSON(fluxFile string) error {
-	p := libflux.Parse(fluxFile)
+	p := libflux.ParseString(fluxFile)
 	defer p.Free()
 	if _, err := p.MarshalJSON(); err != nil {
 		return err
@@ -84,7 +89,7 @@ func ParseReturnJSON(fluxFile string) error {
 }
 
 func ParseAndDeserializeJSON(fluxFile string) error {
-	p := libflux.Parse(fluxFile)
+	p := libflux.ParseString(fluxFile)
 	defer p.Free()
 	bs, err := p.MarshalJSON()
 	if err != nil {
@@ -92,18 +97,36 @@ func ParseAndDeserializeJSON(fluxFile string) error {
 	}
 	var bb = bytes.NewBuffer(bs)
 	d := json.NewDecoder(bb)
-	pkg := &ast.File{}
+	pkg := &ast.Package{}
 	if err := d.Decode(pkg); err != nil {
 		return err
 	}
 	return nil
 }
 
-func ParseAndDeserializeFB(fluxFile string) error {
-	_ = libflux.ParseIntoFbs(fluxFile)
+func ParseAndReturnFB(fluxFile string) error {
+	p := libflux.ParseString(fluxFile)
+	defer p.Free()
+	if _, err := p.MarshalFB(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
+func ParseAndDeserializeFB(fluxFile string) error {
+	p := libflux.ParseString(fluxFile)
+	defer p.Free()
+	bs, err := p.MarshalFB()
+	if err != nil {
+		return err
+	}
+	if _ = ast.DeserializeFromFlatBuffer(bs); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func GoParse(fluxFile string) error {
 	f := token.NewFile("", len(fluxFile))

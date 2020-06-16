@@ -13,10 +13,11 @@ import (
 	"github.com/influxdata/flux/codes"
 	"github.com/influxdata/flux/execute"
 	"github.com/influxdata/flux/internal/errors"
-	"github.com/influxdata/flux/internal/execute/tableutil"
+	"github.com/influxdata/flux/internal/execute/table"
 	"github.com/influxdata/flux/interpreter"
 	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
+	"github.com/influxdata/flux/runtime"
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/flux/values"
 )
@@ -36,16 +37,9 @@ type PivotOpSpec struct {
 }
 
 func init() {
-	pivotSignature := flux.FunctionSignature(
-		map[string]semantic.PolyType{
-			"rowKey":      semantic.NewArrayPolyType(semantic.String),
-			"columnKey":   semantic.NewArrayPolyType(semantic.String),
-			"valueColumn": semantic.String,
-		},
-		[]string{"rowKey", "columnKey", "valueColumn"},
-	)
+	pivotSignature := runtime.MustLookupBuiltinType("universe", "pivot")
 
-	flux.RegisterPackageValue("universe", PivotKind, flux.FunctionValue(PivotKind, createPivotOpSpec, pivotSignature))
+	runtime.RegisterPackageValue("universe", PivotKind, flux.MustValue(flux.FunctionValue(PivotKind, createPivotOpSpec, pivotSignature)))
 	flux.RegisterOpSpec(PivotKind, newPivotOp)
 
 	plan.RegisterProcedureSpec(PivotKind, newPivotProcedure, PivotKind)
@@ -435,6 +429,9 @@ type pivotTransformation2 struct {
 	alloc  *memory.Allocator
 	spec   PivotProcedureSpec
 	groups *execute.GroupLookup
+
+	watermark  execute.Time
+	processing execute.Time
 }
 
 func newPivotTransformation2(ctx context.Context, spec PivotProcedureSpec, id execute.DatasetID, alloc *memory.Allocator) (execute.Transformation, execute.Dataset, error) {
@@ -508,7 +505,7 @@ func (t *pivotTransformation2) Process(id execute.DatasetID, tbl flux.Table) err
 		}
 
 		// The key must be a string.
-		if key.Type() != semantic.String {
+		if key.Type().Nature() != semantic.String {
 			return errors.New(codes.FailedPrecondition, "column key must be of type string")
 		}
 		label := key.Str()
@@ -609,14 +606,21 @@ func (t *pivotTransformation2) getColumn(cr flux.ColReader, j int) array.Interfa
 }
 
 func (t *pivotTransformation2) UpdateWatermark(id execute.DatasetID, mark execute.Time) error {
-	return t.d.UpdateWatermark(mark)
+	t.watermark = mark
+	return nil
 }
 
 func (t *pivotTransformation2) UpdateProcessingTime(id execute.DatasetID, mark execute.Time) error {
-	return t.d.UpdateProcessingTime(mark)
+	t.processing = mark
+	return nil
 }
 
 func (t *pivotTransformation2) Finish(id execute.DatasetID, err error) {
+	// Inform the downstream dataset that we are finished.
+	// Wrap this in a function so that we do not capture the err variable.
+	// https://play.golang.org/p/QXns3c8s76f
+	defer func() { t.d.Finish(err) }()
+
 	t.groups.Range(func(key flux.GroupKey, value interface{}) {
 		if err != nil {
 			return
@@ -628,12 +632,18 @@ func (t *pivotTransformation2) Finish(id execute.DatasetID, err error) {
 		if err != nil {
 			return
 		}
-		err = t.d.Process(tbl)
+		if err = t.d.Process(tbl); err != nil {
+			return
+		}
 	})
 	t.groups.Clear()
 
-	// Inform the downstream dataset that we are finished.
-	t.d.Finish(err)
+	if err = t.d.UpdateWatermark(t.watermark); err != nil {
+		return
+	}
+	if err = t.d.UpdateProcessingTime(t.processing); err != nil {
+		return
+	}
 }
 
 type pivotTableBuffer struct {
@@ -705,5 +715,5 @@ func (gr *pivotTableGroup) doPivot(key flux.GroupKey, mem arrowmemory.Allocator)
 	if err := tb.Validate(); err != nil {
 		return nil, err
 	}
-	return tableutil.FromBuffer(tb), nil
+	return table.FromBuffer(tb), nil
 }

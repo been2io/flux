@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"context"
 	"sort"
 )
 
@@ -20,8 +21,10 @@ func newHeuristicPlanner() *heuristicPlanner {
 
 func (p *heuristicPlanner) addRules(rules ...Rule) {
 	for _, rule := range rules {
-		ruleSlice := p.rules[rule.Pattern().Root()]
-		p.rules[rule.Pattern().Root()] = append(ruleSlice, rule)
+		for _, root := range rule.Pattern().Roots() {
+			ruleSlice := p.rules[root]
+			p.rules[root] = append(ruleSlice, rule)
+		}
 	}
 }
 
@@ -37,7 +40,7 @@ func (p *heuristicPlanner) clearRules() {
 
 // matchRules applies any applicable rules to the given plan node,
 // and returns the rewritten plan node and whether or not any rewriting was done.
-func (p *heuristicPlanner) matchRules(node Node) (Node, bool, error) {
+func (p *heuristicPlanner) matchRules(ctx context.Context, node Node) (Node, bool, error) {
 	anyChanged := false
 
 	for _, rule := range p.rules[AnyKind] {
@@ -45,7 +48,7 @@ func (p *heuristicPlanner) matchRules(node Node) (Node, bool, error) {
 			continue
 		}
 		if rule.Pattern().Match(node) {
-			newNode, changed, err := rule.Rewrite(node)
+			newNode, changed, err := rule.Rewrite(ctx, node)
 			if err != nil {
 				return nil, false, err
 			}
@@ -59,7 +62,7 @@ func (p *heuristicPlanner) matchRules(node Node) (Node, bool, error) {
 			continue
 		}
 		if rule.Pattern().Match(node) {
-			newNode, changed, err := rule.Rewrite(node)
+			newNode, changed, err := rule.Rewrite(ctx, node)
 			if err != nil {
 				return nil, false, err
 			}
@@ -77,7 +80,7 @@ func (p *heuristicPlanner) matchRules(node Node) (Node, bool, error) {
 //
 // Plan may change its argument and/or return a new instance of Spec, so the correct way to call Plan is:
 //     plan, err = plan.Plan(plan)
-func (p *heuristicPlanner) Plan(inputPlan *Spec) (*Spec, error) {
+func (p *heuristicPlanner) Plan(ctx context.Context, inputPlan *Spec) (*Spec, error) {
 	for anyChanged := true; anyChanged; {
 		visited := make(map[Node]struct{})
 
@@ -100,7 +103,7 @@ func (p *heuristicPlanner) Plan(inputPlan *Spec) (*Spec, error) {
 			_, alreadyVisited := visited[node]
 
 			if !alreadyVisited {
-				newNode, changed, err := p.matchRules(node)
+				newNode, changed, err := p.matchRules(ctx, node)
 				if err != nil {
 					return nil, err
 				}
