@@ -285,13 +285,18 @@ func (t *mergeJoinTransformation) Process(id execute.DatasetID, tbl flux.Table) 
 	// If a table is missing any of the "on" columns, then it won't be part of the output:
 	//   - A missing column is treated as a null value
 	//   - Null values are not considered as equal to each other in joins
-	numOnCols := 0
+	m := make(map[string]bool, len(t.cache.on))
 	for _, c := range tbl.Cols() {
 		if t.cache.on[c.Label] {
-			numOnCols++
+			m[c.Label] = true
 		}
 	}
-	if numOnCols < len(t.cache.on) {
+	for _, c := range tbl.Key().Cols() {
+		if t.cache.on[c.Label] {
+			m[c.Label] = true
+		}
+	}
+	if len(m) < len(t.cache.on) {
 		// Discard this table
 		tbl.Done()
 		return nil
@@ -954,8 +959,10 @@ func (c *MergeJoinCache) postJoinGroupKey(keys map[execute.DatasetID]flux.GroupK
 				col:   column.Label,
 			}
 
-			colMeta := c.schemaMap[tableAndColumn]
-
+			colMeta, ok := c.schemaMap[tableAndColumn]
+			if !ok && c.on[column.Label] {
+				colMeta = column
+			}
 			if !added[colMeta.Label] {
 				key.cols = append(key.cols, colMeta)
 				key.vals = append(key.vals, groupKey.Value(j))
