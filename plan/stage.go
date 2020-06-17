@@ -133,9 +133,6 @@ func (sp StagePlanner) setup(spec *flux.Spec) (*flux.Spec, error) {
 		if o.Spec.Kind() == StageKind {
 			stages = append(stages, o)
 		}
-		if sp.timeRange == nil && o.Spec.Kind() == "range" {
-			sp.timeRange = o
-		}
 		return nil
 	})
 	parents, children, _, err := spec.DetermineParentsChildrenAndRoots()
@@ -159,6 +156,9 @@ func (sp StagePlanner) setup(spec *flux.Spec) (*flux.Spec, error) {
 			return nil, err
 		}
 		err := stageSpec.Spec.Walk(func(o *flux.Operation) error {
+			if o.Spec.Kind() == "range" {
+				sp.timeRange = o
+			}
 			return spec.RemoveOperation(o)
 		})
 		if err != nil {
