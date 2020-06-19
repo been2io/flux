@@ -122,11 +122,44 @@ aggregateWindow = (every, fn, column="_value", timeSrc="_stop",timeDst="_time", 
 // and then undo the windowing to produce an output table for every input table.
 agg = (every, fn, groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
     tables
-        |>group(columns:groupBy)
+        |> group(columns:groupBy)
         |> window(every:every, createEmpty: createEmpty)
         |> fn(column:column)
         |> stage()
         |> fn(column:column)
+        |> window(every:inf, timeColumn:timeDst)
+
+meanAgg = (every,groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
+    tables
+        |> group(columns:groupBy)
+        |> window(every:every, createEmpty: createEmpty)
+        |> reduce(
+                fn: (r, accumulator) => ({
+                  sum: float(v: r._value) + accumulator.sum,
+                  count: accumulator.count + 1.0
+                }),
+                identity: {sum: 0.0, count: 0.0}
+            )
+        |>stage()
+        |> reduce(
+                fn: (r, accumulator) => ({
+                  sum: r.sum + accumulator.sum,
+                  count: accumulator.count + r.count,
+                  _value: accumulator.sum / accumulator.count
+                }),
+                identity: {sum: 0.0, count: 0.0,_value:0.0}
+        )
+
+sumAgg = (every,groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
+    tables
+        |> agg(every:every,fn:sum,groupBy:groupBy)
+countAgg = (every, groupBy=[""],column="_value", timeDst="_time",createEmpty=true, tables=<-) =>
+    tables
+        |> group(columns:groupBy)
+        |> window(every:every, createEmpty: createEmpty)
+        |> count(column:column)
+        |> stage()
+        |> sum(column:column)
         |> window(every:inf, timeColumn:timeDst)
 
 // Increase returns the total non-negative difference between values in a table.

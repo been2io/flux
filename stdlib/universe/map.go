@@ -209,8 +209,7 @@ func (t *mapTransformation) Process(id execute.DatasetID, tbl flux.Table) error 
 				}
 			}
 
-			key := groupKeyForObject(i, cr, m, on)
-			builder, created := t.cache.TableBuilder(key)
+			builder, created := t.cache.TableBuilder(tbl.Key())
 			if created {
 				if t.mergeKey {
 					if err := execute.AddTableKeyCols(tbl.Key(), builder); err != nil {
