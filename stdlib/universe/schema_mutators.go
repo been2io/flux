@@ -274,7 +274,7 @@ func (m *DropKeepMutator) Mutate(ctx context.Context, bctx *BuilderContext) erro
 	}
 
 	bctx.TableColumns = newCols
-	bctx.TableKey = execute.NewGroupKey(keyCols, keyValues)
+	//bctx.TableKey = execute.NewGroupKey(keyCols, keyValues)
 	bctx.ColIdxMap = newColMap
 
 	return nil
