@@ -129,13 +129,13 @@ agg = (every, fn, groupBy=[""],column="_value", timeSrc="_start",timeDst="_time"
         |> fn(column:column)
         |> window(every:inf, timeColumn:timeDst)
 
-meanAgg = (every,groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
+meanAgg = (every,groupBy=[""],column="_value", timeDst="_time", createEmpty=true, tables=<-) =>
     tables
         |> group(columns:groupBy)
         |> window(every:every, createEmpty: createEmpty)
         |> reduce(
                 fn: (r, accumulator) => ({
-                  sum: float(v: r._value) + accumulator.sum,
+                  sum: r._value + accumulator.sum,
                   count: accumulator.count + 1.0
                 }),
                 identity: {sum: 0.0, count: 0.0}
@@ -143,12 +143,15 @@ meanAgg = (every,groupBy=[""],column="_value", timeSrc="_start",timeDst="_time",
         |>stage()
         |> reduce(
                 fn: (r, accumulator) => ({
-                  sum: r.sum + accumulator.sum,
+                  sum: float(v: r.sum) + accumulator.sum,
                   count: accumulator.count + r.count,
-                  _value: accumulator.sum / accumulator.count
+                  _value: if (accumulator.count + r.count)> 0 then (r.sum + accumulator.sum) / (accumulator.count + r.count)
+                  else 0.0
                 }),
                 identity: {sum: 0.0, count: 0.0,_value:0.0}
         )
+        |> drop(columns: ["sum", "count"])
+        |> window(every:inf, timeColumn:timeDst)
 
 sumAgg = (every,groupBy=[""],column="_value", timeSrc="_start",timeDst="_time", createEmpty=true, tables=<-) =>
     tables

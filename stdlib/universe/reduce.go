@@ -19,7 +19,7 @@ const ReduceKind = "reduce"
 
 type ReduceOpSpec struct {
 	Fn          interpreter.ResolvedFunction `json:"fn"`
-	ReducerType semantic.Type                `json:"reducer_type"`
+	ReducerType map[string]semantic.Nature   `json:"reducer_type"`
 	Identity    map[string]string            `json:"identity"`
 }
 
@@ -65,7 +65,11 @@ func createReduceOpSpec(args flux.Arguments, a *flux.Administration) (flux.Opera
 	if o, err := args.GetRequiredObject("identity"); err != nil {
 		return nil, err
 	} else {
-		spec.ReducerType = o.Type()
+		m := map[string]semantic.Nature{}
+		for k, v := range o.Type().Properties() {
+			m[k] = v.Nature()
+		}
+		spec.ReducerType = m
 		spec.Identity = make(map[string]string, o.Len())
 		var haderr error
 		o.Range(func(name string, v values.Value) {
@@ -104,10 +108,13 @@ func newReduceProcedure(qs flux.OperationSpec, pa plan.Administration) (plan.Pro
 	if !ok {
 		return nil, errors.Newf(codes.Internal, "invalid spec type %T", qs)
 	}
-
+	m := map[string]semantic.Type{}
+	for k, v := range spec.ReducerType {
+		m[k] = v
+	}
 	return &ReduceProcedureSpec{
 		Fn:          spec.Fn,
-		ReducerType: spec.ReducerType,
+		ReducerType: semantic.NewObjectType(m),
 		Identity:    spec.Identity,
 	}, nil
 }
@@ -130,6 +137,9 @@ func createReduceTransformation(id execute.DatasetID, mode execute.AccumulationM
 	s, ok := spec.(*ReduceProcedureSpec)
 	if !ok {
 		return nil, nil, errors.Newf(codes.Internal, "invalid spec type %T", spec)
+	}
+	if s.Fn.Scope == nil {
+		s.Fn.Scope=flux.Prelude()
 	}
 	cache := execute.NewTableBuilderCache(a.Allocator())
 	d := execute.NewDataset(id, mode, cache)
@@ -229,7 +239,7 @@ func (t *reduceTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 	builder, created := t.cache.TableBuilder(tblKey)
 	if created {
 		// add the key columns to the table.
-		if err := execute.AddTableKeyCols(tblKey, builder); err != nil {
+		if err := execute.AddTableKeyTimeCols(nil, builder); err != nil {
 			return err
 		}
 
@@ -245,16 +255,13 @@ func (t *reduceTransformation) Process(id execute.DatasetID, tbl flux.Table) err
 				return err
 			}
 		}
-
+		if err := execute.AppendKeyTimeValues(tblKey, builder); err != nil {
+			return err
+		}
 		for j, c := range builder.Cols() {
 			v, ok := reducer.Get(c.Label)
 			if !ok {
-				if idx := execute.ColIdx(c.Label, tbl.Key().Cols()); idx >= 0 {
-					v = tbl.Key().Value(idx)
-				} else {
-					// This should be unreachable
-					return errors.Newf(codes.Internal, "could not find value for column %q", c.Label)
-				}
+				continue
 			}
 			if err := builder.AppendValue(j, v); err != nil {
 				return err
