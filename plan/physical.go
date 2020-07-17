@@ -55,6 +55,7 @@ func (pp *physicalPlanner) Plan(spec *Spec) (*Spec, error) {
 		return nil, err
 	}
 
+
 	// Ensure that the plan is valid
 	if !pp.disableValidation {
 		err := transformedSpec.CheckIntegrity()

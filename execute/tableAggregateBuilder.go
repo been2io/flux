@@ -181,7 +181,7 @@ func (t *aggregateTableBuilder) AppendValue(j int, v values.Value) error {
 	default:
 		return errors.Newf(codes.Invalid, "unsupported aggregate type %v", v.Type())
 	}
-	if vs.Len() == 16 {
+	if vs.Len() == 8 {
 		t.compute()
 	}
 	return nil
