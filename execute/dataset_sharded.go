@@ -9,16 +9,22 @@ type ConcurrentDataset struct {
 	id  DatasetID
 	ts  TransformationSet
 	idx int
+	cap int
 }
 
-func NewConcurrentDataset(id DatasetID) *ConcurrentDataset {
-	return &ConcurrentDataset{id: id}
+func NewConcurrentDataset(id DatasetID,capacity int) *ConcurrentDataset {
+	return &ConcurrentDataset{id: id,cap:capacity}
 }
 
 func (d *ConcurrentDataset) AddTransformation(t Transformation) {
 	d.ts = append(d.ts, t)
 }
-
+func (d *ConcurrentDataset)Cap()int  {
+	return d.cap
+}
+func (d *ConcurrentDataset) Size() int  {
+	return len(d.ts)
+}
 func (d *ConcurrentDataset) Process(tbl flux.Table) error {
 	i := d.idx % len(d.ts)
 	d.idx++

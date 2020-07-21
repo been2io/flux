@@ -2,19 +2,16 @@ package execute
 
 import (
 	"context"
+	"fmt"
 	"github.com/influxdata/flux"
-	"github.com/influxdata/flux/memory"
 	"github.com/influxdata/flux/plan"
 	uuid "github.com/satori/go.uuid"
-	"go.uber.org/zap"
 )
 
 const StageTransformerKind = "stageTransformer"
 
-
-
 type stageTransformerPhysicSpec struct {
-	pl *plan.Spec
+	n plan.Node
 }
 
 func (s stageTransformerPhysicSpec) RetractTable(key flux.GroupKey) error {
@@ -50,80 +47,89 @@ func (s stageTransformerPhysicSpec) Cost(inStats []plan.Statistics) (cost plan.C
 }
 
 type stageTransformer struct {
-	spec      stageTransformerPhysicSpec
-	successor TransformationSet
-	ds        dataset
+	node      plan.Node
+	successor *PassthroughDataset
+	ds        *ConcurrentDataset
 	es        *executionState
-	dg        DatasetGroup
 }
 
-func (s *stageTransformer) createExecutionState() error {
-	es := &executionState{
-		p:         s.spec.pl,
-		alloc:     &memory.Allocator{},
-		resources: flux.ResourceManagement{},
-		results:   make(map[string]flux.Result),
-		// TODO(nathanielc): Have the planner specify the dispatcher throughput
-		dispatcher: newPoolDispatcher(10, zap.NewNop()),
+func createStageTransformer(id DatasetID, es *executionState, node plan.Node, concurrency int) (Transformation, Dataset, error) {
+	succ := NewPassthroughDataset(id)
+	ds := NewConcurrentDataset(id, concurrency)
+	t := &stageTransformer{
+		node:      node,
+		successor: succ,
+		ds:        ds,
+		es:        es,
 	}
-	v := &createExecutionNodeVisitor{
-		ctx:   context.Background(),
-		es:    es,
-		nodes: make(map[plan.Node]Node),
+	return t, succ, nil
+}
+func (s *stageTransformer) createExecutionState(ctx context.Context, pred Dataset, key string) error {
+	node := s.node
+	ppn, ok := node.(*plan.PhysicalPlanNode)
+	if !ok {
+		return fmt.Errorf("cannot execute plan node of type %T", node)
 	}
+	spec := node.ProcedureSpec()
+	kind := spec.Kind()
+	id := DatasetIDFromNodeID(node.ID())
+	newId := uuid.NewV5(uuid.UUID(id), key)
 
-	if err := s.spec.pl.BottomUpWalk(v.Visit); err != nil {
+	createTransformationFn, ok := procedureToTransformation[kind]
+	if !ok {
+		return fmt.Errorf("unsupported procedure %v", kind)
+	}
+	var streamContext streamContext
+	if node.Bounds() != nil {
+		streamContext.bounds = &Bounds{
+			Start: node.Bounds().Start,
+			Stop:  node.Bounds().Stop,
+		}
+	}
+	ec := executionContext{
+		ctx:           ctx,
+		es:            s.es,
+		parents:       make([]DatasetID, len(node.Predecessors())),
+		streamContext: streamContext,
+	}
+	tr, ds, err := createTransformationFn(DatasetID(newId), DiscardingMode, spec, ec)
+	if err != nil {
 		return err
 	}
+	if ppn.TriggerSpec == nil {
+		ppn.TriggerSpec = plan.DefaultTriggerSpec
+	}
+	ds.SetTriggerSpec(ppn.TriggerSpec)
+	transport := newConsecutiveTransport(s.es.dispatcher, tr)
+	pred.AddTransformation(transport)
+	for _, t := range s.successor.ts {
+		ds.AddTransformation(t)
+	}
+
 	return nil
 }
 func (s stageTransformer) RetractTable(id DatasetID, key flux.GroupKey) error {
 	panic("implement me")
 }
 
-func (s stageTransformer) Process(id DatasetID, tbl flux.Table) error {
-	newId := uuid.NewV5(uuid.UUID(id), tbl.Key().String())
-	ds := NewPassthroughDataset(DatasetID(newId))
-	for _, source := range s.es.sources {
-		tr := source.(Transformation)
-		t := newConsecutiveTransport(s.es.dispatcher, tr)
-		ds.AddTransformation(t)
-	}
-	s.dg.Add(id, ds)
-	return ds.Process(tbl)
-}
-
-func (s stageTransformer) UpdateWatermark(id DatasetID, t Time) error {
-	return s.dg.Foreach(id, func(d Dataset) error {
-		return d.UpdateWatermark(t)
-	})
-}
-
-func (s stageTransformer) UpdateProcessingTime(id DatasetID, t Time) error {
-	return s.dg.Foreach(id, func(d Dataset) error {
-		return d.UpdateProcessingTime(t)
-	})
-}
-
-func (s stageTransformer) Finish(id DatasetID, err error) {
-	s.dg.Foreach(id, func(d Dataset) error {
-		d.Finish(err)
-		return nil
-	})
-}
-
-type DatasetGroup struct {
-	ds map[DatasetID][]Dataset
-}
-
-func (dg *DatasetGroup) Add(id DatasetID, d Dataset) {
-	dg.ds[id] = append(dg.ds[id], d)
-}
-func (dg *DatasetGroup) Foreach(id DatasetID, f func(d Dataset) error) error {
-	for _, d := range dg.ds[id] {
-		if err := f(d); err != nil {
+func (s *stageTransformer) Process(id DatasetID, tbl flux.Table) error {
+	if s.ds.Size() < s.ds.Cap() {
+		err := s.createExecutionState(context.Background(), s.ds, tbl.Key().String())
+		if err != nil {
 			return err
 		}
 	}
-	return nil
+	return s.ds.Process(tbl)
+}
+
+func (s stageTransformer) UpdateWatermark(id DatasetID, t Time) error {
+	return s.ds.UpdateWatermark(t)
+}
+
+func (s stageTransformer) UpdateProcessingTime(id DatasetID, t Time) error {
+	return s.ds.UpdateProcessingTime(t)
+}
+
+func (s stageTransformer) Finish(id DatasetID, err error) {
+	s.ds.Finish(err)
 }
