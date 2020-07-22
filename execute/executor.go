@@ -17,6 +17,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+var EnableConcurrentTransfomer = true
+
 type Executor interface {
 	// Execute will begin execution of the plan.Spec using the memory allocator.
 	// This returns a mapping of names to the query results.
@@ -198,26 +200,35 @@ func (v *createExecutionNodeVisitor) Visit(node plan.Node) error {
 		v.es.sources = append(v.es.sources, source)
 		v.nodes[node] = source
 	} else {
+		var tr Transformation
+		var ds Dataset
+		var err error
+		//create concurrent transformer
+		if EnableConcurrentTransfomer {
+			tr, ds, err = createStageTransformer(id, v.es, node, 4)
+		}else {
+			createTransformationFn, ok := procedureToTransformation[kind]
 
+			if !ok {
+				return fmt.Errorf("unsupported procedure %v", kind)
+			}
+
+			tr, ds, err = createTransformationFn(id, DiscardingMode, spec, ec)
+
+			if err != nil {
+				return err
+			}
+
+			if ppn.TriggerSpec == nil {
+				ppn.TriggerSpec = plan.DefaultTriggerSpec
+			}
+			ds.SetTriggerSpec(ppn.TriggerSpec)
+			v.nodes[node] = ds
+		}
+		v.nodes[node] = ds
 		// If node is internal, create a transformation.
 		// For each predecessor, add a transport for sending data upstream.
-		createTransformationFn, ok := procedureToTransformation[kind]
 
-		if !ok {
-			return fmt.Errorf("unsupported procedure %v", kind)
-		}
-
-		tr, ds, err := createTransformationFn(id, DiscardingMode, spec, ec)
-
-		if err != nil {
-			return err
-		}
-
-		if ppn.TriggerSpec == nil {
-			ppn.TriggerSpec = plan.DefaultTriggerSpec
-		}
-		ds.SetTriggerSpec(ppn.TriggerSpec)
-		v.nodes[node] = ds
 
 		for _, p := range nonYieldPredecessors(node) {
 			executionNode := v.nodes[p]
