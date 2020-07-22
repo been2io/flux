@@ -8,7 +8,7 @@ import (
 )
 
 func init()  {
-	plan.RegisterLogicalRules(&WindowAggregateMergeRule{})
+	//plan.RegisterLogicalRules(&WindowAggregateMergeRule{})
 	execute.RegisterTransformation(windowAggregate,createWindowAggregateTransformation)
 }
 const windowAggregate = "windowAggregate"
